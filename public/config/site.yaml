@@ -1,0 +1,137 @@
+# 网站基本配置
+site:
+  title: "Vue Docs UI 示例项目"
+  description: "基于 Vue Docs UI 构建的文档网站示例"
+  # logo支持以下格式：
+  # 1. emoji: "🤖"
+  # 2. 图片URL: "https://example.com/logo.png"
+  # 3. 本地图片: "/images/logo.png"
+  # 4. 相对路径: "./assets/logo.svg"
+  logo:
+    light: "/images/favicon.svg"
+    dark: "/images/favicon-dark.svg"
+  author: "Vue Docs UI Team"
+  
+# 顶部导航配置
+navbar:
+  showLogo: true
+  showTitle: true
+  showLanguageSwitcher: true
+  items:
+    - title: "首页"
+      link: "/"
+      active: true
+    - title: "指南"
+      link: "/guide"
+  actions:
+    - type: "github"
+      link: "https://github.com/shenjianZ/vue-docs-ui"
+      enabled: true
+
+# 侧边栏导航配置
+sidebar:
+  enabled: true
+  collections:
+    guide:
+      sections:
+        - title: "快速开始"
+          path: "/guide"
+          children:
+            - title: "介绍"
+              path: "/guide/introduction"
+            - title: "安装"
+              path: "/guide/installation"
+            - title: "快速上手"
+              path: "/guide/quick-start"
+            - title: "配置说明"
+              path: "/guide/configuration"
+          
+
+# Theme Configuration
+theme:
+  # Default theme mode: 'light' | 'dark' | 'auto'
+  # light: Force light mode
+  # dark: Force dark mode
+  # auto: Follow system preference (default)
+  defaultMode: "auto"
+  
+  # Allow users to toggle theme (show theme toggle button)
+  allowToggle: true
+  
+
+# Table of Contents Configuration
+toc:
+  # Maximum heading level to display in TOC (1-6)
+  maxLevel: 3
+  
+  # Enable table of contents
+  enabled: true
+  
+  # TOC title
+  title: "本页目录"
+
+# Footer Configuration
+footer:
+  enabled: true
+  copyright: "© 2024 Vue Docs UI. All rights reserved."
+  repository:
+    url: "https://github.com/your_github_id/your_repo_name"
+    branch: "master"
+  lastUpdated: "2024-12-19"
+  links:
+    - title: "Documentation"
+      link: "/guide/introduction"
+    - title: "GitHub"
+      link: "https://github.com/your_github_id/your_repo_name"
+      external: true
+    - title: "License"
+      link: "/license"
+  social:
+    - name: "email"
+      url: "mailto:contact@example.com"
+      icon: "mail"
+    - name: "github"
+      url: "https://github.com/your_github_id"
+      icon: "github"
+    # - name: "youtube"
+    #   url: "https://youtube.com/@yourhandle"
+    #   icon: "youtube"
+    # - name: "twitter"
+    #   url: "https://twitter.com/yourhandle"
+    #   icon: "twitter"
+    # - name: "discord"
+    #   url: "https://discord.gg/yourinvite"
+    #   icon: "discord"
+    # - name: "telegram"
+    #   url: "https://t.me/yourhandle"
+    #   icon: "telegram"
+    # - name: "tiktok"
+    #   url: "https://tiktok.com/@yourhandle"
+    #   icon: "tiktok"
+    - name: "bilibili"
+      url: "https://space.bilibili.com/your_bilibili_id"
+      icon: "bilibili"
+    - name: "qq"
+      url: "mqqapi://card/show_pslcard?src_type=internal&version=1&uin=your_qq_id&card_type=person&source=qrcode"
+      icon: "qq"
+    - name: "wechat"
+      url: "weixin://dl/add?your_wechat_id"
+      icon: "wechat"
+    # - name: "weibo"
+    #   url: "https://weibo.com/yourhandle"
+    #   icon: "weibo"
+    # - name: "douyin"
+    #   url: "https://www.douyin.com/user/yourhandle"
+    #   icon: "douyin"
+    # - name: "zhihu"
+    #   url: "https://www.zhihu.com/people/yourhandle"
+    #   icon: "zhihu" 
+
+# PWA Configuration
+pwa:
+  enabled: true
+  name: "Vue Docs UI"
+  shortName: "VueDocsUI"
+  description: "Beautiful documentation websites made simple"
+  themeColor: "#ffffff"
+  backgroundColor: "#ffffff" 
