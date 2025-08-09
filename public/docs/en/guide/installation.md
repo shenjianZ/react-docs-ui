@@ -137,4 +137,3 @@ The built files will be in the `dist/` directory, ready to deploy to any static 
 - [Examples](/examples) - See Vue Docs UI in action 
 
 
-##### dsad

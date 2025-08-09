@@ -10,6 +10,7 @@ import App from "./App.tsx"
 // @ts-expect-error types provided via ambient declaration
 import yaml from "js-yaml"
 import "./index.css"
+import 'highlight.js/styles/github.css'
 
 async function bootstrap() {
   try {

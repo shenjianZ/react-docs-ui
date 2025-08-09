@@ -157,3 +157,21 @@
   .prose a { @apply underline decoration-muted-foreground underline-offset-4 transition-colors hover:text-foreground; }
   .prose hr { @apply my-6 border-border; }
 }
+
+/* 代码高亮与可读性增强 */
+/* 深色模式：统一代码块背景符合项目约定 */
+.dark .prose pre {
+  background: #141414;
+}
+
+/* 避免块级代码被背景色覆盖，保留高亮主题颜色 */
+.prose pre code {
+  background: transparent;
+  color: inherit;
+}
+
+/* 防止某些排版插件为代码添加引号装饰 */
+.prose pre code::before,
+.prose pre code::after {
+  content: none !important;
+}
