@@ -32,20 +32,6 @@ Welcome to my documentation! This is written in **Markdown**.
 
 ## Code Example
 
-Here's a simple Vue component:
-
-```vue
-<template>
-  <div class="hello">
-    <h1>{{ message }}</h1>
-  </div>
-</template>
-
-<script setup lang="ts">
-const message = "Hello Vue Docs UI!"
-</script>
-```
-
 ## Lists and More
 
 1. Ordered lists work great
@@ -55,9 +41,10 @@ const message = "Hello Vue Docs UI!"
 - Unordered lists too
 - With bullet points
 - And consistent spacing
+```
 
 > **Tip**: Use blockquotes for important notes and tips!
-```
+
 
 ### 2. Add to Navigation
 

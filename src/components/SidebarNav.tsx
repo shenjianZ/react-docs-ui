@@ -78,10 +78,22 @@ export function SidebarNav({ lang, sidebar }: SidebarNavProps) {
           key={section.title}
           defaultOpen={section.path ? pathname.startsWith(`/${lang}${section.path}`) : false}
         >
-          <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium text-sm hover:bg-muted">
-            {section.title}
-            <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]]:rotate-90" />
-          </CollapsibleTrigger>
+          {section.path ? (
+            <CollapsibleTrigger asChild>
+              <Link
+                to={`/${lang}${section.path}`}
+                className="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium text-sm hover:bg-muted"
+              >
+                <span>{section.title}</span>
+                <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]]:rotate-90" />
+              </Link>
+            </CollapsibleTrigger>
+          ) : (
+            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium text-sm hover:bg-muted">
+              {section.title}
+              <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]]:rotate-90" />
+            </CollapsibleTrigger>
+          )}
           <CollapsibleContent className="py-1 pl-4">
             <div className="grid grid-flow-row auto-rows-max text-sm">
               {(section.children || []).map(item => {
