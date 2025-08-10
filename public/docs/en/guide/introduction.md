@@ -1,50 +1,28 @@
 # Introduction
 
-Welcome to **Vue Docs UI** - the simplest way to create beautiful documentation websites with Vue.js!
+React Docs UI is a React component library and toolset designed specifically for building modern documentation websites. Its core philosophy is **configuration over code**, allowing you to focus entirely on content creation.
 
-## What is Vue Docs UI?
+## Core Advantages
 
-Vue Docs UI is a modern, lightweight, and highly customizable documentation framework built with Vue 3 and TypeScript. It helps you create professional documentation websites with minimal setup and maximum flexibility.
+- **Configuration-Driven**: This is the core feature of React Docs UI. You don't need to write complex React components or routing logic; just maintain a clear `site.yaml` file to define everything from the site's navigation and sidebar to its theme and footer.
 
-## Key Features
+- **Fully-Featured**: Out-of-the-box, it provides everything a modern documentation website needs:
+  - Responsive layout
+  - Light/dark theme switching
+  - Markdown-based content rendering (with GFM and Frontmatter support)
+  - Built-in code syntax highlighting
+  - Quick command menu (Cmd+K)
+  - Internationalization support
 
-### 🚀 **Quick Setup**
-Get started in minutes with zero configuration required.
+- **Extremely Simple to Start**: With the official `create-react-docs-ui` scaffolding tool, you can launch a fully functional documentation website in under a minute, without any complex environment setup.
 
-### 📱 **Responsive Design**
-Looks great on all devices - from mobile phones to desktop computers.
+- **Highly Customizable**: While it works out-of-the-box, every part (like the logo, color scheme, navigation links, social media icons, etc.) can be deeply customized through the configuration file.
 
-### 🎨 **Customizable Themes**
-Built-in light and dark themes with full customization support.
+## Use Cases
 
-### 📝 **Markdown Support**
-Write your documentation in Markdown with enhanced features.
+Whether you are an individual developer or part of a team, React Docs UI is perfect for the following scenarios:
 
-### 🔍 **Built-in Search**
-Powerful search functionality to help users find content quickly.
-
-### ⚡ **Lightning Fast**
-Built with Vite for incredibly fast development and build times.
-
-## Why Vue Docs UI?
-
-- **Developer Friendly**: Simple API and intuitive configuration
-- **Production Ready**: Optimized for performance and SEO
-- **Extensible**: Easy to customize and extend with your own components
-- **Modern**: Built with the latest Vue 3 and TypeScript technologies
-
-## Getting Started
-
-Ready to create your first documentation website? Check out our [Installation Guide](/guide/installation) to get started in just a few minutes!
-
-## Community
-
-Join our growing community:
-
-- 🐛 [Report Issues](https://github.com/shenjianZ/vue-docs-ui/issues)
-- 💡 [Feature Requests](https://github.com/shenjianZ/vue-docs-ui/discussions)
-- 📖 [Documentation](https://github.com/shenjianZ/vue-docs-ui)
-
----
-
-*Happy documenting! 📚* 
+- **Open Source Project Documentation**: Provide a professional and easy-to-maintain documentation site for your React project.
+- **Product Manuals**: Clearly present your product's features and usage guides.
+- **Team Knowledge Bases**: Build and share knowledge based on React technology within your team.
+- **Personal Blogs or Portfolios**: Organize and display your technical articles or projects in an elegant way.

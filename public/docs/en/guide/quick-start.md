@@ -1,217 +1,109 @@
 # Quick Start
 
-This guide will help you understand the basics of Vue Docs UI and get your documentation website up and running quickly.
+This guide will walk you through creating, configuring, and running your own React documentation website from scratch in 5 minutes.
 
-## Project Overview
+## 1. Create the Project
 
-Vue Docs UI follows a simple file-based routing system. Your documentation is organized as:
+Using the official scaffolding tool is the most efficient way. Open your terminal and run the following command:
 
-- **Configuration**: `public/config/site.yaml` - Site settings and navigation
-- **Content**: `public/docs/` - Markdown files for your documentation pages
-- **Assets**: `public/images/` - Images and other static assets
-
-## Writing Your First Page
-
-Let's create a simple documentation page:
-
-### 1. Create a Markdown File
-
-Create a new file at `public/docs/my-first-page.md`:
-
-```markdown
-# My First Page
-
-Welcome to my documentation! This is written in **Markdown**.
-
-## Features
-
-- Easy to write
-- Supports code syntax highlighting
-- Responsive design
-- Built-in search
-
-## Code Example
-
-## Lists and More
-
-1. Ordered lists work great
-2. With automatic numbering
-3. And proper styling
-
-- Unordered lists too
-- With bullet points
-- And consistent spacing
+```bash
+# This creates a project named "my-awesome-docs"
+npx create-react-docs-ui@latest my-awesome-docs
 ```
 
-> **Tip**: Use blockquotes for important notes and tips!
+Next, enter the project directory and install the dependencies:
 
+```bash
+cd my-awesome-docs
+npm install
+```
 
-### 2. Add to Navigation
+## 2. Organize Your Documents
 
-Update your `public/config/site.yaml` to include the new page:
+All your documentation content is stored as Markdown files in the `public/docs/` directory.
+
+- Open the `public/docs/en/` directory.
+- You can modify the existing `index.md` and files under the `guide` directory, or create new `.md` files.
+
+For example, let's create a new page. Create a new file named `about.md` in `public/docs/en/`:
+
+```markdown
+---
+title: About Us
+description: This is a page about our team.
+---
+
+# About Us
+
+We love open source and creation!
+```
+
+**Note**: You can use `frontmatter` at the top of your Markdown files to define the page `title` and `description`.
+
+## 3. Configure the Website
+
+Now, let's display the newly created page by modifying the configuration file.
+
+Open the core configuration file `public/config/site.yaml`.
+
+### a. Modify Site Information
+
+Update the `site` section to give your website a new title and logo.
+
+```yaml
+site:
+  title: "My Awesome Docs"
+  description: "A website built with React Docs UI"
+  logo: "🚀" # You can use an emoji or an image path
+```
+
+### b. Add to the Navbar
+
+In the `navbar.items` array, add a link for the "About" page. Remember to update the links for the English version.
+
+```yaml
+navbar:
+  items:
+    - title: "Home"
+      link: "/en/"
+    - title: "Guide"
+      link: "/en/guide/introduction"
+    - title: "About"  # New
+      link: "/en/about" # New
+```
+
+### c. Add to the Sidebar
+
+To make the "About" page visible in the sidebar, we'll add a new entry in `sidebar.collections.guide.sections`. Make sure to use English paths.
 
 ```yaml
 sidebar:
-  sections:
-    - title: "Getting Started"
-      path: "/guide"
-      children:
-        - title: "My First Page"
-          path: "/my-first-page"
+  collections:
+    guide:
+      sections:
+        - title: "Getting Started"
+          path: "/en/guide"
+          children:
+            - title: "Introduction"
+              path: "/en/guide/introduction"
+            - title: "Installation"
+              path: "/en/guide/installation"
+            - title: "Quick Start"
+              path: "/en/guide/quick-start"
+        # You can create a new section for the "About" page
+        - title: "About Us"
+          path: "/en/about"
+          children:
+            - title: "About"
+              path: "/en/about"
 ```
 
-### 3. View Your Page
+## 4. Launch the Website
 
-Start the development server and navigate to your new page:
+Save all your changes and run the following command in your terminal:
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:5173/my-first-page` to see your page!
-
-## Understanding Configuration
-
-The `site.yaml` file controls your entire site structure:
-
-### Site Settings
-```yaml
-site:
-  title: "Your Site Title"
-  description: "Site description for SEO"
-  logo: "📚"  # Emoji, image URL, or path
-  author: "Your Name"
-```
-
-### Navigation Bar
-```yaml
-navbar:
-  items:
-    - title: "Home"
-      link: "/"
-    - title: "GitHub"
-      link: "https://github.com/username/repo"
-      external: true
-```
-
-### Sidebar Navigation
-```yaml
-sidebar:
-  sections:
-    - title: "Section Name"
-      path: "/section"
-      children:
-        - title: "Page Title"
-          path: "/page-path"
-```
-
-## Markdown Features
-
-Vue Docs UI supports enhanced Markdown with:
-
-### Code Highlighting
-```javascript
-// JavaScript code is highlighted
-function greet(name) {
-  return `Hello, ${name}!`
-}
-```
-
-### Tables
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Responsive | ✅ | Works on all devices |
-| Themes | ✅ | Light and dark mode |
-| Search | ✅ | Built-in search |
-
-### Math (Optional)
-If you need math equations, you can add support for LaTeX:
-
-Inline math: $E = mc^2$
-
-Block math:
-$$
-\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
-$$
-
-## Customizing Appearance
-
-### Theme Colors
-Customize your site's colors in `site.yaml`:
-
-```yaml
-theme:
-  colors:
-    primary: "#3b82f6"    # Main brand color
-    secondary: "#64748b"  # Secondary text
-    accent: "#06b6d4"     # Accent color
-```
-
-### Fonts
-```yaml
-theme:
-  fonts:
-    primary: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
-    mono: "JetBrains Mono, Consolas, monospace"
-```
-
-## Adding Images
-
-Place images in `public/images/` and reference them in your Markdown:
-
-```markdown
-![Logo](/images/logo.png)
-```
-
-Or with custom sizing:
-```markdown
-<img src="/images/screenshot.png" alt="Screenshot" width="600">
-```
-
-## Best Practices
-
-### 1. Organize Your Content
-```
-public/docs/
-├── guide/
-│   ├── introduction.md
-│   ├── installation.md
-│   └── quick-start.md
-├── api/
-│   ├── components.md
-│   └── utilities.md
-└── examples/
-    ├── basic.md
-    └── advanced.md
-```
-
-### 2. Use Descriptive Titles
-- Good: "Setting up Authentication"
-- Bad: "Auth Setup"
-
-### 3. Add Table of Contents
-Enable TOC in your `site.yaml`:
-
-```yaml
-toc:
-  enabled: true
-  maxLevel: 3
-  title: "On This Page"
-```
-
-### 4. Link Between Pages
-Use relative links to connect your content:
-
-```markdown
-Check out our [Installation Guide](/guide/installation) for setup instructions.
-```
-
-## What's Next?
-
-Now that you understand the basics:
-
-1. **[Configuration](/guide/configuration)** - Learn about all available options
-2. **[Advanced Features](/advanced/customization)** - Customize your site further
-3. **[Deployment](/advanced/deployment)** - Deploy your site to production
-
-Happy documenting! 🚀 
+Your website should now be running at `http://localhost:5173`. Visit it, and you will see the updated title, logo, and the new "About" link in the navbar and sidebar. Congratulations, you have successfully mastered the basic workflow of React Docs UI!

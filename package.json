@@ -1,8 +1,8 @@
 {
-  "name": "@react-docs-ui-vite/core",
+  "name": "react-docs-ui",
   "version": "0.1.0",
   "type": "module",
-  "description": "React Docs UI library (Vite) — components and layout to build documentation sites.",
+  "description": "React Docs UI library — components and layout to build documentation sites.",
   "main": "dist/react-docs-ui.umd.js",
   "module": "dist/react-docs-ui.es.js",
   "types": "dist/types/index.d.ts",

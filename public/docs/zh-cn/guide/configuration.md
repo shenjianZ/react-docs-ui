@@ -1,6 +1,6 @@
 # 配置文件 (`site.yaml`) 详解
 
-`vue-docs-ui` 的核心是其**配置驱动**的理念。你几乎可以通过 `public/config/site.yaml` 这一个文件来定义整个网站的外观和行为。本文档将详细解释每个配置项。
+`react-docs-ui` 的核心是其**配置驱动**的理念。你几乎可以通过 `public/config/site.yaml` 这一个文件来定义整个网站的外观和行为。本文档将详细解释每个配置项。
 
 ## 顶级配置项概览
 
@@ -12,9 +12,6 @@
 | `theme` | 配置网站的主题，如颜色、浅色/深色模式。 |
 | `footer` | 配置网站底部的页脚信息。 |
 | `toc` | 配置文章页面右侧的目录（Table of Contents）。 |
-| `search` | 配置内置的全文搜索功能。 |
-| `pwa` | 配置渐进式Web应用（PWA）相关设置。 |
-| `ai` | 配置 AI 助手功能。 |
 
 ---
 
@@ -24,15 +21,15 @@
 
 | 字段 | 说明 | 示例 |
 | :--- | :--- | :--- |
-| `title` | 网站标题，显示在浏览器标签页上。 | `"Vue Docs UI"` |
-| `description` | 网站描述，用于搜索引擎优化 (SEO)。 | `"一个 Vue 3 文档网站构建工具"` |
-| `logo` | 网站 Logo，显示在导航栏左上角。 | `"📚"` 或 `"/images/logo.png"` |
-| `author` | 网站作者。 | `"Vue Docs UI Team"` |
+| `title` | 网站标题，显示在浏览器标签页上。 | `"React Docs UI"` |
+| `description` | 网站描述，用于搜索引擎优化 (SEO)。 | `"一个 React 文档网站构建工具"` |
+| `logo` | 网站 Logo，显示在导航栏左上角。 | `"📚"` 或 `"/images/logo.png"` 或一个包含 `light` 和 `dark` 模式图片路径的对象 |
+| `author` | 网站作者。 | `"React Docs UI Team"` |
 
 **Logo 格式说明:**
 1.  **Emoji**: 直接使用一个表情符号，如 `"🚀"`。
 2.  **本地图片**: 指向 `public` 目录下的图片路径，如 `"/images/logo.png"`。
-3.  **外部图片 URL**: 一个完整的图片链接。
+3.  **亮/暗模式图片**: 一个对象，包含 `light` 和 `dark` 两个键，分别指向不同主题下的图片路径。
 
 ---
 
@@ -43,6 +40,7 @@
 | 字段 | 说明 |
 | :--- | :--- |
 | `items` | 导航项数组，定义了导航栏中显示的所有链接。 |
+| `actions` | (可选) 导航栏右侧的操作按钮，如 GitHub 链接。 |
 
 ### `navbar.items`
 
@@ -56,13 +54,15 @@
 
 ## `sidebar`
 
-侧边栏导航配置，是文档结构的核心。
+侧边栏导航配置，是文档结构的核心。它使用 `collections` 来组织不同部分的内容。
 
 | 字段 | 说明 |
 | :--- | :--- |
-| `sections` | 侧边栏区域数组，每个区域代表一个可折叠的菜单组。 |
+| `collections` | 一个对象，键是集合的名称（通常对应一级路由，如 `guide`），值是该集合的侧边栏配置。 |
 
-### `sidebar.sections`
+### `sidebar.collections.<name>.sections`
+
+每个集合包含一个 `sections` 数组，每个 `section` 代表一个可折叠的菜单组。
 
 | 字段 | 说明 | 示例 |
 | :--- | :--- | :--- |
@@ -70,7 +70,7 @@
 | `path` | 区域的基础路径。当用户访问的 URL 以此路径开头时，该区域会自动展开并高亮。 | `"/guide"` |
 | `children` | 该区域下的子链接数组。 | |
 
-### `sidebar.sections.children`
+### `sidebar.collections.<name>.sections.children`
 
 | 字段 | 说明 | 示例 |
 | :--- | :--- | :--- |
@@ -85,9 +85,8 @@
 
 | 字段 | 说明 | 可选值 | 默认值 |
 | :--- | :--- | :--- | :--- |
-| `defaultMode` | 网站的默认主题模式。 | `'light'`, `'dark'`, `'auto'` | `'auto'` |
+| `defaultMode` | 网站的默认主题模式。 | `'light'`, `'dark'`, `'system'` | `'system'` |
 | `allowToggle` | 是否允许用户切换主题。 | `true`, `false` | `true` |
-| `primaryColor`| 网站的主题色。 | CSS 颜色值 | `"#3b82f6"` |
 
 ---
 
@@ -110,14 +109,6 @@
 | `branch` | 文档所在的 Git 分支。 | `"main"` |
 | `dir` | 文档文件在仓库中的根目录。 | `"docs/src"` |
 
-### `footer.social`
-
-| 字段 | 说明 | 示例 |
-| :--- | :--- | :--- |
-| `name` | 社交媒体名称，用于 `aria-label`。 | `"GitHub"` |
-| `url` | 链接地址。 | `"https://github.com/user"` |
-| `icon` | 图标标识符，支持 `github`, `twitter`, `discord` 等。 | `"github"` |
-
 ---
 
 ## `toc` (Table of Contents)
@@ -129,41 +120,3 @@
 | `enabled` | 是否启用页面目录功能。 | `true` |
 | `maxLevel` | 在目录中显示的最大标题级别（h1-h6）。 | `3` |
 | `title` | 目录组件的标题。 | `"本页内容"` |
-
----
-
-## `search`
-
-内置搜索功能配置。
-
-| 字段 | 说明 | 示例 |
-| :--- | :--- | :--- |
-| `enabled` | 是否启用搜索功能。 | `true` |
-| `placeholder` | 搜索框的占位文本。 | `"搜索文档..."` |
-
----
-
-## `pwa`
-
-渐进式Web应用配置。
-
-| 字段 | 说明 | 示例 |
-| :--- | :--- | :--- |
-| `enabled` | 是否启用 PWA 功能。 | `true` |
-| `name` | PWA 的完整名称。 | `"Vue Docs UI"` |
-| `shortName` | PWA 的短名称。 | `"VueDocs"` |
-
----
-
-## `ai`
-
-AI 助手配置。
-
-| 字段 | 说明 | 示例 |
-| :--- | :--- | :--- |
-| `enabled` | 是否启用 AI 助手功能。 | `true` |
-| `buttonTitle` | 浮动按钮的标题。 | `"AI 助手"` |
-| `modalTitle` | 对话框的标题。 | `"与 AI 对话"` |
-| `placeholder` | 输入框的占位文本。 | `"向我提问..."` |
-
-**注意**: AI 功能的 `provider` 和 `apiKey` 等敏感信息在 `public/config/ai.json` 中单独配置，以避免意外泄露。

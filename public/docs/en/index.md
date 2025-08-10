@@ -1,58 +1,34 @@
-# Welcome to Vue Docs UI
+# React Docs UI
 
-Vue Docs UI is a modern documentation website builder based on Vue 3, providing an out-of-the-box documentation solution.
+A **configuration-driven** modern documentation website builder based on React.
 
-## 🌟 Key Features
+React Docs UI aims to make creating beautiful, powerful documentation websites simpler than ever. You just need to focus on writing Markdown documents, and everything else—from routing and navigation to theme switching and the command menu—is driven by a simple YAML configuration.
 
-- **🚀 Ready to Use** - Launch your documentation website with just 3 lines of code
-- **🎨 Modern Design** - Beautiful interface design with light/dark theme support
-- **📱 Mobile Responsive** - Perfect responsive design
-- **🌐 Internationalization** - Built-in multi-language support
-- **🤖 AI Assistant** - Integrated AI chat assistant with multiple model support
-- **⚡ High Performance** - Built with Vite for fast hot reload
-- **🔍 Full-text Search** - Smart search functionality
-- **📝 Enhanced Markdown** - Rich Markdown extensions
+## Core Features
 
-## 🏗️ Architecture Features
+- **Configuration-Driven**: Define your entire website via `site.yaml` without coding.
+- **Out-of-the-Box**: Quickly start your project with all necessary features built-in.
+- **Modern Design**: Elegant responsive layout with automatic light/dark theme switching.
+- **Command Menu**: Built-in `Cmd+K` shortcut menu for quick page access.
+- **Markdown Support**: Full support for GFM and Frontmatter.
+- **Internationalization**: Easily implement multi-language support through configuration files.
 
-- **Component-based Design** - Modular components, easy to extend
-- **TypeScript Support** - Complete type support
-- **Customizable Themes** - Flexible theme configuration
-- **Plugin System** - Extensible plugin architecture
+## Quick Start
 
-## 📦 Quick Start
+Get your own documentation website with just one command:
 
 ```bash
-# Create new project
-npm create vue-docs-ui@latest my-docs
+# Create the project
+npx create-react-docs-ui@latest my-docs
 
-# Navigate to project directory
+# Enter the project directory
 cd my-docs
 
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
+# Install dependencies and start
+npm install && npm run dev
 ```
 
-## 📖 Usage
+## Links
 
-```javascript
-import { createDocsApp } from 'vue-docs-ui'
-import 'vue-docs-ui/dist/vue-docs-ui.css'
-
-createDocsApp({
-  configPath: '/config/site.yaml',
-  el: '#app'
-})
-```
-
-It's that simple! No complex configuration needed, get a fully functional documentation website immediately.
-
-## 🔗 Related Links
-
-- [GitHub Repository](https://github.com/shenjianZ/vue-docs-ui)
-- [Online Demo](https://vue-docs-ui.example.com)
-- [User Guide](/guide/introduction)
-- [API Documentation](/advanced/api) 
+- **[Guide](/en/guide/introduction)**: Start learning about all the features of React Docs UI.
+- **[GitHub](https://github.com/shenjianZ/react-docs-ui)**: View the source code, submit issues, or contribute.

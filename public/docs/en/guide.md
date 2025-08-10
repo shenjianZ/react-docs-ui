@@ -1,31 +1,10 @@
-# Getting Started
+# Guide
 
-## Getting Started with Vue Docs UI
+This guide will help you fully understand and master all the features of React Docs UI. Whether you are a beginner or looking for in-depth customization, you will find the information you need here.
 
-Welcome to Vue Docs UI! This is a modern documentation website building tool based on Vue 3.
+## Table of Contents
 
-## Quick Overview
-
-Vue Docs UI enables you to:
-- 🚀 **Quick Start** - Create beautiful documentation websites with just a few lines of code
-- 📱 **Responsive Design** - Perfect adaptation to all devices
-- 🎨 **Highly Customizable** - Flexible theme and style configuration
-- 📝 **Markdown Support** - Use familiar Markdown syntax
-
-## Learning Path
-
-### [📖 Introduction](/guide/introduction)
-Learn about Vue Docs UI's core concepts and features
-
-### [⚡ Installation](/guide/installation)
-Learn how to install and set up Vue Docs UI
-
-### [🏃‍♂️ Quick Start](/guide/quick-start)
-Get hands-on experience through practical examples
-
-### [⚙️ Configuration](/guide/configuration)
-Deep dive into configuration options and customization methods
-
-## Ready to Start?
-
-Choose any of the topics above to begin your learning journey, or jump directly to [Quick Start](/guide/quick-start) to experience it immediately! 
+- **[Introduction](/en/guide/introduction)**: Learn about the core philosophy and main advantages of React Docs UI.
+- **[Installation](/en/guide/installation)**: Learn how to install via the scaffolding tool or manually.
+- **[Quick Start](/en/guide/quick-start)**: Create and run your first documentation website in 5 minutes.
+- **[Configuration (`site.yaml`)](/en/guide/configuration)**: Dive deep into each configuration option to take full control of your site.
