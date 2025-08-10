@@ -4,7 +4,7 @@ This guide will help you fully understand and master all the features of React D
 
 ## Table of Contents
 
-- **[Introduction](/en/guide/introduction)**: Learn about the core philosophy and main advantages of React Docs UI.
-- **[Installation](/en/guide/installation)**: Learn how to install via the scaffolding tool or manually.
-- **[Quick Start](/en/guide/quick-start)**: Create and run your first documentation website in 5 minutes.
-- **[Configuration (`site.yaml`)](/en/guide/configuration)**: Dive deep into each configuration option to take full control of your site.
+- **[Introduction](/guide/introduction)**: Learn about the core philosophy and main advantages of React Docs UI.
+- **[Installation](/guide/installation)**: Learn how to install via the scaffolding tool or manually.
+- **[Quick Start](/guide/quick-start)**: Create and run your first documentation website in 5 minutes.
+- **[Configuration (`site.yaml`)](/guide/configuration)**: Dive deep into each configuration option to take full control of your site.

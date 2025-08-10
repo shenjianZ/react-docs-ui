@@ -30,5 +30,5 @@ npm install && npm run dev
 
 ## Links
 
-- **[Guide](/en/guide/introduction)**: Start learning about all the features of React Docs UI.
+- **[Guide](/guide/introduction)**: Start learning about all the features of React Docs UI.
 - **[GitHub](https://github.com/shenjianZ/react-docs-ui)**: View the source code, submit issues, or contribute.

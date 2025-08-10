@@ -30,5 +30,5 @@ npm install && npm run dev
 
 ## 链接
 
-- **[指南](/zh-cn/guide/introduction)**: 开始了解 React Docs UI 的所有功能。
+- **[指南](/guide/introduction)**: 开始了解 React Docs UI 的所有功能。
 - **[GitHub](https://github.com/shenjianZ/react-docs-ui)**: 查看源码、提交问题或贡献代码。
