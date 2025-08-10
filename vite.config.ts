@@ -2,22 +2,19 @@ import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
-import { Buffer } from "buffer"
+import { nodePolyfills } from "vite-plugin-node-polyfills"
 
 // https://vite.dev/config/
 export default defineConfig({
   appType: "spa",
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), nodePolyfills()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      buffer: "buffer/",
     },
   },
   define: {
-    "global.Buffer": Buffer,
-    "global": "globalThis",
-  },
-  optimizeDeps: {
-    include: ["buffer"],
+    global: "globalThis",
   },
 })
