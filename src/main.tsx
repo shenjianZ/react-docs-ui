@@ -1,6 +1,3 @@
-import { Buffer } from "buffer"
-// @ts-ignore
-window.Buffer = Buffer
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
@@ -10,7 +7,6 @@ import App from "./App.tsx"
 // @ts-expect-error types provided via ambient declaration
 import yaml from "js-yaml"
 import "./index.css"
-import 'highlight.js/styles/github.css'
 
 async function bootstrap() {
   try {

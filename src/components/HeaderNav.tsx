@@ -6,6 +6,7 @@ import { useTheme } from "@/components/theme-provider"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ModeToggle } from "@/components/mode-toggle"
 import { buttonVariants } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 // Define SiteConfig types locally as they are not available in the Vite project
@@ -111,33 +112,61 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
           <nav className="flex items-center">
             {(navbar.actions || [])
               .filter(action => action.enabled !== false)
-              .map(action => {
+              .map((action, idx) => {
                 const title = action.title || (action.type === "github" ? "GitHub" : "Action")
                 return (
-                  <a
-                    key={action.link}
-                    href={action.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div
-                      className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        "w-9 px-0"
-                      )}
-                    >
-                      {action.type === "github" ? (
-                        <Github className="h-4 w-4" />
-                      ) : (
-                        <span className="text-sm">{title}</span>
-                      )}
-                      <span className="sr-only">{title}</span>
-                    </div>
-                  </a>
+                  <TooltipProvider key={action.link || `${action.type || 'action'}-${idx}`}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <a
+                          href={action.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={title}
+                        >
+                          <div
+                            className={cn(
+                              buttonVariants({ variant: "ghost" }),
+                              "w-9 px-0"
+                            )}
+                          >
+                            {action.type === "github" ? (
+                              <Github className="h-4 w-4" />
+                            ) : (
+                              <span className="text-sm">{title}</span>
+                            )}
+                          </div>
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent align="center">{title}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )
               })}
-            {navbar.showLanguageSwitcher !== false && <LanguageSwitcher />}
-            {(themeConfig?.allowToggle ?? true) && <ModeToggle />}
+            {navbar.showLanguageSwitcher !== false && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <LanguageSwitcher />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent align="center">切换语言</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {(themeConfig?.allowToggle ?? true) && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <ModeToggle />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent align="center">切换主题</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </nav>
         </div>
       </div>

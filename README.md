@@ -1,3 +1,22 @@
+# React Docs UI (Vite)
+
+This package can be used as a library, similar to `vue-docs-ui`.
+
+## Install
+
+```bash
+npm install @react-docs-ui-vite/core
+```
+
+## Usage
+
+```tsx
+import "@react-docs-ui-vite/core/dist/react-docs-ui.css"
+import { DocsLayout, HeaderNav, SidebarNav, TableOfContents } from "@react-docs-ui-vite/core"
+```
+
+See `public/config/site.yaml` and `public/docs` in this repo for an example content structure.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
