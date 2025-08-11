@@ -1,88 +1,77 @@
-# React Docs UI (Vite)
+English | [简体中文](README-zh.md)
 
-This package can be used as a library, similar to `vue-docs-ui`.
+## react-docs-ui
 
-## Install
+React documentation site UI components. Ship a modern docs site with a small set of composable primitives and a ready-to-use app shell.
 
+### Install
 ```bash
-npm install @react-docs-ui-vite/core
+npm install react-docs-ui
 ```
 
-## Usage
-
+### Quick usage
+Minimal layout:
 ```tsx
-import "@react-docs-ui-vite/core/dist/react-docs-ui.css"
-import { DocsLayout, HeaderNav, SidebarNav, TableOfContents } from "@react-docs-ui-vite/core"
+import 'react-docs-ui/dist/react-docs-ui.css'
+import { DocsLayout, HeaderNav, SidebarNav, TableOfContents, MdxContent } from 'react-docs-ui'
+
+function Page() {
+  const source = `# Hello\n\nSome markdown...`
+  return (
+    <DocsLayout lang="en" config={{
+      site: { logo: '/logo.svg', title: 'My Docs', description: 'Awesome docs' },
+      navbar: { items: [] },
+      sidebar: { collections: {} },
+    }}>
+      <MdxContent source={source} />
+    </DocsLayout>
+  )
+}
 ```
 
-See `public/config/site.yaml` and `public/docs` in this repo for an example content structure.
+Or use the full app router (reads `public/config/site(.lang).yaml` and `public/docs/<lang>/**/*.md` at runtime):
+```tsx
+import 'react-docs-ui/dist/react-docs-ui.css'
+import { DocsApp } from 'react-docs-ui'
 
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+export default function App() {
+  return <DocsApp />
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Exports
+- Layout: `DocsLayout`
+- App shell: `DocsApp`
+- Navigation: `HeaderNav`, `SidebarNav`, `TableOfContents`
+- Theming: `ThemeProvider`, `ModeToggle`, `LanguageSwitcher`
+- Markdown: `MdxContent`
+- Primitives: `ScrollArea`, `Tooltip`, `Dialog`, `DropdownMenu`, `Command`, `ContextMenu`, `buttonVariants`
+- Utils: `cn`, `getConfig`, types `SiteConfig`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Configuration file (`public/config/site.yaml`)
+See the `create-react-docs-ui` README for a full example. Basic shape:
+```yaml
+site:
+  logo: /logo.svg
+  title: My Docs
+  description: Awesome docs
+navbar:
+  items:
+    - title: GitHub
+      link: https://github.com/shenjianZ/react-docs-ui
+      external: true
+sidebar:
+  collections: {}
 ```
+
+### Documentation content
+- Place markdown under `public/docs/<lang>/**/*.md`
+- Route path maps to file path after the language segment
+- Optional frontmatter is supported by a simple parser
+
+### Requirements
+- React 18+
+- Works with Vite; CSS file must be imported
+
+### License
+MIT

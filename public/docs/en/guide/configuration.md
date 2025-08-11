@@ -1,122 +1,149 @@
 # Configuration File (`site.yaml`) Explained
 
-The core of `react-docs-ui` is its **configuration-driven** philosophy. You can define the entire look and behavior of your website almost exclusively through the `public/config/site.yaml` file. This document explains each configuration option in detail.
+The project is configuration-driven. Most behavior is defined in `public/config/site.yaml`. This page documents every field using concise tables.
 
-## Top-Level Configuration Overview
-
-| Top-Level Field | Description |
-| :--- | :--- |
-| `site` | Global site information, such as title, description, and logo. |
-| `navbar` | Configures the top navigation bar of the website. |
-| `sidebar` | Configures the navigation menu in the website's sidebar. |
-| `theme` | Configures the website's theme, such as colors and light/dark mode. |
-| `footer` | Configures the footer information at the bottom of the website. |
-| `toc` | Configures the Table of Contents on the right side of article pages. |
+## Top-level keys
+| Key | Purpose |
+| :-- | :-- |
+| `site` | Global metadata like title, description, logo, author |
+| `navbar` | Top navigation bar (logo/title toggles, items, actions) |
+| `sidebar` | Left navigation tree (collections/sections/children) |
+| `theme` | Theme options (default mode, toggle) |
+| `toc` | Article table of contents (enabled, levels, title) |
+| `footer` | Footer links, socials, repository meta |
+| `pwa` | Progressive Web App settings (reserved/optional) |
 
 ---
 
 ## `site`
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `title` | string | Site title | `"React Docs UI Example"` |
+| `description` | string | Short site description (SEO) | `"Beautiful docs made simple"` |
+| `logo` | string or object | Logo to display. String can be emoji or image path. Object allows light/dark images. | `"📚"`, `"/images/logo.png"`, or `{ light: "/images/favicon.svg", dark: "/images/favicon-dark.svg" }` |
+| `author` | string | Site author/organization | `"React Docs UI Team"` |
 
-Basic metadata configuration for the website.
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `title` | The website title, displayed in the browser tab. | `"React Docs UI"` |
-| `description` | The website description, used for Search Engine Optimization (SEO). | `"A React documentation website builder"` |
-| `logo` | The website logo, displayed in the top-left corner of the navbar. | `"📚"` or `"/images/logo.png"` or an object with `light` and `dark` image paths |
-| `author` | The author of the website. | `"React Docs UI Team"` |
-
-**Logo Format Guide:**
-1.  **Emoji**: Use an emoji directly, like `"🚀"`.
-2.  **Local Image**: A path to an image in the `public` directory, like `"/images/logo.png"`.
-3.  **Light/Dark Mode Images**: An object with `light` and `dark` keys, pointing to different image paths for each theme.
+Logo formats supported:
+- Emoji: `"🚀"`
+- URL or public path: `"/images/logo.png"`
+- Light/Dark object: `{ light, dark }`
 
 ---
 
 ## `navbar`
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `showLogo` | boolean | Show logo at top-left |
+| `showTitle` | boolean | Show site title in navbar |
+| `showLanguageSwitcher` | boolean | Show language switcher |
+| `items` | array<Item> | Primary navigation links |
+| `actions` | array<Action> | Right-side action buttons (e.g. GitHub) |
 
-Top navigation bar configuration.
+Item
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `title` | string | Link text | `"Guide"` |
+| `link` | string | Path or URL. Internal paths start with `/`. | `"/guide"` |
+| `external` | boolean (optional) | Open in new tab if true |
+| `visible` | boolean (optional) | Conditionally hide/show |
 
-| Field | Description |
-| :--- | :--- |
-| `items` | An array of navigation items that defines all the links displayed in the navbar. |
-| `actions` | (Optional) Action buttons on the right side of the navbar, such as a GitHub link. |
-
-### `navbar.items`
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `title` | The display text for the navigation item. | `"Guide"` |
-| `link` | The link address. Internal links start with `/`. | `"/guide/introduction"` |
-| `external` | (Optional) If `true`, it's an external link that will open in a new tab. | `true` |
+Action
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `type` | `"github"` or `"custom"` (optional) | Predefined or custom action | `"github"` |
+| `title` | string (optional) | Button text when `type` is `custom` |
+| `link` | string | Destination URL |
+| `icon` | string (optional) | Icon name for custom action |
+| `enabled` | boolean (optional) | Toggle the action |
 
 ---
 
 ## `sidebar`
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean (optional) | Global toggle for sidebar |
+| `collections` | record<string, Collection> | Map of top-level sections (e.g. `guide`) |
+| `sections` | Section[] (legacy, optional) | Backward-compatible single-tree definition |
 
-Sidebar navigation configuration, which is the core of the documentation structure. It uses `collections` to organize different sections of content.
+Collection
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `sections` | Section[] | Grouped side-nav sections |
 
-| Field | Description |
-| :--- | :--- |
-| `collections` | An object where keys are collection names (usually corresponding to top-level routes like `guide`), and values are the sidebar configurations for that collection. |
+Section
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `title` | string | Section title | `"Getting Started"` |
+| `path` | string | Base path that expands/highlights this section | `"/guide"` |
+| `children` | Child[] (optional) | Leaf links under the section |
 
-### `sidebar.collections.<name>.sections`
-
-Each collection contains a `sections` array, where each `section` represents a collapsible menu group.
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `title` | The title of the section. | `"Getting Started"` |
-| `path` | The base path for the section. When a user visits a URL starting with this path, this section will automatically expand and be highlighted. | `"/guide"` |
-| `children` | An array of child links under this section. | |
-
-### `sidebar.collections.<name>.sections.children`
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `title` | The display text for the child link. | `"Introduction"` |
-| `path` | The full path to the child link, pointing to a specific Markdown page. | `"/guide/introduction"` |
+Child
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `title` | string | Link text | `"Introduction"` |
+| `path` | string | Full page path | `"/guide/introduction"` |
 
 ---
 
 ## `theme`
+| Field | Type | Description | Options | Default |
+| :-- | :-- | :-- | :-- | :-- |
+| `defaultMode` | string | Default color mode | `light`, `dark`, `auto` | `auto` |
+| `allowToggle` | boolean | Allow user theme switching | `true`/`false` | `true` |
 
-Theme and appearance configuration.
+---
 
-| Field | Description | Options | Default |
-| :--- | :--- | :--- | :--- |
-| `defaultMode` | The default theme mode for the website. | `'light'`, `'dark'`, `'system'` | `'system'` |
-| `allowToggle` | Whether to allow users to switch the theme. | `true`, `false` | `true` |
+## `toc`
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Enable page table of contents | `true` |
+| `maxLevel` | number (1-6) | Max heading depth to show | `3` |
+| `title` | string | TOC panel title | `"On This Page"` |
+
+Note: Per-page TOC visibility/anchors are also affected by page frontmatter.
 
 ---
 
 ## `footer`
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Show footer |
+| `copyright` | string | Copyright text |
+| `repository` | Repository (optional) | Repo info used for links like “Edit this page” |
+| `lastUpdated` | string (optional) | Site/content last update date |
+| `links` | Link[] (optional) | Footer link columns |
+| `social` | Social[] (optional) | Social icon links |
 
-Footer configuration.
+Repository
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `url` | string | Repository URL | `"https://github.com/user/repo"` |
+| `branch` | string | Docs branch | `"main"` |
 
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `copyright` | Copyright information. `{year}` will be replaced with the current year. | `"Copyright © {year} My Company"` |
-| `repository` | (Optional) Repository information, used for displaying links like "Edit this page on GitHub". | |
-| `links` | (Optional) Additional link columns displayed in the footer. | |
-| `social` | (Optional) Social media icon links displayed in the footer. | |
+Link
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `title` | string | Link title |
+| `link` | string | Path or URL |
+| `external` | boolean (optional) | Open in new tab |
 
-### `footer.repository`
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `url` | The URL of the repository. | `"https://github.com/user/repo"` |
-| `branch` | The Git branch where the documentation is located. | `"main"` |
-| `dir` | The root directory of the documentation files in the repository. | `"docs/src"` |
+Social
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `name` | string | Provider key (e.g. `github`, `twitter`, `bilibili`) |
+| `url` | string | Profile or link URL |
+| `icon` | string | Icon name |
 
 ---
 
-## `toc` (Table of Contents)
+## `pwa` (optional)
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Enable PWA features (reserved) |
+| `name` | string | App name |
+| `shortName` | string | Short app name |
+| `description` | string | App description |
+| `themeColor` | string | Theme color |
+| `backgroundColor` | string | Background color |
 
-Configuration for the table of contents on the right side of article pages.
-
-| Field | Description | Example |
-| :--- | :--- | :--- |
-| `enabled` | Whether to enable the page table of contents feature. | `true` |
-| `maxLevel` | The maximum heading level (h1-h6) to display in the TOC. | `3` |
-| `title` | The title of the TOC component. | `"On this page"` |
+---

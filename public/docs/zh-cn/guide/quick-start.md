@@ -38,7 +38,6 @@ description: 这是一个关于我们团队的页面。
 我们热爱开源和创造！
 ```
 
-**注意**: 你可以在 Markdown 文件顶部使用 `frontmatter` 来定义页面标题 (`title`) 和描述 (`description`)。
 
 ## 3. 配置网站
 

@@ -38,7 +38,6 @@ description: This is a page about our team.
 We love open source and creation!
 ```
 
-**Note**: You can use `frontmatter` at the top of your Markdown files to define the page `title` and `description`.
 
 ## 3. Configure the Website
 
