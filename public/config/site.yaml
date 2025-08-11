@@ -1,7 +1,7 @@
 # 网站基本配置
 site:
-  title: "Vue Docs UI 示例项目"
-  description: "基于 Vue Docs UI 构建的文档网站示例"
+  title: "React Docs UI 示例项目"
+  description: "基于 React Docs UI 构建的文档网站示例"
   # logo支持以下格式：
   # 1. emoji: "🤖"
   # 2. 图片URL: "https://example.com/logo.png"
@@ -10,7 +10,7 @@ site:
   logo:
     light: "/images/favicon.svg"
     dark: "/images/favicon-dark.svg"
-  author: "Vue Docs UI Team"
+  author: "React Docs UI Team"
   
 # 顶部导航配置
 navbar:
@@ -25,7 +25,7 @@ navbar:
       link: "/guide"
   actions:
     - type: "github"
-      link: "https://github.com/shenjianZ/vue-docs-ui"
+      link: "https://github.com/shenjianZ/React-docs-ui"
       enabled: true
 
 # 侧边栏导航配置
@@ -73,7 +73,7 @@ toc:
 # Footer Configuration
 footer:
   enabled: true
-  copyright: "© 2024 Vue Docs UI. All rights reserved."
+  copyright: "© 2024 React Docs UI. All rights reserved."
   repository:
     url: "https://github.com/your_github_id/your_repo_name"
     branch: "master"
@@ -130,8 +130,8 @@ footer:
 # PWA Configuration
 pwa:
   enabled: true
-  name: "Vue Docs UI"
-  shortName: "VueDocsUI"
+  name: "React Docs UI"
+  shortName: "ReactDocsUI"
   description: "Beautiful documentation websites made simple"
   themeColor: "#ffffff"
   backgroundColor: "#ffffff" 

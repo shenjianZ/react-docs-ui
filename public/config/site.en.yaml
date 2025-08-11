@@ -1,7 +1,7 @@
 # Website Configuration
 site:
-  title: "Vue Docs UI Example"
-  description: "Example documentation website built with Vue Docs UI"
+  title: "React Docs UI Example"
+  description: "Example documentation website built with React Docs UI"
   # Logo formats supported:
   # 1. emoji: "🤖"
   # 2. image URL: "https://example.com/logo.png"
@@ -10,7 +10,7 @@ site:
   logo:
     light: "/images/favicon.svg"
     dark: "/images/favicon-dark.svg"
-  author: "Vue Docs UI Team"
+  author: "React Docs UI Team"
   
 # Navigation Bar Configuration
 navbar:
@@ -25,7 +25,7 @@ navbar:
       link: "/guide"
   actions:
     - type: "github"
-      link: "https://github.com/shenjianZ/vue-docs-ui"
+      link: "https://github.com/shenjianZ/React-docs-ui"
       enabled: true
 
 # Sidebar Navigation Configuration
@@ -73,7 +73,7 @@ toc:
 # Footer Configuration
 footer:
   enabled: true
-  copyright: "© 2024 Vue Docs UI. All rights reserved."
+  copyright: "© 2024 React Docs UI. All rights reserved."
   repository:
     url: "https://github.com/your_github_id/your_repo_name"
     branch: "master"
@@ -130,8 +130,8 @@ footer:
 # PWA Configuration
 pwa:
   enabled: false
-  name: "Vue Docs UI"
-  shortName: "VueDocsUI"
+  name: "React Docs UI"
+  shortName: "ReactDocsUI"
   description: "Beautiful documentation websites made simple"
   themeColor: "#ffffff"
   backgroundColor: "#ffffff" 
