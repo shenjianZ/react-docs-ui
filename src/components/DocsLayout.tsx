@@ -4,6 +4,7 @@ import { HeaderNav } from "@/components/HeaderNav"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Footer } from "./Footer"
 
 // Define SiteConfig types locally
 interface SiteConfig {
@@ -15,6 +16,7 @@ interface SiteConfig {
     sections?: any
     collections?: Record<string, { sections: any }>
   }
+  footer?: any
 }
 
 interface DocsLayoutProps {
@@ -44,7 +46,7 @@ export function DocsLayout({
             </ScrollArea>
           </aside>
         )}
-        <div className="relative flex">
+        <div className="relative flex md:col-start-2">
           <main className="relative py-6 lg:py-8 flex-auto">{children}</main>
           {toc && (
             <aside
@@ -57,6 +59,11 @@ export function DocsLayout({
             </aside>
           )}
         </div>
+        {config.footer?.enabled !== false && (
+          <div className="md:col-start-2">
+            <Footer footer={config.footer} lang={lang} site={site} />
+          </div>
+        )}
       </div>
     </div>
   )

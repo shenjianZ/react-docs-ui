@@ -19,6 +19,7 @@ export { DocsLayout } from "./components/DocsLayout"
 export { HeaderNav } from "./components/HeaderNav"
 export { SidebarNav } from "./components/SidebarNav"
 export { TableOfContents } from "./components/TableOfContents"
+export { Footer } from "./components/Footer"
 
 // Theming
 export { ThemeProvider, useTheme } from "./components/theme-provider"
@@ -34,6 +35,9 @@ export {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./components/ui/collapsible"
+export { Separator } from "./components/ui/separator"
+export { Badge } from "./components/ui/badge"
+export { Label } from "./components/ui/label"
 export { Command, CommandDialog } from "./components/ui/command"
 export {
   ContextMenu,

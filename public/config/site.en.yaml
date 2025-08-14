@@ -75,23 +75,44 @@ footer:
   enabled: true
   copyright: "© 2024 React Docs UI. All rights reserved."
   repository:
-    url: "https://github.com/your_github_id/your_repo_name"
+    url: "https://github.com/shenjianZ/React-docs-ui"
     branch: "master"
-  lastUpdated: "2024-12-19"
-  links:
-    - title: "Documentation"
-      link: "/guide/introduction"
-    - title: "GitHub"
-      link: "https://github.com/your_github_id/your_repo_name"
-      external: true
-    - title: "License"
-      link: "/license"
+  lastUpdated: "2025-08-14"
+  version: "v0.1.7"
+  groups:
+    - title: "Community"
+      items:
+        - title: "Discussions"
+          link: "https://github.com/shenjianZ/React-docs-ui/discussions"
+          external: true
+        - title: "Issues"
+          link: "https://github.com/shenjianZ/React-docs-ui/issues"
+          external: true
+        - title: "Contributing"
+          link: "https://github.com/shenjianZ/React-docs-ui/blob/master/CONTRIBUTING.md"
+          external: true
+        - title: "Releases"
+          link: "https://github.com/shenjianZ/React-docs-ui/releases"
+          external: true
+    - title: "Help & Support"
+      items:
+        - title: "Examples"
+          link: "/guide/quick-start"
+        - title: "Source Code"
+          link: "https://github.com/shenjianZ/React-docs-ui"
+          external: true
+        - title: "License"
+          link: "https://github.com/shenjianZ/React-docs-ui/blob/master/LICENSE"
+          external: true
+        - title: "Back to Top"
+          link: "#"
+          action: "scrollTop"
   social:
     - name: "email"
       url: "mailto:contact@example.com"
       icon: "mail"
     - name: "github"
-      url: "https://github.com/your_github_id"
+      link: "https://github.com/shenjianZ/React-docs-ui"
       icon: "github"
     # - name: "youtube"
     #   url: "https://youtube.com/@yourhandle"

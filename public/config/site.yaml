@@ -73,16 +73,45 @@ toc:
 # Footer Configuration
 footer:
   enabled: true
-  copyright: "© 2024 React Docs UI. All rights reserved."
+  copyright: "© 2025 React Docs UI. All rights reserved."
   repository:
-    url: "https://github.com/your_github_id/your_repo_name"
+    url: "https://github.com/shenjianZ/React-docs-ui"
     branch: "master"
-  lastUpdated: "2024-12-19"
+  lastUpdated: "2025-08-14"
+  version: "v0.1.7"
+  groups:
+    - title: "社区"
+      items:
+        - title: "讨论区"
+          link: "https://github.com/shenjianZ/React-docs-ui/discussions"
+          external: true
+        - title: "问题反馈"
+          link: "https://github.com/shenjianZ/React-docs-ui/issues"
+          external: true
+        - title: "贡献指南"
+          link: "https://github.com/shenjianZ/React-docs-ui/blob/master/CONTRIBUTING.md"
+          external: true
+        - title: "版本发布"
+          link: "https://github.com/shenjianZ/React-docs-ui/releases"
+          external: true
+    - title: "帮助支持"
+      items:
+        - title: "示例"
+          link: "/guide/quick-start"
+        - title: "源代码"
+          link: "https://github.com/shenjianZ/React-docs-ui"
+          external: true
+        - title: "开源许可"
+          link: "https://github.com/shenjianZ/React-docs-ui/blob/master/LICENSE"
+          external: true
+        - title: "回到顶部"
+          link: "#"
+          action: "scrollTop"
   links:
     - title: "Documentation"
       link: "/guide/introduction"
     - title: "GitHub"
-      link: "https://github.com/your_github_id/your_repo_name"
+      link: "https://github.com/shenjianZ/React-docs-ui"
       external: true
     - title: "License"
       link: "/license"

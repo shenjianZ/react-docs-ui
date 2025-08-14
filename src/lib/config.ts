@@ -56,6 +56,44 @@ export interface SiteConfig {
   theme?: {
     allowToggle?: boolean
   }
+  footer?: {
+    enabled?: boolean
+    copyright?: string
+    repository?: {
+      url?: string
+      branch?: string
+    }
+    lastUpdated?: string
+    version?: string
+    groups?: {
+      title: string
+      items: {
+        title: string
+        link: string
+        external?: boolean
+      }[]
+    }[]
+    links?: {
+      title: string
+      link: string
+      external?: boolean
+    }[]
+    social?: {
+      name: string
+      url?: string
+      link?: string
+      icon?: string
+    }[]
+    builtWith?: { name: string; url?: string }[]
+  }
+  pwa?: {
+    enabled?: boolean
+    name?: string
+    shortName?: string
+    description?: string
+    themeColor?: string
+    backgroundColor?: string
+  }
 }
 
 export async function getConfig(
