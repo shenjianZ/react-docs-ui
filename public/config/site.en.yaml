@@ -155,4 +155,31 @@ pwa:
   shortName: "ReactDocsUI"
   description: "Beautiful documentation websites made simple"
   themeColor: "#ffffff"
-  backgroundColor: "#ffffff" 
+  backgroundColor: "#ffffff"
+
+# Context Menu Configuration
+contextMenu:
+  # Global switch, set to false to completely disable context menu
+  enabled: true
+
+  # Page group menu items configuration
+  page:
+    copyUrl: true          # Copy current URL
+    copyTitle: false       # Copy page title
+    copyMarkdownLink: true # Copy Markdown link
+    openInNewTab: false    # Open in new tab
+    reload: true           # Refresh
+    printPage: true        # Print page
+    scrollToTop: true      # Scroll to top
+    scrollToBottom: true   # Scroll to bottom
+
+  # Site group menu items configuration
+  site:
+    goHome: true    # Go to home
+    quickNav: false # Quick navigation
+    language: false # Language switch
+
+  # Appearance group menu items configuration
+  appearance:
+    theme: false          # Theme switch
+    resetThemePref: false # Reset theme preference 

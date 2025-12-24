@@ -50,6 +50,38 @@ function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>
   }
 }
 
+function RootShell(): React.JSX.Element {
+  const [contextMenuConfig, setContextMenuConfig] = useState<SiteConfig["contextMenu"] | undefined>(undefined)
+
+  useEffect(() => {
+    let cancelled = false
+
+    ;(async () => {
+      try {
+        const loadedConfig = await getConfig("zh-cn")
+        if (!cancelled) {
+          setContextMenuConfig(loadedConfig?.contextMenu)
+        }
+      } catch (error) {
+        console.error("Error loading context menu config:", error)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <GlobalContextMenu config={contextMenuConfig}>
+        <CommandMenu />
+        <Outlet />
+      </GlobalContextMenu>
+    </ThemeProvider>
+  )
+}
+
 function DocsPage() {
   const params = useParams<{ lang: string; "*": string }>()
   const langParam = params.lang
@@ -153,17 +185,6 @@ function DocsPage() {
         <MdxContent source={content} />
       )}
     </DocsLayout>
-  )
-}
-
-function RootShell(): React.JSX.Element {
-  return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <GlobalContextMenu>
-        <CommandMenu />
-        <Outlet />
-      </GlobalContextMenu>
-    </ThemeProvider>
   )
 }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { Globe } from "lucide-react"
-import * as React from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"

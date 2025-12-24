@@ -163,4 +163,31 @@ pwa:
   shortName: "ReactDocsUI"
   description: "Beautiful documentation websites made simple"
   themeColor: "#ffffff"
-  backgroundColor: "#ffffff" 
+  backgroundColor: "#ffffff"
+
+# 右键菜单配置
+contextMenu:
+  # 全局开关，false 则完全禁用右键菜单
+  enabled: true
+
+  # 页面组菜单项配置
+  page:
+    copyUrl: true          # 复制当前链接
+    copyTitle: false        # 复制页面标题
+    copyMarkdownLink: true # 复制 Markdown 链接
+    openInNewTab: false     # 在新标签页打开
+    reload: true           # 刷新
+    printPage: true        # 打印页面
+    scrollToTop: true      # 回到顶部
+    scrollToBottom: true   # 滚动到底部
+
+  # 站点组菜单项配置
+  site:
+    goHome: true   # 返回首页
+    quickNav: false # 快速跳转
+    language: false # 语言切换
+
+  # 外观组菜单项配置
+  appearance:
+    theme: false          # 主题切换
+    resetThemePref: false # 重置主题偏好 

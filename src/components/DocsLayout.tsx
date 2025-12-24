@@ -61,7 +61,7 @@ export function DocsLayout({
         </div>
         {config.footer?.enabled !== false && (
           <div className="md:col-start-2">
-            <Footer footer={config.footer} lang={lang} site={site} />
+            <Footer footer={config.footer} lang={lang} />
           </div>
         )}
       </div>

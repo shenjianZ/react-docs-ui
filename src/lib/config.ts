@@ -94,6 +94,28 @@ export interface SiteConfig {
     themeColor?: string
     backgroundColor?: string
   }
+  contextMenu?: {
+    enabled?: boolean
+    page?: {
+      copyUrl?: boolean
+      copyTitle?: boolean
+      copyMarkdownLink?: boolean
+      openInNewTab?: boolean
+      reload?: boolean
+      printPage?: boolean
+      scrollToTop?: boolean
+      scrollToBottom?: boolean
+    }
+    site?: {
+      goHome?: boolean
+      quickNav?: boolean
+      language?: boolean
+    }
+    appearance?: {
+      theme?: boolean
+      resetThemePref?: boolean
+    }
+  }
 }
 
 export async function getConfig(
