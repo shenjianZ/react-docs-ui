@@ -17,6 +17,66 @@ import {
 import { useTheme } from "@/components/theme-provider"
 import type { SiteConfig } from "@/lib/config"
 
+// 语言翻译
+const i18n = {
+  "zh-cn": {
+    page: "页面",
+    copyUrl: "复制当前链接",
+    copyTitle: "复制页面标题",
+    copyMarkdownLink: "复制 Markdown 链接",
+    copySelectedText: "复制",
+    openInNewTab: "在新标签页打开",
+    reload: "刷新",
+    printPage: "打印页面",
+    scrollToTop: "回到顶部",
+    scrollToBottom: "滚动到底部",
+    site: "站点",
+    goHome: "返回首页",
+    quickNav: "快速跳转",
+    docsIndex: "文档首页",
+    guide: "指南",
+    introduction: "简介",
+    installation: "安装",
+    quickStart: "快速开始",
+    configuration: "配置",
+    language: "语言",
+    appearance: "外观",
+    theme: "主题",
+    light: "浅色",
+    dark: "深色",
+    system: "跟随系统",
+    resetThemePref: "重置主题偏好",
+  },
+  en: {
+    page: "Page",
+    copyUrl: "Copy Current URL",
+    copyTitle: "Copy Page Title",
+    copyMarkdownLink: "Copy Markdown Link",
+    copySelectedText: "Copy",
+    openInNewTab: "Open in New Tab",
+    reload: "Reload",
+    printPage: "Print Page",
+    scrollToTop: "Scroll to Top",
+    scrollToBottom: "Scroll to Bottom",
+    site: "Site",
+    goHome: "Go Home",
+    quickNav: "Quick Navigation",
+    docsIndex: "Docs Index",
+    guide: "Guide",
+    introduction: "Introduction",
+    installation: "Installation",
+    quickStart: "Quick Start",
+    configuration: "Configuration",
+    language: "Language",
+    appearance: "Appearance",
+    theme: "Theme",
+    light: "Light",
+    dark: "Dark",
+    system: "System",
+    resetThemePref: "Reset Theme Preference",
+  },
+}
+
 // 默认配置
 const defaultContextMenuConfig: Required<SiteConfig>["contextMenu"] = {
   enabled: true,
@@ -24,6 +84,7 @@ const defaultContextMenuConfig: Required<SiteConfig>["contextMenu"] = {
     copyUrl: true,
     copyTitle: true,
     copyMarkdownLink: true,
+    copySelectedText: true,
     openInNewTab: true,
     reload: true,
     printPage: true,
@@ -78,6 +139,17 @@ export function GlobalContextMenu({
     }
   }, [])
 
+  const copySelectedText = useCallback(async () => {
+    try {
+      const selectedText = window.getSelection()?.toString() || ""
+      if (selectedText) {
+        await navigator.clipboard.writeText(selectedText)
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
+
   const openInNewTab = useCallback(() => {
     window.open(window.location.href, "_blank")
   }, [])
@@ -89,6 +161,7 @@ export function GlobalContextMenu({
   const goHome = useCallback(() => navigate("/"), [navigate])
 
   const currentLang = (location.pathname.startsWith("/en") ? "en" : "zh-cn")
+  const t = i18n[currentLang]
 
   const goLang = useCallback(
     (code: string) => {
@@ -149,19 +222,20 @@ export function GlobalContextMenu({
         {/* 页面组 */}
         {hasPageItems && (
           <>
-            <ContextMenuLabel>页面</ContextMenuLabel>
+            <ContextMenuLabel>{t.page}</ContextMenuLabel>
             <ContextMenuGroup>
-              {pageConfig.copyUrl && <ContextMenuItem onClick={copyUrl}>复制当前链接</ContextMenuItem>}
-              {pageConfig.copyTitle && <ContextMenuItem onClick={copyTitle}>复制页面标题</ContextMenuItem>}
-              {pageConfig.copyMarkdownLink && <ContextMenuItem onClick={copyMarkdownLink}>复制 Markdown 链接</ContextMenuItem>}
-              {pageConfig.openInNewTab && <ContextMenuItem onClick={openInNewTab}>在新标签页打开</ContextMenuItem>}
-              {pageConfig.reload && <ContextMenuItem onClick={reload}>刷新</ContextMenuItem>}
-              {pageConfig.printPage && <ContextMenuItem onClick={printPage}>打印页面</ContextMenuItem>}
+              {pageConfig.copyUrl && <ContextMenuItem onClick={copyUrl}>{t.copyUrl}</ContextMenuItem>}
+              {pageConfig.copyTitle && <ContextMenuItem onClick={copyTitle}>{t.copyTitle}</ContextMenuItem>}
+              {pageConfig.copyMarkdownLink && <ContextMenuItem onClick={copyMarkdownLink}>{t.copyMarkdownLink}</ContextMenuItem>}
+              {pageConfig.copySelectedText && <ContextMenuItem onClick={copySelectedText}>{t.copySelectedText}</ContextMenuItem>}
+              {pageConfig.openInNewTab && <ContextMenuItem onClick={openInNewTab}>{t.openInNewTab}</ContextMenuItem>}
+              {pageConfig.reload && <ContextMenuItem onClick={reload}>{t.reload}</ContextMenuItem>}
+              {pageConfig.printPage && <ContextMenuItem onClick={printPage}>{t.printPage}</ContextMenuItem>}
               {(pageConfig.scrollToTop || pageConfig.scrollToBottom) && (
                 <>
                   <ContextMenuSeparator />
-                  {pageConfig.scrollToTop && <ContextMenuItem onClick={scrollToTop}>回到顶部</ContextMenuItem>}
-                  {pageConfig.scrollToBottom && <ContextMenuItem onClick={scrollToBottom}>滚动到底部</ContextMenuItem>}
+                  {pageConfig.scrollToTop && <ContextMenuItem onClick={scrollToTop}>{t.scrollToTop}</ContextMenuItem>}
+                  {pageConfig.scrollToBottom && <ContextMenuItem onClick={scrollToBottom}>{t.scrollToBottom}</ContextMenuItem>}
                 </>
               )}
             </ContextMenuGroup>
@@ -172,25 +246,25 @@ export function GlobalContextMenu({
         {hasSiteItems && (
           <>
             {hasPageItems && <ContextMenuSeparator />}
-            <ContextMenuLabel>站点</ContextMenuLabel>
+            <ContextMenuLabel>{t.site}</ContextMenuLabel>
             <ContextMenuGroup>
-              {siteConfig.goHome && <ContextMenuItem onClick={goHome}>返回首页</ContextMenuItem>}
+              {siteConfig.goHome && <ContextMenuItem onClick={goHome}>{t.goHome}</ContextMenuItem>}
               {siteConfig.quickNav && (
                 <ContextMenuSub>
-                  <ContextMenuSubTrigger>快速跳转</ContextMenuSubTrigger>
+                  <ContextMenuSubTrigger>{t.quickNav}</ContextMenuSubTrigger>
                   <ContextMenuSubContent>
-                    <ContextMenuItem onClick={() => quickNav("index")}>文档首页</ContextMenuItem>
-                    <ContextMenuItem onClick={() => quickNav("guide")}>指南</ContextMenuItem>
-                    <ContextMenuItem onClick={() => quickNav("guide/introduction")}>简介</ContextMenuItem>
-                    <ContextMenuItem onClick={() => quickNav("guide/installation")}>安装</ContextMenuItem>
-                    <ContextMenuItem onClick={() => quickNav("guide/quick-start")}>快速开始</ContextMenuItem>
-                    <ContextMenuItem onClick={() => quickNav("guide/configuration")}>配置</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("index")}>{t.docsIndex}</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("guide")}>{t.guide}</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("guide/introduction")}>{t.introduction}</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("guide/installation")}>{t.installation}</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("guide/quick-start")}>{t.quickStart}</ContextMenuItem>
+                    <ContextMenuItem onClick={() => quickNav("guide/configuration")}>{t.configuration}</ContextMenuItem>
                   </ContextMenuSubContent>
                 </ContextMenuSub>
               )}
               {siteConfig.language && (
                 <ContextMenuSub>
-                  <ContextMenuSubTrigger>语言</ContextMenuSubTrigger>
+                  <ContextMenuSubTrigger>{t.language}</ContextMenuSubTrigger>
                   <ContextMenuSubContent>
                     <ContextMenuRadioGroup value={currentLang}>
                       <ContextMenuRadioItem value="en" onClick={() => goLang("en")}>English</ContextMenuRadioItem>
@@ -207,21 +281,21 @@ export function GlobalContextMenu({
         {hasAppearanceItems && (
           <>
             {(hasPageItems || hasSiteItems) && <ContextMenuSeparator />}
-            <ContextMenuLabel>外观</ContextMenuLabel>
+            <ContextMenuLabel>{t.appearance}</ContextMenuLabel>
             <ContextMenuGroup>
               {appearanceConfig.theme && (
                 <ContextMenuSub>
-                  <ContextMenuSubTrigger>主题</ContextMenuSubTrigger>
+                  <ContextMenuSubTrigger>{t.theme}</ContextMenuSubTrigger>
                   <ContextMenuSubContent>
                     <ContextMenuRadioGroup value={theme}>
-                      <ContextMenuRadioItem value="light" onClick={() => setTheme("light")}>浅色</ContextMenuRadioItem>
-                      <ContextMenuRadioItem value="dark" onClick={() => setTheme("dark")}>深色</ContextMenuRadioItem>
-                      <ContextMenuRadioItem value="system" onClick={() => setTheme("system")}>跟随系统</ContextMenuRadioItem>
+                      <ContextMenuRadioItem value="light" onClick={() => setTheme("light")}>{t.light}</ContextMenuRadioItem>
+                      <ContextMenuRadioItem value="dark" onClick={() => setTheme("dark")}>{t.dark}</ContextMenuRadioItem>
+                      <ContextMenuRadioItem value="system" onClick={() => setTheme("system")}>{t.system}</ContextMenuRadioItem>
                     </ContextMenuRadioGroup>
                   </ContextMenuSubContent>
                 </ContextMenuSub>
               )}
-              {appearanceConfig.resetThemePref && <ContextMenuItem onClick={resetThemePref}>重置主题偏好</ContextMenuItem>}
+              {appearanceConfig.resetThemePref && <ContextMenuItem onClick={resetThemePref}>{t.resetThemePref}</ContextMenuItem>}
             </ContextMenuGroup>
           </>
         )}

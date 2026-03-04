@@ -8,7 +8,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills"
 export default defineConfig({
   appType: "spa",
   plugins: [react(), tailwindcss(), nodePolyfills()],
-  publicDir: true,
+  publicDir: "public",
   build: {
     copyPublicDir: true,
   },

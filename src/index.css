@@ -142,12 +142,21 @@
     overflow-x: auto;
   }
   .prose pre > code {
-    display: grid;
-    min-width: 100%;
-    word-break: break-word;
+    display: block;
     padding: 1rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
+    white-space: pre !important;
+    width: max-content;
+    max-width: none;
+  }
+  /* 移动端代码块优化 */
+  @media (max-width: 640px) {
+    .prose pre > code {
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      line-height: 1.125rem;
+    }
   }
   .prose code:not(pre code) {
     border-radius: 0.25rem;
@@ -179,13 +188,14 @@
   }
   .prose table {
     width: 100%;
-    overflow: hidden;
     border-radius: 0.375rem;
     border-width: 1px;
     border-color: var(--color-border);
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
+  .prose thead { background-color: var(--color-secondary); }
+  .prose th, .prose td { border-bottom-width: 1px; border-color: var(--color-border); padding: 0.5rem 0.75rem; }
   .prose thead { background-color: var(--color-secondary); }
   .prose th, .prose td { border-bottom-width: 1px; border-color: var(--color-border); padding: 0.5rem 0.75rem; }
   .prose a { 
@@ -221,7 +231,6 @@
 /* 代码高亮样式 */
 .hljs {
   display: block;
-  overflow-x: auto;
   padding: 0.5em;
   background: transparent;
 }

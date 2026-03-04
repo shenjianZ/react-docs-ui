@@ -11,9 +11,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+const translations = {
+  "zh-cn": {
+    switchLanguage: "切换语言",
+  },
+  en: {
+    switchLanguage: "Switch language",
+  },
+}
+
 export function LanguageSwitcher() {
   const navigate = useNavigate()
   const location = useLocation()
+
+  const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
+  const t = translations[currentLang]
 
   const locales = [
     { code: "en", name: "English" },
@@ -36,7 +48,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <Globe className="h-4 w-4" />
-          <span className="sr-only">Switch language</span>
+          <span className="sr-only">{t.switchLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

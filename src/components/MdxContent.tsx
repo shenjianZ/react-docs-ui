@@ -29,6 +29,13 @@ export function MdxContent({ source }: MdxContentProps) {
           [rehypeAutolinkHeadings, { behavior: "append" }],
         ]}
         components={{
+          table({ children, ...props }) {
+            return (
+              <div className="overflow-x-auto">
+                <table {...props}>{children}</table>
+              </div>
+            )
+          },
           a({ href, children, ...props }) {
             if (!href) return <a {...props}>{children}</a>
 

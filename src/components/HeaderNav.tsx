@@ -1,4 +1,4 @@
-import { Github } from "lucide-react"
+import { Github, Menu, MoreVertical } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
@@ -7,6 +7,13 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ModeToggle } from "@/components/mode-toggle"
 import { buttonVariants } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 // Define SiteConfig types locally as they are not available in the Vite project
@@ -43,13 +50,28 @@ interface HeaderNavProps {
   site: SiteConfig["site"]
   navbar: SiteConfig["navbar"]
   themeConfig?: { allowToggle?: boolean }
+  onMenuClick?: () => void
 }
 
-export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
+export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: HeaderNavProps) {
   const location = useLocation()
   const pathname = location.pathname
   const { theme } = useTheme()
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light")
+
+  const translations = {
+    "zh-cn": {
+      switchLanguage: "切换语言",
+      switchTheme: "切换主题",
+    },
+    en: {
+      switchLanguage: "Switch language",
+      switchTheme: "Toggle theme",
+    },
+  }
+  
+  const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
+  const t = translations[currentLang]
 
   useEffect(() => {
     if (theme === "system") {
@@ -74,8 +96,19 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center px-4 md:px-8">
+        {/* 移动端汉堡菜单按钮 */}
+        <button
+          onClick={onMenuClick}
+          className={cn(
+            buttonVariants({ variant: "ghost" }),
+            "mr-2 px-0 flex-shrink-0 md:hidden"
+          )}
+          aria-label="打开菜单"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         {(((navbar.showLogo ?? true) as boolean) || ((navbar.showTitle ?? true) as boolean)) && (
-          <Link to={`/${lang}`} className="mr-6 flex items-center space-x-2">
+          <div className="mr-6 flex items-center space-x-2 flex-shrink-0">
             {(navbar.showLogo ?? true) && (
               <img
                 src={resolvedTheme === "dark" ? logoDark : logoLight}
@@ -85,11 +118,11 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
               />
             )}
             {(navbar.showTitle ?? true) && (
-              <span className="font-bold sm:inline-block">{site.title}</span>
+              <span className="font-bold sm:inline-block whitespace-nowrap">{site.title}</span>
             )}
-          </Link>
+          </div>
         )}
-        <nav className="ml-6 flex items-center space-x-6 text-sm font-medium">
+        <nav className="ml-6 flex items-center space-x-6 text-sm font-medium hidden md:flex">
           {navbar.items.filter(i => i.visible !== false).map(
             item =>
               !item.external && (
@@ -108,8 +141,9 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
               )
           )}
         </nav>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <nav className="flex items-center">
+        <div className="flex flex-1 items-center justify-end">
+          {/* 桌面端：显示独立图标 */}
+          <nav className="flex items-center space-x-2 hidden md:flex">
             {(navbar.actions || [])
               .filter(action => action.enabled !== false)
               .map((action, idx) => {
@@ -151,7 +185,7 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
                       <LanguageSwitcher />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent align="center">切换语言</TooltipContent>
+                  <TooltipContent align="center">{t.switchLanguage}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
@@ -163,11 +197,61 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
                       <ModeToggle />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent align="center">切换主题</TooltipContent>
+                  <TooltipContent align="center">{t.switchTheme}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
           </nav>
+          {/* 移动端：显示下拉菜单 */}
+          <div className="relative md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "w-9 px-0 flex-shrink-0"
+                  )}
+                  aria-label="更多选项"
+                >
+                  <MoreVertical className="h-5 w-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[40px]">
+                {(navbar.actions || [])
+                  .filter(action => action.enabled !== false)
+                  .map((action, idx) => {
+                    return (
+                      <DropdownMenuItem key={action.link || `${action.type || 'action'}-${idx}`} asChild>
+                        <a
+                          href={action.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full h-9"
+                        >
+                          {action.type === "github" && <Github className="h-4 w-4" />}
+                        </a>
+                      </DropdownMenuItem>
+                    )
+                  })}
+                {navbar.showLanguageSwitcher !== false && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="flex items-center justify-center w-full h-9">
+                      <LanguageSwitcher />
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {(themeConfig?.allowToggle ?? true) && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="flex items-center justify-center w-full h-9">
+                      <ModeToggle />
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>
