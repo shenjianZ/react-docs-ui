@@ -4,7 +4,12 @@ import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
 import rehypeRaw from "rehype-raw"
 import rehypeHighlight from "rehype-highlight"
+import remarkMath from "remark-math"
+import rehypeKatex from "rehype-katex"
 import { Link, useParams } from "react-router-dom"
+import "katex/dist/katex.min.css"
+import "katex/contrib/mhchem/mhchem.js"
+import macros_physics from "katex-physics"
 
 interface MdxContentProps {
   source: string
@@ -18,7 +23,7 @@ export function MdxContent({ source }: MdxContentProps) {
   return (
     <div className="prose dark:prose-invert max-w-none">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
           rehypeSlug,
           // 允许在 Markdown 中渲染原生 HTML（需放在 autolink 之前）
@@ -27,6 +32,19 @@ export function MdxContent({ source }: MdxContentProps) {
           [rehypeHighlight as any, { ignoreMissing: true }],
           // 避免将整个标题包裹在 <a> 中，防止与标题内部链接产生嵌套 <a>
           [rehypeAutolinkHeadings, { behavior: "append" }],
+          // 数学公式渲染（启用全部功能）
+          [rehypeKatex, {
+            strict: false,
+            trust: true,
+            macros: {
+              "\\R": "\\mathbb{R}",
+              "\\N": "\\mathbb{N}",
+              "\\Z": "\\mathbb{Z}",
+              "\\Q": "\\mathbb{Q}",
+              "\\C": "\\mathbb{C}",
+              ...macros_physics,
+            },
+          }],
         ]}
         components={{
           table({ children, ...props }) {
