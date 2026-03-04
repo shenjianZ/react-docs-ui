@@ -5,6 +5,10 @@ import { useParams } from "react-router-dom"
 import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
+import * as navigation from "../lib/navigation"
+
+console.log("navigation module:", navigation)
+console.log("getPrevNextPage function:", navigation.getPrevNextPage)
 
 export function DocsPage() {
   const params = useParams<{ lang: string; "*": string }>()
@@ -18,6 +22,21 @@ export function DocsPage() {
   const [frontmatter, setFrontmatter] = useState<any>(null)
   const [configLoading, setConfigLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(true)
+
+  // 计算当前路径的第一段（用于匹配 collections）
+  const firstSegment = useMemo(() => {
+    const parts = (slug || "").split("/").filter(Boolean)
+    return parts.length > 0 ? parts[0] : ""
+  }, [slug])
+
+  // 计算上一节和下一节
+  const { prev, next } = useMemo(() => {
+    const currentPath = `/${currentLang}/${slug || ""}`
+    console.log("DocsPage useMemo:", { config, sidebar: config?.sidebar, currentPath, firstSegment })
+    const result = getPrevNextPage(config?.sidebar, currentPath, firstSegment)
+    console.log("DocsPage result:", result)
+    return result
+  }, [config?.sidebar, currentLang, slug, firstSegment])
 
   // 加载站点配置：仅在语言变化时触发
   useEffect(() => {
@@ -96,7 +115,13 @@ export function DocsPage() {
   }
 
   return (
-    <DocsLayout lang={currentLang} config={config!} frontmatter={frontmatter}>
+    <DocsLayout
+      lang={currentLang}
+      config={config!}
+      frontmatter={frontmatter}
+      prev={prev}
+      next={next}
+    >
       {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} />}
     </DocsLayout>
   )

@@ -20,6 +20,7 @@ export { HeaderNav } from "./components/HeaderNav"
 export { SidebarNav } from "./components/SidebarNav"
 export { TableOfContents } from "./components/TableOfContents"
 export { Footer } from "./components/Footer"
+export { PageNavigation } from "./components/PageNavigation"
 
 // Theming
 export { ThemeProvider, useTheme } from "./components/theme-provider"
@@ -88,7 +89,9 @@ export { MdxContent } from "./components/MdxContent"
 // Library utilities and types
 export { cn } from "./lib/utils"
 export { getConfig } from "./lib/config"
+export { getPrevNextPage } from "./lib/navigation"
 export type { SiteConfig } from "./lib/config"
+export type { NavigationItem, NavigationResult } from "./lib/navigation"
 
 // Ready-to-use app
 export { DocsApp } from "./app/DocsApp"

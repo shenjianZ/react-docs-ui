@@ -6,6 +6,7 @@ import { MobileSidebar } from "@/components/MobileSidebar"
 import { FloatingNavBall } from "@/components/FloatingNavBall"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
+import { PageNavigation } from "@/components/PageNavigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
@@ -28,6 +29,8 @@ interface DocsLayoutProps {
   config: SiteConfig
   frontmatter: any
   children: React.ReactNode
+  prev?: { title: string; path: string } | null
+  next?: { title: string; path: string } | null
 }
 
 export function DocsLayout({
@@ -35,13 +38,15 @@ export function DocsLayout({
   config,
   frontmatter,
   children,
+  prev,
+  next,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
   const toc = frontmatter?.toc
 
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  
+
   // 滚动位置记忆
   useScrollPosition()
 
@@ -80,11 +85,12 @@ export function DocsLayout({
             </aside>
           )}
         </div>
-        {config.footer?.enabled !== false && (
-          <div className="md:col-start-2">
+        <div className="md:col-start-2">
+          <PageNavigation prev={prev} next={next} lang={lang} />
+          {config.footer?.enabled !== false && (
             <Footer footer={config.footer} lang={lang} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

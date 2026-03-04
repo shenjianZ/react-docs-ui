@@ -12,6 +12,7 @@ import { GlobalContextMenu } from "../components/GlobalContextMenu"
 import { CommandMenu } from "../components/CommandMenu"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
+import { getPrevNextPage } from "../lib/navigation"
 
 // 简单的 markdown frontmatter 解析函数，不依赖 Buffer
 function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>; content: string } {
@@ -94,6 +95,18 @@ function DocsPage() {
   const [frontmatter, setFrontmatter] = useState<any>(null)
   const [configLoading, setConfigLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(true)
+
+  // 计算当前路径的第一段（用于匹配 collections）
+  const firstSegment = useMemo(() => {
+    const parts = (slug || "").split("/").filter(Boolean)
+    return parts.length > 0 ? parts[0] : ""
+  }, [slug])
+
+  // 计算上一节和下一节
+  const { prev, next } = useMemo(() => {
+    const currentPath = `/${currentLang}/${slug || ""}`
+    return getPrevNextPage(config?.sidebar, currentPath, firstSegment)
+  }, [config?.sidebar, currentLang, slug, firstSegment])
 
   useEffect(() => {
     let cancelled = false
@@ -178,7 +191,7 @@ function DocsPage() {
   }
 
   return (
-    <DocsLayout lang={currentLang} config={config!} frontmatter={frontmatter}>
+    <DocsLayout lang={currentLang} config={config!} frontmatter={frontmatter} prev={prev} next={next}>
       {contentLoading && !content ? (
         <div>Loading...</div>
       ) : (

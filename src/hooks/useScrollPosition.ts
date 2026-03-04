@@ -118,8 +118,24 @@ export function useScrollPosition() {
     }
   }, [location.pathname, location.search])
 
+  // 清除指定路径的滚动位置
+  const clearScrollPosition = (pathname: string) => {
+    const key = pathname + window.location.search
+    scrollPositionsRef.current.delete(key)
+    restoredPathsRef.current.delete(key)
+    
+    // 更新 sessionStorage
+    try {
+      const positions = Object.fromEntries(scrollPositionsRef.current)
+      sessionStorage.setItem("scroll-positions", JSON.stringify(positions))
+    } catch {
+      // ignore
+    }
+  }
+
   return {
     saveScrollPosition,
     restoreScrollPosition,
+    clearScrollPosition,
   }
 }
