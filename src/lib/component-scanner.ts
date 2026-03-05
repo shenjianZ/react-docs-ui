@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tip, Warning, Card, CodeBlock } from '../components/mdx-components'
+import { Tip, Warning, Card } from '../components/mdx-components'
 
 /**
  * 组件注册表类型
@@ -23,8 +23,7 @@ export interface ComponentConfig {
 const BUILTIN_MDX_COMPONENTS: ComponentRegistry = {
   Tip,
   Warning,
-  Card,
-  CodeBlock
+  Card
 }
 
 /**

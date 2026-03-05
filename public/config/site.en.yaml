@@ -73,7 +73,7 @@ toc:
 # Footer Configuration
 footer:
   enabled: true
-  copyright: "© 2024 React Docs UI. All rights reserved."
+  copyright: "© 2025 React Docs UI. All rights reserved."
   repository:
     url: "https://github.com/shenjianZ/React-docs-ui"
     branch: "master"
@@ -107,6 +107,15 @@ footer:
         - title: "Back to Top"
           link: "#"
           action: "scrollTop"
+  links:
+    - title: "Documentation"
+      link: "/guide/introduction"
+    - title: "GitHub"
+      link: "https://github.com/shenjianZ/React-docs-ui"
+      external: true
+    - title: "License"
+      link: "https://github.com/shenjianZ/React-docs-ui/blob/master/LICENSE"
+      external: true
   social:
     - name: "email"
       url: "mailto:contact@example.com"
@@ -150,7 +159,7 @@ footer:
 
 # PWA Configuration
 pwa:
-  enabled: false
+  enabled: true
   name: "React Docs UI"
   shortName: "ReactDocsUI"
   description: "Beautiful documentation websites made simple"

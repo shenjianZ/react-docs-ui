@@ -87,7 +87,7 @@ export {
 export { MdxContent } from "./components/MdxContent"
 
 // MDX components
-export { Tip, Warning, Card, CodeBlock } from './components/mdx-components'
+export { Tip, Warning, Card } from './components/mdx-components'
 export { ComponentProvider, useComponents } from './components/ComponentProvider'
 
 // Component scanner utilities

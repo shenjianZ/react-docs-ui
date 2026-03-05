@@ -108,19 +108,20 @@ footer:
           link: "#"
           action: "scrollTop"
   links:
-    - title: "Documentation"
+    - title: "文档"
       link: "/guide/introduction"
     - title: "GitHub"
       link: "https://github.com/shenjianZ/React-docs-ui"
       external: true
-    - title: "License"
-      link: "/license"
+    - title: "许可证"
+      link: "https://github.com/shenjianZ/React-docs-ui/blob/master/LICENSE"
+      external: true
   social:
     - name: "email"
       url: "mailto:contact@example.com"
       icon: "mail"
     - name: "github"
-      url: "https://github.com/your_github_id"
+      url: "https://github.com/shenjianZ/React-docs-ui"
       icon: "github"
     # - name: "youtube"
     #   url: "https://youtube.com/@yourhandle"

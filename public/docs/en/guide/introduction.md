@@ -1,28 +1,24 @@
 # Introduction
 
-React Docs UI is a React component library and toolset designed specifically for building modern documentation websites. Its core philosophy is **configuration over code**, allowing you to focus entirely on content creation.
+React Docs UI is a configuration-driven documentation site builder.
 
-## Core Advantages
+## Core Features
 
-- **Configuration-Driven**: This is the core feature of React Docs UI. You don't need to write complex React components or routing logic; just maintain a clear `site.yaml` file to define everything from the site's navigation and sidebar to its theme and footer.
-
-- **Fully-Featured**: Out-of-the-box, it provides everything a modern documentation website needs:
-  - Responsive layout
-  - Light/dark theme switching
-  - Markdown-based content rendering (with GFM and Frontmatter support)
-  - Built-in code syntax highlighting
-  - Quick command menu (Cmd+K)
-  - Internationalization support
-
-- **Extremely Simple to Start**: With the official `create-react-docs-ui` scaffolding tool, you can launch a fully functional documentation website in under a minute, without any complex environment setup.
-
-- **Highly Customizable**: While it works out-of-the-box, every part (like the logo, color scheme, navigation links, social media icons, etc.) can be deeply customized through the configuration file.
+1. **Configuration-Driven**: Control all features via YAML config
+2. **MDX Support**: Use React components in Markdown
+3. **Theme System**: Light/dark themes with auto mode
+4. **Navigation**: Top navbar, sidebar, table of contents
+5. **Internationalization**: Multi-language support
+6. **Shortcuts**: Command menu (Cmd+K), context menu
+7. **Code Highlighting**: rehype-highlight integration
+8. **Math Formulas**: KaTeX rendering
+9. **PWA Support**: Configurable Progressive Web App
+10. **AI Integration**: Configurable AI assistant (requires API key)
 
 ## Use Cases
 
-Whether you are an individual developer or part of a team, React Docs UI is perfect for the following scenarios:
-
-- **Open Source Project Documentation**: Provide a professional and easy-to-maintain documentation site for your React project.
-- **Product Manuals**: Clearly present your product's features and usage guides.
-- **Team Knowledge Bases**: Build and share knowledge based on React technology within your team.
-- **Personal Blogs or Portfolios**: Organize and display your technical articles or projects in an elegant way.
+- Open source project documentation
+- Product manuals
+- Team knowledge bases
+- Technical blogs
+- API documentation

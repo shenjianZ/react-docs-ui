@@ -131,40 +131,40 @@ export function MdxContent({ source }: MdxContentProps) {
   const lang = params.lang || "zh-cn"
   const registeredComponents = useComponents()
   
-  // 转换 JSX 语法为 HTML
-  const transformedSource = convertJSXToHTML(source)
+  // ✅ 优化：添加缓存，只在 source 变化时重新转换
+  const transformedSource = React.useMemo(() => {
+    return convertJSXToHTML(source)
+  }, [source])
 
-  // 动态生成组件映射，支持所有注册的组件（包括自定义组件）
-  const dynamicComponents = React.useMemo(() => {
-    const componentMap: Record<string, React.ComponentType<any>> = {}
-    
+  // ✅ 优化：使用 Map 提高查找性能，并为 WrappedComponent 添加 React.memo
+  const componentMap = React.useMemo(() => {
+    const map = new Map<string, React.ComponentType<any>>()
     if (registeredComponents) {
-      // 将所有组件名称转换为小写，支持 <MyTip> 和 <mytip> 两种写法
       Object.entries(registeredComponents).forEach(([name, Component]) => {
         const lowerName = name.toLowerCase()
         
-        // 创建一个包装组件，将所有 props 传递给实际组件
-        const WrappedComponent = ({ children, ...props }: any) => {
-          // 提取 data-* 属性并转换为正常的 props
+        // ✅ 优化：WrappedComponent 使用 React.memo 减少不必要的重渲染
+        const WrappedComponent = React.memo(({ children, ...props }: any) => {
           const componentProps = extractDataProps(props)
           return React.createElement(Component as any, componentProps, children)
-        }
+        })
         
-        // 注册组件（支持多种命名方式）
-        componentMap[lowerName] = WrappedComponent
+        map.set(lowerName, WrappedComponent)
         
-        // 对于带点号的组件（如 BadgeList.Badge），也需要注册为不带点号的格式
-        // 因为 HTML 规范不允许标签名包含点号
         if (name.includes('.')) {
           const [parentName, subName] = name.split('.')
           const combinedLower = `${parentName.toLowerCase()}-${subName.toLowerCase()}`
-          componentMap[combinedLower] = WrappedComponent
+          map.set(combinedLower, WrappedComponent)
         }
       })
     }
-    
-    return componentMap
+    return map
   }, [registeredComponents])
+  
+  // ✅ 转换为对象以兼容 ReactMarkdown
+  const dynamicComponents = React.useMemo(() => {
+    return Object.fromEntries(componentMap)
+  }, [componentMap])
 
   return (
     <div className="prose dark:prose-invert max-w-none">
