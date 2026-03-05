@@ -5,10 +5,7 @@ import { useParams } from "react-router-dom"
 import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
-import * as navigation from "../lib/navigation"
-
-console.log("navigation module:", navigation)
-console.log("getPrevNextPage function:", navigation.getPrevNextPage)
+import { getPrevNextPage } from "../lib/navigation"
 
 export function DocsPage() {
   const params = useParams<{ lang: string; "*": string }>()

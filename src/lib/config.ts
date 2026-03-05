@@ -100,6 +100,7 @@ export interface SiteConfig {
       copyUrl?: boolean
       copyTitle?: boolean
       copyMarkdownLink?: boolean
+      copySelectedText?: boolean
       openInNewTab?: boolean
       reload?: boolean
       printPage?: boolean
@@ -114,6 +115,15 @@ export interface SiteConfig {
     appearance?: {
       theme?: boolean
       resetThemePref?: boolean
+    }
+  }
+  // MDX 组件配置
+  mdx?: {
+    componentsPath?: string  // 组件扫描路径，默认 '/src/components'
+    enabled?: boolean         // 是否启用 MDX 支持，默认 true
+    // 手动配置的组件列表（可选）
+    components?: {
+      [componentName: string]: string  // 组件名称到组件导入路径的映射
     }
   }
 }

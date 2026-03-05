@@ -11,7 +11,6 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tailwindcss(),
-      dts({ include: ["src"], outDir: "dist/types" }),
     ],
     build: {
       lib: {
@@ -28,6 +27,7 @@ export default defineConfig(() => {
           "clsx",
           "tailwind-merge",
           "buffer",
+          "/src/generated/mdx-components.ts",
         ],
         output: {
           globals: {

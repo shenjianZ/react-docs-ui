@@ -63,10 +63,14 @@ export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: Head
     "zh-cn": {
       switchLanguage: "切换语言",
       switchTheme: "切换主题",
+      openMenu: "打开菜单",
+      moreOptions: "更多选项",
     },
     en: {
       switchLanguage: "Switch language",
       switchTheme: "Toggle theme",
+      openMenu: "Open menu",
+      moreOptions: "More options",
     },
   }
   
@@ -103,7 +107,7 @@ export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: Head
             buttonVariants({ variant: "ghost" }),
             "mr-2 px-0 flex-shrink-0 md:hidden"
           )}
-          aria-label="打开菜单"
+          aria-label={t.openMenu}
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -211,7 +215,7 @@ export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: Head
                     buttonVariants({ variant: "ghost" }),
                     "w-9 px-0 flex-shrink-0"
                   )}
-                  aria-label="更多选项"
+                  aria-label={t.moreOptions}
                 >
                   <MoreVertical className="h-5 w-5" />
                 </button>

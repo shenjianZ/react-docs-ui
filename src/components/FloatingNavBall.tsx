@@ -13,10 +13,23 @@ interface FloatingNavBallProps {
   }[]
 }
 
+const translations = {
+  "zh-cn": {
+    openNav: "打开导航",
+    closeNav: "关闭导航"
+  },
+  en: {
+    openNav: "Open navigation",
+    closeNav: "Close navigation"
+  }
+}
+
 export function FloatingNavBall({ lang, items }: FloatingNavBallProps) {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
   const pathname = location.pathname
+  const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
+  const t = translations[currentLang]
 
   const filteredItems = items.filter(i => i.visible !== false && !i.external)
 
@@ -34,7 +47,7 @@ export function FloatingNavBall({ lang, items }: FloatingNavBallProps) {
           isOpen ? "rotate-180 scale-110" : "hover:scale-110",
           "bg-primary text-primary-foreground"
         )}
-        aria-label={isOpen ? "关闭导航" : "打开导航"}
+        aria-label={isOpen ? t.closeNav : t.openNav}
       >
         {isOpen ? <X className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
       </button>

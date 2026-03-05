@@ -11,8 +11,10 @@ import { ThemeProvider } from "../components/theme-provider"
 import { GlobalContextMenu } from "../components/GlobalContextMenu"
 import { CommandMenu } from "../components/CommandMenu"
 import { MdxContent } from "../components/MdxContent"
+import { ComponentProvider } from "../components/ComponentProvider"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
+import { scanComponents, loadComponents } from "../lib/component-scanner"
 
 // 简单的 markdown frontmatter 解析函数，不依赖 Buffer
 function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>; content: string } {
@@ -53,6 +55,7 @@ function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>
 
 function RootShell(): React.JSX.Element {
   const [contextMenuConfig, setContextMenuConfig] = useState<SiteConfig["contextMenu"] | undefined>(undefined)
+  const [components, setComponents] = useState<Record<string, React.ComponentType<any>>>({})
 
   useEffect(() => {
     let cancelled = false
@@ -62,9 +65,24 @@ function RootShell(): React.JSX.Element {
         const loadedConfig = await getConfig("zh-cn")
         if (!cancelled) {
           setContextMenuConfig(loadedConfig?.contextMenu)
+          
+          // 加载组件
+          const componentsPath = loadedConfig?.mdx?.componentsPath || '/src/components'
+          const componentsConfig = loadedConfig?.mdx?.components
+          
+          if (loadedConfig?.mdx?.enabled !== false) {
+            try {
+              const componentList = await scanComponents(componentsPath)
+              const loadedComponents = await loadComponents(componentList, componentsConfig)
+              console.log('[MDX] 已加载的组件:', Object.keys(loadedComponents))
+              setComponents(loadedComponents)
+            } catch (error) {
+              console.warn('[MDX] 加载组件失败:', error)
+            }
+          }
         }
       } catch (error) {
-        console.error("Error loading context menu config:", error)
+        console.error("Error loading config:", error)
       }
     })()
 
@@ -75,10 +93,12 @@ function RootShell(): React.JSX.Element {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <GlobalContextMenu config={contextMenuConfig}>
-        <CommandMenu />
-        <Outlet />
-      </GlobalContextMenu>
+      <ComponentProvider components={components}>
+        <GlobalContextMenu config={contextMenuConfig}>
+          <CommandMenu />
+          <Outlet />
+        </GlobalContextMenu>
+      </ComponentProvider>
     </ThemeProvider>
   )
 }
@@ -91,10 +111,11 @@ function DocsPage() {
   const currentLang = useMemo(() => langParam || "zh-cn", [langParam])
 
   const [config, setConfig] = useState<SiteConfig | null>(null)
-  const [content, setContent] = useState("")
-  const [frontmatter, setFrontmatter] = useState<any>(null)
-  const [configLoading, setConfigLoading] = useState(true)
+  const [content, setContent] = useState<string | null>(null)
+  const [frontmatter, setFrontmatter] = useState<Record<string, any>>({})
+  const [isMdx, setIsMdx] = useState(false)
   const [contentLoading, setContentLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   // 计算当前路径的第一段（用于匹配 collections）
   const firstSegment = useMemo(() => {
@@ -110,7 +131,6 @@ function DocsPage() {
 
   useEffect(() => {
     let cancelled = false
-    setConfigLoading(true)
 
     ;(async () => {
       try {
@@ -123,8 +143,6 @@ function DocsPage() {
         if (!cancelled) {
           setConfig(null)
         }
-      } finally {
-        if (!cancelled) setConfigLoading(false)
       }
     })()
 
@@ -138,64 +156,109 @@ function DocsPage() {
     setContentLoading(true)
 
     const pageSlug = slug || "index"
-    const docPath = `/docs/${currentLang}/${pageSlug}.md`
-
-    ;(async () => {
+    
+    const mdPath = `/docs/${currentLang}/${pageSlug}.md`
+    const mdxPath = `/docs/${currentLang}/${pageSlug}.mdx`
+    
+    const loadContent = async () => {
       try {
-        console.log("Fetching document:", docPath)
-        const response = await fetch(docPath)
-        const contentType = response.headers.get("content-type")
-
-        if (
-          !response.ok ||
-          !contentType ||
-          (!contentType.includes("text/markdown") &&
-            !contentType.includes("text/plain"))
-        ) {
-          throw new Error(
-            `File not found or invalid content type for: ${docPath}`
-          )
+        // 同时请求两个文件
+        const [mdResponse, mdxResponse] = await Promise.all([
+          fetch(mdPath),
+          fetch(mdxPath)
+        ])
+        
+        let contentToUse: string | null = null
+        let isMdxFile = false
+        
+        // 检查 MDX 文件
+        if (mdxResponse.ok) {
+          const mdxText = await mdxResponse.text()
+          // 检查是否是 HTML（表示文件不存在）
+          if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
+            contentToUse = mdxText
+            isMdxFile = true
+          }
         }
-
-        const markdown = await response.text()
+        
+        // 如果 MDX 不可用，检查 MD 文件
+        if (!contentToUse && mdResponse.ok) {
+          const mdText = await mdResponse.text()
+          // 检查是否是 HTML（表示文件不存在）
+          if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
+            contentToUse = mdText
+            isMdxFile = false
+          }
+        }
+        
+        if (!contentToUse) {
+          throw new Error(`Neither ${mdPath} nor ${mdxPath} found`)
+        }
+        
         if (cancelled) return
         
-        console.log("Parsing markdown with custom parser...")
-        
-        // 使用自定义的解析函数，避免 Buffer 依赖
-        const { data, content } = parseMarkdownFrontmatter(markdown)
+        const { data } = parseMarkdownFrontmatter(contentToUse)
         setFrontmatter(data)
-        setContent(content)
+        setContent(contentToUse)
+        setIsMdx(isMdxFile)
         
       } catch (error) {
-        console.error("Error loading document:", error)
         if (cancelled) return
         const errorMessage =
-          "# 404 - Not Found\n\nThe page you're looking for at `" +
-          docPath +
-          "` could not be found."
+          "# 404 - Not Found\n\nThe page you're looking for could not be found."
         setContent(errorMessage)
         setFrontmatter({ title: "Not Found" })
+        setIsMdx(false)
+        setError(error as Error)
       } finally {
-        if (!cancelled) setContentLoading(false)
+        setContentLoading(false)
       }
-    })()
+    }
+
+    loadContent()
+
+    // 监听文档文件变化，实现热更新
+    if (import.meta.hot) {
+      const handleUpdate = () => {
+        loadContent()
+      }
+
+      // 监听 MDX 和 MD 文件的变化
+      const mdxFile = `/public/docs/${currentLang}/${pageSlug}.mdx`
+      const mdFile = `/public/docs/${currentLang}/${pageSlug}.md`
+
+      import.meta.hot.accept(mdxFile, handleUpdate)
+      import.meta.hot.accept(mdFile, handleUpdate)
+    }
 
     return () => {
       cancelled = true
     }
   }, [currentLang, slug])
 
-  if (configLoading && !config) {
+  if (!config) {
     return <div>Loading...</div>
   }
 
+  if (error) {
+    return (
+      <DocsLayout lang={currentLang} config={config} frontmatter={{ title: '错误' }} prev={null} next={null}>
+        <div className="text-red-600">
+          <h1>页面加载失败</h1>
+          <p>{error.message}</p>
+        </div>
+      </DocsLayout>
+    )
+  }
+
   return (
-    <DocsLayout lang={currentLang} config={config!} frontmatter={frontmatter} prev={prev} next={next}>
+    <DocsLayout lang={currentLang} config={config} frontmatter={frontmatter} prev={prev} next={next}>
       {contentLoading && !content ? (
         <div>Loading...</div>
+      ) : isMdx ? (
+        <MdxContent source={content || ''} />
       ) : (
-        <MdxContent source={content} />
+        <MdxContent source={content || ''} />
       )}
     </DocsLayout>
   )
@@ -220,5 +283,3 @@ export function DocsApp(): React.JSX.Element {
 
   return <RouterProvider router={router} />
 }
-
-

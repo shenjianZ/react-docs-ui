@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
 
@@ -14,8 +15,20 @@ interface TableOfContentsProps {
   toc: TocItem[]
 }
 
+const translations = {
+  "zh-cn": {
+    onThisPage: "本页目录"
+  },
+  en: {
+    onThisPage: "On This Page"
+  }
+}
+
 export function TableOfContents({ toc }: TableOfContentsProps) {
+  const location = useLocation()
   const [activeId, setActiveId] = useState<string | null>(null)
+  const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
+  const t = translations[currentLang]
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -65,7 +78,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
 
   return (
     <div className="space-y-2">
-      <p className="font-medium">On This Page</p>
+      <p className="font-medium">{t.onThisPage}</p>
       <ul className="m-0 list-none">
         {toc.map(item => (
           <li key={item.url} className={cn("mt-0 pt-2")}>

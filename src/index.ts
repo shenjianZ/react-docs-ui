@@ -86,12 +86,20 @@ export {
 // Markdown renderer
 export { MdxContent } from "./components/MdxContent"
 
+// MDX components
+export { Tip, Warning, Card, CodeBlock } from './components/mdx-components'
+export { ComponentProvider, useComponents } from './components/ComponentProvider'
+
+// Component scanner utilities
+export { scanComponents, importComponent, loadComponents, mergeComponents } from './lib/component-scanner'
+export type { ComponentRegistry, ComponentConfig } from './lib/component-scanner'
+
 // Library utilities and types
 export { cn } from "./lib/utils"
 export { getConfig } from "./lib/config"
 export { getPrevNextPage } from "./lib/navigation"
 export type { SiteConfig } from "./lib/config"
-export type { NavigationItem, NavigationResult } from "./lib/navigation"
+export type { NavigationResult } from "./lib/navigation"
 
 // Ready-to-use app
 export { DocsApp } from "./app/DocsApp"

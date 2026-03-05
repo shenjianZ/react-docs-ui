@@ -53,20 +53,7 @@ function handleNavigationClick(e: React.MouseEvent<HTMLAnchorElement>, targetPat
 }
 
 export function PageNavigation({ prev, next, lang }: PageNavigationProps) {
-  console.log("PageNavigation render:", {
-    prev,
-    next,
-    lang,
-    prevType: typeof prev,
-    nextType: typeof next,
-    prevNull: prev === null,
-    nextNull: next === null,
-    prevUndefined: prev === undefined,
-    nextUndefined: next === undefined
-  })
-
   if (!prev && !next) {
-    console.log("PageNavigation returning null because prev and next are both falsy")
     return null
   }
 

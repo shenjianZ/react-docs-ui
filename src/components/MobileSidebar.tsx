@@ -1,4 +1,3 @@
-import * as React from "react"
 import { useEffect } from "react"
 import { SidebarNav } from "./SidebarNav"
 import { ScrollArea } from "@/components/ui/scroll-area"
