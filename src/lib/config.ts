@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error types provided via ambient declaration
+// @ts-ignore types provided via ambient declaration
 import yaml from "js-yaml"
 
 export interface SiteConfig {
