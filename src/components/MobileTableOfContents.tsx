@@ -24,7 +24,7 @@ export function MobileTableOfContents({ toc }: MobileTableOfContentsProps) {
           "bg-primary text-primary-foreground",
           "flex items-center justify-center",
           "transition-all duration-300",
-          "md:hidden"
+          "lg:hidden"
         )}
       >
         <List className="h-6 w-6" />
@@ -33,7 +33,7 @@ export function MobileTableOfContents({ toc }: MobileTableOfContentsProps) {
       {/* 遮罩层 */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 md:hidden"
+          className="fixed inset-0 bg-black/50 z-50 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -44,7 +44,7 @@ export function MobileTableOfContents({ toc }: MobileTableOfContentsProps) {
           "fixed left-0 right-0 top-0 z-50",
           "max-h-[70vh] mx-4 mt-4 rounded-lg bg-background shadow-xl",
           "transition-all duration-300 ease-in-out",
-          "md:hidden",
+          "lg:hidden",
           isOpen
             ? "opacity-100 translate-y-0"
             : "opacity-0 -translate-y-full pointer-events-none"

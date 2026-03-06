@@ -75,7 +75,7 @@ export function DocsLayout({
       {/* 移动端目录导航 */}
       <MobileTableOfContents toc={toc} />
       <div 
-  className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'max-w-[calc(100vw-280px)]' : 'container'}`}
+  className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
 >
         {sidebar && (
           <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block">
