@@ -12,18 +12,19 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import { getConfig, type SiteConfig } from "@/lib/config"
 import { useTheme } from "@/components/theme-provider"
+import { docIndexCache } from "@/lib/doc-index"
+import type { DocItem } from "@/lib/doc-scanner"
 
 export function CommandMenu() {
   const [open, setOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [allDocs, setAllDocs] = useState<DocItem[]>([])
   const location = useLocation()
   const navigate = useNavigate()
   const params = useParams<{ lang: string }>()
   const lang = params.lang || (location.pathname.startsWith("/en") ? "en" : "zh-cn")
   const { setTheme } = useTheme()
-
-  const [config, setConfig] = useState<SiteConfig | null>(null)
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -36,29 +37,38 @@ export function CommandMenu() {
     return () => document.removeEventListener("keydown", down)
   }, [])
 
+  // 加载所有文档索引
   useEffect(() => {
     let cancelled = false
+
     ;(async () => {
-      const cfg = await getConfig(lang)
-      if (!cancelled) setConfig(cfg)
+      try {
+        const docs = await docIndexCache.getDocuments(lang)
+        if (!cancelled) {
+          setAllDocs(docs)
+        }
+      } catch (error) {
+        console.error('Failed to load document index:', error)
+      }
     })()
+
     return () => { cancelled = true }
   }, [lang])
 
-  const navItems = useMemo(() => {
-    const items: { title: string; to: string }[] = []
-    if (!config) return items
-    const sidebar = config.sidebar
-    const collections = sidebar?.collections
-    const sections = collections?.guide?.sections ?? sidebar?.sections ?? []
-    sections.forEach(section => {
-      if (section.path) items.push({ title: section.title, to: `/${lang}${section.path}` })
-      ;(section.children || []).forEach(child => {
-        items.push({ title: child.title, to: `/${lang}${child.path}` })
-      })
-    })
-    return items
-  }, [config, lang])
+  // 过滤文档
+  const filteredDocs = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allDocs
+    }
+
+    const lowerQuery = searchQuery.toLowerCase()
+    return allDocs.filter(doc =>
+      doc.title.toLowerCase().includes(lowerQuery) ||
+      doc.path.toLowerCase().includes(lowerQuery) ||
+      doc.description?.toLowerCase().includes(lowerQuery) ||
+      doc.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
+    )
+  }, [allDocs, searchQuery])
 
   const go = (to: string) => {
     setOpen(false)
@@ -68,14 +78,18 @@ export function CommandMenu() {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <Command>
-        <CommandInput placeholder={lang === "en" ? "Type a command or search..." : "输入命令或搜索..."} />
+        <CommandInput
+          placeholder={lang === "en" ? "Type a command or search..." : "输入命令或搜索..."}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
         <CommandList>
           <CommandEmpty>{lang === "en" ? "No results found." : "未找到结果"}</CommandEmpty>
-          <CommandGroup heading={lang === "en" ? "Navigation" : "导航"}>
-            {navItems.map(item => (
-              <CommandItem key={item.to} onSelect={() => go(item.to)}>
-                {item.title}
-                <CommandShortcut>↵</CommandShortcut>
+          <CommandGroup heading={lang === "en" ? "Pages" : "文档页面"}>
+            {filteredDocs.map(doc => (
+              <CommandItem key={doc.path} onSelect={() => go(doc.path)}>
+                {doc.title}
+                <CommandShortcut>{doc.path.startsWith(`/${lang}/`) ? doc.path.substring(`/${lang}/`.length - 1) : doc.path}</CommandShortcut>
               </CommandItem>
             ))}
           </CommandGroup>
