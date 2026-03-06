@@ -15,6 +15,9 @@ import { ComponentProvider } from "../components/ComponentProvider"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents } from "../lib/component-scanner"
+import { unified } from "unified"
+import remarkParse from "remark-parse"
+import { rehypeToc } from "../lib/rehype-toc"
 
 // 简单的 markdown frontmatter 解析函数，不依赖 Buffer
 function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>; content: string } {
@@ -194,12 +197,30 @@ function DocsPage() {
         if (!contentToUse) {
           throw new Error(`Neither ${mdPath} nor ${mdxPath} found`)
         }
-        
+
         if (cancelled) return
-        
-        const { data } = parseMarkdownFrontmatter(contentToUse)
-        setFrontmatter(data)
-        setContent(contentToUse)
+
+        const { data, content: markdownContent } = parseMarkdownFrontmatter(contentToUse)
+
+        // 获取配置中的 maxLevel
+        const maxLevel = config?.toc?.maxLevel || 3
+
+        // 运行 remark 处理链生成 toc
+        const remarkProcessor = unified()
+          .use(remarkParse)
+          .use(rehypeToc, { maxLevel });
+
+        const remarkTree = await remarkProcessor.run(remarkProcessor.parse(markdownContent));
+        const toc = (remarkTree as any).data?.toc || [];
+
+        // 将 toc 合并到 frontmatter 中
+        const enrichedFrontmatter = {
+          ...data,
+          toc
+        };
+
+        setFrontmatter(enrichedFrontmatter)
+        setContent(markdownContent)
         setIsMdx(isMdxFile)
         
       } catch (error) {

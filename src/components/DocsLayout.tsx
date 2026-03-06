@@ -3,10 +3,9 @@ import { useState } from "react"
 
 import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
-import { FloatingNavBall } from "@/components/FloatingNavBall"
+import { FloatingActionBall } from "@/components/FloatingActionBall"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
-import { MobileTableOfContents } from "@/components/MobileTableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
@@ -70,10 +69,14 @@ export function DocsLayout({
           onOpenChange={setMobileSidebarOpen}
         />
       )}
-      {/* 移动端悬浮导航球 */}
-      <FloatingNavBall lang={lang} items={navbar.items || []} />
-      {/* 移动端目录导航 */}
-      <MobileTableOfContents toc={toc} />
+      {/* 统一悬浮球 */}
+      <FloatingActionBall
+        lang={lang}
+        navItems={navbar.items || []}
+        toc={toc}
+        showSidebar={!!sidebar}
+        onOpenSidebar={() => setMobileSidebarOpen(true)}
+      />
       <div 
   className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
 >
