@@ -126,6 +126,12 @@ export interface SiteConfig {
       [componentName: string]: string  // 组件名称到组件导入路径的映射
     }
   }
+  // 目录导航配置
+  toc?: {
+    enabled?: boolean        // 是否启用目录导航，默认 true
+    maxLevel?: number        // 最大标题层级，默认 3（h1-h3）
+    title?: string           // 目录标题，默认 "本页目录"
+  }
 }
 
 export async function getConfig(

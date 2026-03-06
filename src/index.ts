@@ -104,4 +104,8 @@ export type { NavigationResult } from "./lib/navigation"
 // Ready-to-use app
 export { DocsApp } from "./app/DocsApp"
 
+// Rehype TOC utilities
+export { rehypeToc } from './lib/rehype-toc'
+export type { TocItem } from './lib/rehype-toc'
+
 

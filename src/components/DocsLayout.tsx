@@ -6,6 +6,7 @@ import { MobileSidebar } from "@/components/MobileSidebar"
 import { FloatingNavBall } from "@/components/FloatingNavBall"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
+import { MobileTableOfContents } from "@/components/MobileTableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
@@ -22,6 +23,11 @@ interface SiteConfig {
     collections?: Record<string, { sections: any }>
   }
   footer?: any
+  toc?: {
+    enabled?: boolean
+    maxLevel?: number
+    title?: string
+  }
 }
 
 interface DocsLayoutProps {
@@ -42,7 +48,9 @@ export function DocsLayout({
   next,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
-  const toc = frontmatter?.toc
+  const toc = config.toc?.enabled !== false
+    ? (frontmatter?.toc || [])
+    : []
 
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -64,7 +72,11 @@ export function DocsLayout({
       )}
       {/* 移动端悬浮导航球 */}
       <FloatingNavBall lang={lang} items={navbar.items || []} />
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8">
+      {/* 移动端目录导航 */}
+      <MobileTableOfContents toc={toc} />
+      <div 
+  className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'max-w-[calc(100vw-280px)]' : 'container'}`}
+>
         {sidebar && (
           <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block">
             <ScrollArea className="h-full py-6 pr-6 lg:py-8">
@@ -72,18 +84,9 @@ export function DocsLayout({
             </ScrollArea>
           </aside>
         )}
+        {/* 内容区域 */}
         <div className="relative flex md:col-start-2 min-w-0 overflow-hidden">
           <main className="relative py-6 lg:py-8 flex-auto w-full">{children}</main>
-          {toc && (
-            <aside
-              className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block"
-              style={{ right: "2rem", width: "200px" }}
-            >
-              <ScrollArea className="h-full py-6 pr-6 lg:py-8">
-                <TableOfContents toc={toc} />
-              </ScrollArea>
-            </aside>
-          )}
         </div>
         <div className="md:col-start-2">
           <PageNavigation prev={prev} next={next} lang={lang} />
@@ -92,6 +95,14 @@ export function DocsLayout({
           )}
         </div>
       </div>
+      {/* 目录导航 - 紧贴页面右侧边缘 */}
+      {toc && toc.length > 0 && (
+        <aside className="fixed top-14 right-0 z-30 hidden lg:block h-[calc(100vh-3.5rem)] w-[280px] shrink-0 border-l border-border bg-background/50 backdrop-blur-sm">
+          <ScrollArea className="h-full py-6 pr-4 lg:py-8 pl-6">
+            <TableOfContents toc={toc} />
+          </ScrollArea>
+        </aside>
+      )}
     </div>
   )
 }

@@ -64,7 +64,9 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     url: string
   ) => {
     e.preventDefault()
-    const element = document.getElementById(url.slice(1))
+    const elementId = url.slice(1)
+    const element = document.getElementById(elementId)
+
     if (element) {
       element.scrollIntoView({ behavior: "smooth" })
       // Update URL hash without reloading
@@ -86,7 +88,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
               href={item.url}
               onClick={e => handleLinkClick(e, item.url)}
               className={cn(
-                "inline-block no-underline transition-colors hover:text-foreground",
+                "block no-underline transition-colors hover:text-foreground whitespace-normal break-words",
                 item.url.slice(1) === activeId
                   ? "text-foreground font-medium"
                   : "text-muted-foreground",

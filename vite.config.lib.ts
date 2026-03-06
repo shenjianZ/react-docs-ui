@@ -12,7 +12,7 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       dts({
-        tsconfigPath: "./tsconfig.json",
+        tsconfigPath: "./tsconfig.lib.json",
         outDir: "./dist/types",
         insertTypesEntry: true,
         copyDtsFiles: true,

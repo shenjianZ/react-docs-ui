@@ -1,0 +1,141 @@
+# MDX 组件使用示例
+
+本页面演示了如何在 Markdown 文档中使用自定义 React 组件。
+
+## 使用内置组件
+
+react-docs-ui 提供了一些内置的 MDX 组件，可以直接使用。
+
+**注意**：组件名称支持 PascalCase（推荐）和小写两种写法。例如，`<CodeBlock>` 和 `<codeblock>` 都可以正常工作。
+
+<Tip title="这是提示">
+    这是一个提示组件的内容。你可以在这里放置重要的提示信息。
+</Tip>
+
+<Warning title="这是警告">
+    这是一个警告组件的内容。用于提醒用户注意潜在的问题或风险。
+</Warning>
+
+<Card title="这是卡片">
+    这是一个卡片组件的内容。卡片可以用来组织相关的内容块。
+</Card>
+
+## 使用自定义组件
+
+在 template 的 `src/components` 目录下创建的 React 组件会自动被扫描并注册，可以直接在 MDX 文档中使用：
+
+<MyTip>
+    这是来自 template/src/components 的自定义组件！你可以在 `src/components`
+    目录下创建任何 React 组件，它们都会自动在 MDX 文档中可用。
+</MyTip>
+
+## 新增组件示例
+
+### Alert 组件
+
+Alert 组件支持多种类型：info、success、warning、error
+
+<Alert type="info" title="信息提示">
+    这是一条普通的信息提示，用于展示一般性的信息。
+</Alert>
+
+<Alert type="success" title="操作成功">
+    恭喜！操作已成功完成。
+</Alert>
+
+<Alert type="warning" title="注意">
+    请注意，这里有一些需要注意的事项。
+</Alert>
+
+<Alert type="error" title="错误提示">
+    发生了一个错误，请检查后重试。
+</Alert>
+
+<Alert type="success" title="Success" icon="/images/success.svg">
+    恭喜！操作已成功完成。
+</Alert>
+
+### Feature 组件
+
+Feature 组件用于展示功能特性：
+
+<Feature
+    icon="⚡"
+    title="快速启动"
+    description="只需几秒钟即可启动项目，无需复杂配置。"
+></Feature>
+<Feature
+    icon="🎨"
+    title="主题定制"
+    description="支持亮色和暗色主题，完全可定制。"
+></Feature>
+<Feature
+    icon="📱"
+    title="响应式设计"
+    description="完美适配各种设备，提供最佳用户体验。"
+></Feature>
+
+### Callout 组件
+
+Callout 组件用于强调重要内容：
+
+<Callout variant="default">
+    这是一个默认样式的 Callout，用于强调重要的内容。
+</Callout>
+
+<Callout variant="primary">
+    这是一个主要样式的 Callout，用于突出显示核心信息。
+</Callout>
+
+<Callout variant="secondary">
+    这是一个次要样式的 Callout，用于补充说明。
+</Callout>
+
+### StepList 组件
+
+StepList 组件用于展示步骤流程：
+
+<StepList>
+    <StepList.Step title="安装依赖">
+        运行 `npm install` 命令安装项目所需的依赖包。
+    </StepList.Step>
+    <StepList.Step title="配置环境">
+        根据项目需求配置环境变量和开发环境。
+    </StepList.Step>
+    <StepList.Step title="启动项目">
+        运行 `npm run dev` 启动开发服务器。
+    </StepList.Step>
+    <StepList.Step title="开始开发">
+        开始编写代码，实现你的功能需求。
+    </StepList.Step>
+</StepList>
+
+### BadgeList 组件
+
+BadgeList 组件用于展示标签或状态：
+
+<BadgeList>
+    <BadgeList.Badge variant="default">默认标签</BadgeList.Badge>
+    <BadgeList.Badge variant="success">成功状态</BadgeList.Badge>
+    <BadgeList.Badge variant="warning">警告状态</BadgeList.Badge>
+    <BadgeList.Badge variant="error">错误状态</BadgeList.Badge>
+    <BadgeList.Badge variant="info">信息标签</BadgeList.Badge>
+</BadgeList>
+
+## 代码块示例
+
+你可以在 MDX 中使用标准的 Markdown 代码块语法：
+
+```tsx
+// 这是一个 TypeScript 代码块示例
+function Greeting({ name }: { name: string }) {
+    return <div>Hello, {name}!</div>;
+}
+```
+
+```javascript
+// 这是一个 JavaScript 代码块示例
+function add(a, b) {
+    return a + b;
+}
+```

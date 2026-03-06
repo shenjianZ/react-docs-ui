@@ -1,11 +1,15 @@
 import matter from "gray-matter"
 import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
+import { unified } from "unified"
+import remarkParse from "remark-parse"
+import remarkRehype from "remark-rehype"
 
 import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
+import { rehypeToc } from "../lib/rehype-toc"
 
 export function DocsPage() {
   const params = useParams<{ lang: string; "*": string }>()
@@ -29,10 +33,7 @@ export function DocsPage() {
   // 计算上一节和下一节
   const { prev, next } = useMemo(() => {
     const currentPath = `/${currentLang}/${slug || ""}`
-    console.log("DocsPage useMemo:", { config, sidebar: config?.sidebar, currentPath, firstSegment })
-    const result = getPrevNextPage(config?.sidebar, currentPath, firstSegment)
-    console.log("DocsPage result:", result)
-    return result
+    return getPrevNextPage(config?.sidebar, currentPath, firstSegment)
   }, [config?.sidebar, currentLang, slug, firstSegment])
 
   // 加载站点配置：仅在语言变化时触发
@@ -86,10 +87,28 @@ export function DocsPage() {
         const markdown = await response.text()
         if (cancelled) return
         const { data, content } = matter(markdown)
-        setFrontmatter(data)
+
+        // 获取配置中的 maxLevel
+        const maxLevel = config?.toc?.maxLevel || 3
+
+        // 运行 remark 处理链生成 toc
+        const remarkProcessor = unified()
+          .use(remarkParse)
+          .use(rehypeToc, { maxLevel });
+
+        const remarkTree = await remarkProcessor.run(remarkProcessor.parse(content));
+        const toc = (remarkTree as any).data?.toc || [];
+
+        // 将 toc 合并到 frontmatter 中
+        const enrichedFrontmatter = {
+          ...data,
+          toc
+        };
+
+        setFrontmatter(enrichedFrontmatter)
         setContent(content)
       } catch (error) {
-        console.error(error)
+        console.error('[DocsPage] Error:', error);
         if (cancelled) return
         const errorMessage =
           "# 404 - Not Found\n\nThe page you're looking for at `" +
@@ -105,7 +124,7 @@ export function DocsPage() {
     return () => {
       cancelled = true
     }
-  }, [currentLang, slug])
+  }, [currentLang, slug, config?.toc?.maxLevel])
 
   if (configLoading && !config) {
     return <div>Loading...</div>

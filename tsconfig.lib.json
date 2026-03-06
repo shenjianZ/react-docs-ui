@@ -1,1 +1,31 @@
-{"extends": "./tsconfig.json", "compilerOptions": {"noEmit": false, "declaration": true, "declarationMap": true, "emitDeclarationOnly": false, "outDir": "./dist/types", "rootDir": "./src", "jsx": "react-jsx", "jsxImportSource": "react", "moduleResolution": "bundler", "esModuleInterop": true, "skipLibCheck": true, "target": "ES2020", "module": "ESNext"}, "include": ["src/**/*"], "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "node_modules", "dist", "src/App.tsx", "src/main.tsx", "src/app/**/*", "src/pages/**/*", "src/components/CommandMenu.tsx", "src/components/GlobalContextMenu.tsx"]}
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": false,
+        "outDir": "./dist/types",
+        "rootDir": "./src",
+        "jsx": "react-jsx",
+        "jsxImportSource": "react",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "target": "ES2020",
+        "module": "ESNext",
+    },
+    "include": ["src/**/*"],
+    "exclude": [
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "node_modules",
+        "dist",
+        "src/App.tsx",
+        "src/main.tsx",
+        "src/app/**/*",
+        "src/pages/**/*",
+        "src/components/CommandMenu.tsx",
+        "src/components/GlobalContextMenu.tsx",
+    ],
+}

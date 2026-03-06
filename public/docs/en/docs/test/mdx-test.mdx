@@ -1,0 +1,122 @@
+# MDX Component Usage Examples
+
+This page demonstrates how to use custom React components in Markdown documents.
+
+## Using Built-in Components
+
+react-docs-ui provides some built-in MDX components that can be used directly.
+
+**Note**: Component names support both PascalCase (recommended) and lowercase. For example, both `<CodeBlock>` and `<codeblock>` work correctly.
+
+<Tip title="This is a warning tip"
+>This is the content of a tip component. You can place important tips here.
+</Tip>
+
+<Warning title="This is a warning">
+    This is the content of a warning component. Used to remind users of potential issues or risks.
+</Warning>
+
+<Card title="This is a card">
+    This is the content of a card component. Cards can be used to organize related content blocks.
+</Card>
+
+## Using Custom Components
+
+React components created in the `src/components` directory of the template are automatically scanned and registered, and can be used directly in MDX documents:
+
+<MyTip>
+    This is a custom component from template/src/components! You can create any React component in the `src/components` directory, and they will be automatically available in MDX documents.
+</MyTip>
+
+## New Component Examples
+
+### Alert Component
+
+The Alert component supports multiple types: info, success, warning, error
+
+<Alert type="info" title="Information">
+    This is a general information tip for displaying general information.
+</Alert>
+
+<Alert type="success" title="Operation Successful">
+    Congratulations! The operation has been completed successfully.
+</Alert>
+
+<Alert type="warning" title="Attention">
+    Please note, there are some things that need attention here.
+</Alert>
+
+<Alert type="error" title="Error">
+    An error occurred, please check and try again.
+</Alert>
+
+<Alert type="success" title="Success" icon="/images/success.svg">
+    Congratulations! The operation has been completed successfully.
+</Alert>
+   
+### Feature Component
+
+The Feature component is used to display feature highlights:
+
+<Feature
+    icon="⚡"
+    title="Quick Start"
+    description="Start your project in seconds without complex configuration."
+></Feature>
+<Feature
+    icon="🎨"
+    title="Theme Customization"
+    description="Supports light and dark themes, fully customizable."
+></Feature>
+<Feature
+    icon="📱"
+    title="Responsive Design"
+    description="Perfectly adapts to various devices for the best user experience."
+></Feature>
+
+### Callout Component
+
+The Callout component is used to emphasize important content:
+
+<Callout variant="default">
+    This is a default style Callout used to emphasize important content.
+</Callout>
+
+<Callout variant="primary">
+    This is a primary style Callout used to highlight core information.
+</Callout>
+
+<Callout variant="secondary">
+    This is a secondary style Callout used for supplementary information.
+</Callout>
+
+
+### BadgeList Component
+
+The BadgeList component is used to display tags or statuses:
+
+<BadgeList>
+    <BadgeList.Badge variant="default">Default Tag</BadgeList.Badge>
+    <BadgeList.Badge variant="success">Success Status</BadgeList.Badge>
+    <BadgeList.Badge variant="warning">Warning Status</BadgeList.Badge>
+    <BadgeList.Badge variant="error">Error Status</BadgeList.Badge>
+    <BadgeList.Badge variant="info">Info Tag</BadgeList.Badge>
+</BadgeList>
+
+## Code Block Examples
+
+You can use standard Markdown code block syntax in MDX:
+
+```tsx
+// This is a TypeScript code block example
+function Greeting({ name }: { name: string }) {
+    return <div>Hello, {name}!</div>;
+}
+```
+
+```javascript
+// This is a JavaScript code block example
+function add(a, b) {
+    return a + b;
+}
+```

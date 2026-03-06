@@ -1,4 +1,4 @@
-import { getConfig, type SiteConfig } from './config'
+import { getConfig } from './config'
 
 export interface DocItem {
   title: string
@@ -71,7 +71,7 @@ export async function scanDocuments(lang: string = 'zh-cn'): Promise<DocItem[]> 
 
     // 1. 从 collections 中提取文档
     if (sidebar.collections) {
-      Object.entries(sidebar.collections).forEach(([collectionName, collection]: [string, Collection]) => {
+      Object.entries(sidebar.collections).forEach(([_collectionName, collection]: [string, Collection]) => {
         if (collection.sections && collection.sections.length > 0) {
           const collectionDocs = extractDocumentsFromSections(
             collection.sections,
