@@ -1,4 +1,4 @@
-import { Github, Menu, MoreVertical } from "lucide-react"
+import { Github, MoreVertical } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
@@ -50,10 +50,9 @@ interface HeaderNavProps {
   site: SiteConfig["site"]
   navbar: SiteConfig["navbar"]
   themeConfig?: { allowToggle?: boolean }
-  onMenuClick?: () => void
 }
 
-export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: HeaderNavProps) {
+export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
   const location = useLocation()
   const pathname = location.pathname
   const { theme } = useTheme()
@@ -63,13 +62,11 @@ export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: Head
     "zh-cn": {
       switchLanguage: "切换语言",
       switchTheme: "切换主题",
-      openMenu: "打开菜单",
       moreOptions: "更多选项",
     },
     en: {
       switchLanguage: "Switch language",
       switchTheme: "Toggle theme",
-      openMenu: "Open menu",
       moreOptions: "More options",
     },
   }
@@ -100,17 +97,6 @@ export function HeaderNav({ lang, site, navbar, themeConfig, onMenuClick }: Head
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center px-4 md:px-8">
-        {/* 移动端汉堡菜单按钮 */}
-        <button
-          onClick={onMenuClick}
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "mr-2 px-0 flex-shrink-0 md:hidden"
-          )}
-          aria-label={t.openMenu}
-        >
-          <Menu className="h-5 w-5" />
-        </button>
         {(((navbar.showLogo ?? true) as boolean) || ((navbar.showTitle ?? true) as boolean)) && (
           <div className="mr-6 flex items-center space-x-2 flex-shrink-0">
             {(navbar.showLogo ?? true) && (

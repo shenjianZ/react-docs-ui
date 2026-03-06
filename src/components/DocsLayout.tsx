@@ -59,7 +59,7 @@ export function DocsLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <HeaderNav lang={lang} site={site} navbar={navbar} themeConfig={theme} onMenuClick={() => setMobileSidebarOpen(true)} />
+      <HeaderNav lang={lang} site={site} navbar={navbar} themeConfig={theme} />
       {/* 移动端侧边栏 */}
       {sidebar && (
         <MobileSidebar
