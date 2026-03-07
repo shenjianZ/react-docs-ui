@@ -28,26 +28,46 @@ export function AIChatMessage({ message, onRegenerate, onEdit, onDelete }: AICha
   const isStreaming = message.isStreaming
   const hasError = !!message.error
 
+  const copyToClipboard = useCallback(async (text: string) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      try {
+        document.execCommand('copy')
+      } finally {
+        document.body.removeChild(textarea)
+      }
+    }
+  }, [])
+
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(message.content)
+      await copyToClipboard(message.content)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
       console.error('Failed to copy message')
     }
-  }, [message.content])
+  }, [message.content, copyToClipboard])
 
   const handleCopyCode = useCallback(async (code: string, e: React.MouseEvent) => {
     e.stopPropagation()
     try {
-      await navigator.clipboard.writeText(code)
+      await copyToClipboard(code)
       setCopiedCode(code)
       setTimeout(() => setCopiedCode(null), 2000)
     } catch {
       console.error('Failed to copy code')
     }
-  }, [])
+  }, [copyToClipboard])
 
   const handleSaveEdit = useCallback(() => {
     if (editContent.trim() && editContent !== message.content) {

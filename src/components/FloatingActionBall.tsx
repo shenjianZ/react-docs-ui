@@ -179,7 +179,7 @@ export function FloatingActionBall({
               <nav className="space-y-2">
                 {toc!.map((item, index) => (
                   <a
-                    key={index}
+                    key={`${item.url}-${index}`}
                     href={item.url}
                     onClick={handleCloseAll}
                     className={cn(

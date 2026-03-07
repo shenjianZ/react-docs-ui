@@ -113,42 +113,62 @@ export function GlobalContextMenu({
   const location = useLocation()
   const { theme, setTheme } = useTheme()
 
-  const copyUrl = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
-    } catch {
-      // ignore
+  const copyToClipboard = useCallback(async (text: string) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      try {
+        document.execCommand('copy')
+      } finally {
+        document.body.removeChild(textarea)
+      }
     }
   }, [])
 
-  const copyTitle = useCallback(async () => {
+  const copyUrl = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(document.title || "")
+      await copyToClipboard(window.location.href)
     } catch {
       // ignore
     }
-  }, [])
+  }, [copyToClipboard])
+
+  const copyTitle = useCallback(async () => {
+    try {
+      await copyToClipboard(document.title || "")
+    } catch {
+      // ignore
+    }
+  }, [copyToClipboard])
 
   const copyMarkdownLink = useCallback(async () => {
     try {
       const title = document.title || "Docs"
       const url = window.location.href
-      await navigator.clipboard.writeText(`[${title}](${url})`)
+      await copyToClipboard(`[${title}](${url})`)
     } catch {
       // ignore
     }
-  }, [])
+  }, [copyToClipboard])
 
   const copySelectedText = useCallback(async () => {
     try {
       const selectedText = window.getSelection()?.toString() || ""
       if (selectedText) {
-        await navigator.clipboard.writeText(selectedText)
+        await copyToClipboard(selectedText)
       }
     } catch {
       // ignore
     }
-  }, [])
+  }, [copyToClipboard])
 
   const openInNewTab = useCallback(() => {
     window.open(window.location.href, "_blank")

@@ -82,8 +82,8 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     <div className="space-y-2">
       <p className="font-medium">{t.onThisPage}</p>
       <ul className="m-0 list-none">
-        {toc.map(item => (
-          <li key={item.url} className={cn("mt-0 pt-2")}>
+        {toc.map((item, index) => (
+          <li key={`${item.url}-${index}`} className={cn("mt-0 pt-2")}>
             <a
               href={item.url}
               onClick={e => handleLinkClick(e, item.url)}

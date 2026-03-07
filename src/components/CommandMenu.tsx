@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import {
@@ -25,6 +25,26 @@ export function CommandMenu() {
   const params = useParams<{ lang: string }>()
   const lang = params.lang || (location.pathname.startsWith("/en") ? "en" : "zh-cn")
   const { setTheme } = useTheme()
+
+  const copyToClipboard = useCallback(async (text: string) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      try {
+        document.execCommand('copy')
+      } finally {
+        document.body.removeChild(textarea)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -104,7 +124,7 @@ export function CommandMenu() {
             <CommandItem onSelect={() => { setOpen(false); window.location.reload() }}>
               {lang === "en" ? "Reload Page" : "刷新页面"}
             </CommandItem>
-            <CommandItem onSelect={() => { setOpen(false); navigator.clipboard.writeText(window.location.href) }}>
+            <CommandItem onSelect={() => { setOpen(false); copyToClipboard(window.location.href) }}>
               {lang === "en" ? "Copy URL" : "复制链接"}
             </CommandItem>
           </CommandGroup>

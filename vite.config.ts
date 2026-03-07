@@ -4,11 +4,46 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
-// https://vite.dev/config/
+function publicHmrPlugin() {
+    return {
+        name: 'public-hmr',
+        configureServer(server) {
+            const publicDir = path.resolve(__dirname, 'public')
+            const configDir = path.resolve(publicDir, 'config')
+            const docsDir = path.resolve(publicDir, 'docs')
+
+            server.watcher.add([configDir, docsDir])
+
+            const isTargetFile = (file) => {
+                const relativePath = path.relative(publicDir, file)
+                return (
+                    relativePath.startsWith('config' + path.sep) && file.endsWith('.yaml')
+                ) || (
+                    relativePath.startsWith('docs' + path.sep) &&
+                    (file.endsWith('.md') || file.endsWith('.mdx'))
+                )
+            }
+
+            const triggerReload = (file) => {
+                if (isTargetFile(file)) {
+                    server.ws.send({ type: 'full-reload', path: '*' })
+                }
+            }
+
+            server.watcher.on('change', triggerReload)
+            server.watcher.on('add', triggerReload)
+        }
+    }
+}
+
 export default defineConfig({
     appType: "spa",
-    plugins: [react(), tailwindcss(), nodePolyfills()],
+    plugins: [react(), tailwindcss(), nodePolyfills(), publicHmrPlugin()],
     publicDir: "public",
+    server: {
+        host: "0.0.0.0",
+        port: 5173,
+    },
     build: {
         copyPublicDir: true,
     },

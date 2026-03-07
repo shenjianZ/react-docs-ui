@@ -296,8 +296,28 @@ function ShikiCodeBlock({
   
   // 复制功能
   const handleCopy = React.useCallback(async () => {
+    const copyToClipboard = async (text: string) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-9999px'
+        textarea.style.top = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } finally {
+          document.body.removeChild(textarea)
+        }
+      }
+    }
+
     try {
-      await navigator.clipboard.writeText(code)
+      await copyToClipboard(code)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
