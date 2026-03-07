@@ -5,7 +5,7 @@ interface ComponentContextValue {
   components: ComponentRegistry
 }
 
-const ComponentContext = createContext<ComponentContextValue | undefined>(undefined)
+const ComponentContext = createContext<ComponentContextValue>({ components: {} })
 
 interface ComponentProviderProps {
   components: ComponentRegistry
@@ -21,10 +21,5 @@ export function ComponentProvider({ components, children }: ComponentProviderPro
 }
 
 export function useComponents(): ComponentRegistry {
-  const context = useContext(ComponentContext)
-  if (!context) {
-    console.warn('useComponents must be used within ComponentProvider')
-    return {}
-  }
-  return context.components
+  return useContext(ComponentContext).components
 }
