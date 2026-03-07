@@ -11,6 +11,11 @@ const CONFIG_STORAGE_KEY = 'ai-config'
 
 /** 预定义的 Provider 列表 */
 const BUILTIN_PROVIDERS = ['openai', 'claude', 'gemini'] as const
+type BuiltinProvider = typeof BUILTIN_PROVIDERS[number]
+
+const isBuiltinProvider = (provider: string): provider is BuiltinProvider => {
+  return BUILTIN_PROVIDERS.includes(provider as BuiltinProvider)
+}
 
 /**
  * 获取默认模型配置
@@ -124,12 +129,16 @@ async function decryptModelConfig(config: AIModelConfig): Promise<AIModelConfig>
  */
 export async function saveAIConfig(config: AIConfig): Promise<void> {
   try {
-    // 加密所有模型配置中的API密钥
-    const encryptedModels: Record<string, AIModelConfig> = {}
+    const providerEntries = Object.entries(config.models)
+    
+    const encryptedEntries = await Promise.all(
+      providerEntries.map(async ([provider, modelConfig]) => [
+        provider,
+        await encryptModelConfig(modelConfig),
+      ] as const)
+    )
 
-    for (const [provider, modelConfig] of Object.entries(config.models)) {
-      encryptedModels[provider] = await encryptModelConfig(modelConfig)
-    }
+    const encryptedModels: Record<string, AIModelConfig> = Object.fromEntries(encryptedEntries)
 
     const configToSave: AIConfig = {
       ...config,
@@ -156,12 +165,16 @@ export async function getAIConfig(): Promise<AIConfig | null> {
 
     const config: AIConfig = JSON.parse(stored)
 
-    // 解密所有模型配置中的API密钥
-    const decryptedModels: Record<string, AIModelConfig> = {}
+    const modelEntries = Object.entries(config.models)
+    
+    const decryptedEntries = await Promise.all(
+      modelEntries.map(async ([provider, modelConfig]) => [
+        provider,
+        await decryptModelConfig(modelConfig),
+      ] as const)
+    )
 
-    for (const [provider, modelConfig] of Object.entries(config.models)) {
-      decryptedModels[provider] = await decryptModelConfig(modelConfig)
-    }
+    const decryptedModels: Record<string, AIModelConfig> = Object.fromEntries(decryptedEntries)
 
     const result: AIConfig = {
       enabled: config.enabled !== false, // 默认为 true
@@ -265,7 +278,7 @@ export async function deleteProvider(provider: string): Promise<void> {
   }
 
   // 不能删除预定义的 Provider
-  if (BUILTIN_PROVIDERS.includes(provider as any)) {
+  if (isBuiltinProvider(provider)) {
     throw new Error('不能删除预定义的 Provider')
   }
 
@@ -354,7 +367,7 @@ export async function getAllProviders(): Promise<string[]> {
   }
 
   const customProviders = Object.keys(config.models).filter(
-    p => !BUILTIN_PROVIDERS.includes(p as any)
+    p => !isBuiltinProvider(p)
   )
 
   return [...BUILTIN_PROVIDERS, ...customProviders]

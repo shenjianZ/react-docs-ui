@@ -1,14 +1,18 @@
 /**
  * AI聊天对话框组件
- * 从底部弹出的对话框
+ * 从底部弹出的对话框，支持拖拽、快捷键
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useAI } from './AIProvider'
 import { AIChatMessage } from './AIChatMessage'
 import { AIChatInput } from './AIChatInput'
 import { cn } from '../../lib/utils'
-import { X, Settings, Trash2, Bot, AlertTriangle } from 'lucide-react'
+import { X, Settings, Trash2, Bot, AlertTriangle, GripVertical } from 'lucide-react'
+
+const MIN_HEIGHT = 300
+const MAX_HEIGHT = 700
+const DEFAULT_HEIGHT = 500
 
 export function AIChatDialog() {
   const {
@@ -24,19 +28,113 @@ export function AIChatDialog() {
     regenerateLast,
     clearHistory,
     stopGeneration,
+    editMessage,
+    deleteMessage,
   } = useAI()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const resizeRef = useRef<HTMLDivElement>(null)
+  const isNearBottomRef = useRef(true)
+  
+  const [height, setHeight] = useState(DEFAULT_HEIGHT)
+  const [isResizing, setIsResizing] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 })
 
-  // 自动滚动到底部
-  useEffect(() => {
+  const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      messagesEndRef.current.scrollIntoView({ behavior })
     }
-  }, [messages])
+  }, [])
 
-  // 未配置时显示引导
+  const handleScroll = useCallback(() => {
+    const scrollArea = scrollAreaRef.current
+    if (!scrollArea) return
+    
+    const { scrollTop, scrollHeight, clientHeight } = scrollArea
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
+    isNearBottomRef.current = isNearBottom
+  }, [])
+
+  useEffect(() => {
+    if (isNearBottomRef.current && messagesEndRef.current) {
+      const lastMessage = messages[messages.length - 1]
+      const isStreaming = lastMessage?.isStreaming
+      scrollToBottom(isStreaming ? 'auto' : 'smooth')
+    }
+  }, [messages, scrollToBottom])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isDialogOpen) {
+        closeDialog()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isDialogOpen, closeDialog])
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+    const startY = e.clientY
+    const startHeight = height
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const diff = startY - e.clientY
+      const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startHeight + diff))
+      setHeight(newHeight)
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [height])
+
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return
+    
+    e.preventDefault()
+    setIsDragging(true)
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      posX: position.x,
+      posY: position.y,
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const dx = e.clientX - dragStartRef.current.x
+      const dy = e.clientY - dragStartRef.current.y
+      setPosition({
+        x: dragStartRef.current.posX + dx,
+        y: dragStartRef.current.posY + dy,
+      })
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [position])
+
+  const resetPosition = useCallback(() => {
+    setPosition({ x: 0, y: 0 })
+  }, [])
+
   if (!isConfigured && isDialogOpen) {
     return (
       <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl">
@@ -85,24 +183,44 @@ export function AIChatDialog() {
   }
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl">
+    <div 
+      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl"
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+      }}
+    >
       <div
+        ref={dialogRef}
         className={cn(
           'bg-background border rounded-xl shadow-2xl overflow-hidden',
           'animate-in slide-in-from-bottom-4 duration-300',
           'flex flex-col',
-          'h-[500px] max-h-[70vh]'
+          isDragging && 'cursor-grabbing',
+          isResizing && 'cursor-ns-resize'
         )}
+        style={{ height: `${height}px`, maxHeight: '70vh' }}
       >
-        {/* 头部 */}
-        <div className="flex items-center justify-between p-4 border-b shrink-0">
+        <div 
+          className="flex items-center justify-between p-4 border-b shrink-0 cursor-grab active:cursor-grabbing"
+          onMouseDown={handleDragStart}
+        >
           <div className="flex items-center gap-2">
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
             <Bot className="w-5 h-5 text-primary" />
             <h3 className="font-semibold">AI 助手</h3>
           </div>
 
           <div className="flex items-center gap-1">
-            {/* 清除历史 */}
+            {position.x !== 0 || position.y !== 0 ? (
+              <button
+                onClick={resetPosition}
+                className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                title="重置位置"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            ) : null}
+
             {messages.length > 0 && (
               <button
                 onClick={clearHistory}
@@ -113,7 +231,6 @@ export function AIChatDialog() {
               </button>
             )}
 
-            {/* 设置 */}
             <button
               onClick={openSettings}
               className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
@@ -122,7 +239,6 @@ export function AIChatDialog() {
               <Settings className="w-4 h-4" />
             </button>
 
-            {/* 关闭 */}
             <button
               onClick={closeDialog}
               className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
@@ -133,7 +249,6 @@ export function AIChatDialog() {
           </div>
         </div>
 
-        {/* 选中文本预览 */}
         {selectedText && (
           <div className="px-4 py-2 bg-muted/50 border-b shrink-0">
             <div className="text-xs text-muted-foreground mb-1">选中的内容：</div>
@@ -141,10 +256,10 @@ export function AIChatDialog() {
           </div>
         )}
 
-        {/* 消息区域 */}
         <div
           ref={scrollAreaRef}
           className="flex-1 overflow-y-auto"
+          onScroll={handleScroll}
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
@@ -168,6 +283,16 @@ export function AIChatDialog() {
                       ? regenerateLast
                       : undefined
                   }
+                  onEdit={
+                    message.role === 'user'
+                      ? (newContent) => editMessage(message.id, newContent)
+                      : undefined
+                  }
+                  onDelete={
+                    !isLoading
+                      ? () => deleteMessage(message.id)
+                      : undefined
+                  }
                 />
               ))}
               <div ref={messagesEndRef} />
@@ -175,20 +300,26 @@ export function AIChatDialog() {
           )}
         </div>
 
-        {/* 错误提示 */}
         {error && (
           <div className="px-4 py-2 bg-destructive/10 text-destructive text-sm border-t">
             {error}
           </div>
         )}
 
-        {/* 输入区域 */}
         <AIChatInput
           onSend={sendMessage}
           onStop={stopGeneration}
           isLoading={isLoading}
           placeholder={selectedText ? '询问关于选中内容的问题...' : '输入消息...'}
         />
+
+        <div
+          ref={resizeRef}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-2 cursor-ns-resize flex items-center justify-center"
+          onMouseDown={handleResizeStart}
+        >
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
       </div>
     </div>
   )

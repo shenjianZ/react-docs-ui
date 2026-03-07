@@ -52,7 +52,6 @@ export default defineConfig(() => {
           "next-themes",
           "react-markdown",
           "rehype-autolink-headings",
-          "rehype-highlight",
           "rehype-katex",
           "rehype-raw",
           "rehype-slug",
@@ -60,6 +59,8 @@ export default defineConfig(() => {
           "remark-math",
           "tailwind-merge",
           "unist-util-visit",
+          "shiki",
+          "@shikijs/transformers",
         ],
         output: {
           globals: {

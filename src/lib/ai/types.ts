@@ -113,8 +113,12 @@ export interface ChatOptions {
   maxTokens?: number
   /** 是否流式输出 */
   stream?: boolean
-  /** 超时时间(ms) */
+  /** 超时时间(ms)，默认60000 */
   timeout?: number
+  /** 重试次数，默认3 */
+  retryCount?: number
+  /** 重试延迟(ms)，默认1000 */
+  retryDelay?: number
 }
 
 /** AI Provider配置（内部使用） */

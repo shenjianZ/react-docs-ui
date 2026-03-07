@@ -6,6 +6,32 @@ import type { AIConfig, ChatMessage, ChatContext, StreamEvent, TestConnectionRes
 import { getAIConfig, getCurrentProviderConfig } from './config'
 import { createAIProvider } from './providers'
 
+const DEFAULT_TIMEOUT = 60000
+const DEFAULT_RETRY_COUNT = 3
+const DEFAULT_RETRY_DELAY = 1000
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function isRetryableError(error: Error): boolean {
+  const retryableMessages = [
+    'network',
+    'timeout',
+    'ECONNREFUSED',
+    'ETIMEDOUT',
+    'ENOTFOUND',
+    'rate limit',
+    '429',
+    '503',
+    '502',
+    '500',
+  ]
+  
+  const message = error.message.toLowerCase()
+  return retryableMessages.some(m => message.includes(m.toLowerCase()))
+}
+
 /**
  * 构建包含上下文的消息
  */
@@ -61,16 +87,20 @@ export function buildSystemPrompt(
 }
 
 /**
- * 发送聊天消息
+ * 发送聊天消息（带重试机制）
  */
 export async function sendChatMessage(
   messages: ChatMessage[],
   onEvent: (event: StreamEvent) => void,
   config?: AIConfig,
   context?: ChatContext,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options?: { timeout?: number; retryCount?: number; retryDelay?: number }
 ): Promise<void> {
-  // 获取配置
+  const timeout = options?.timeout ?? DEFAULT_TIMEOUT
+  const maxRetries = options?.retryCount ?? DEFAULT_RETRY_COUNT
+  const retryDelay = options?.retryDelay ?? DEFAULT_RETRY_DELAY
+
   const aiConfig = config || await getAIConfig()
 
   if (!aiConfig || !aiConfig.enabled) {
@@ -85,7 +115,6 @@ export async function sendChatMessage(
     return
   }
 
-  // 构建 Provider 配置
   const providerConfig: AIProviderConfig = {
     type: aiConfig.provider,
     apiKey: modelConfig.apiKey,
@@ -96,18 +125,56 @@ export async function sendChatMessage(
     temperature: modelConfig.temperature,
   }
 
-  // 创建 Provider
   const provider = createAIProvider(aiConfig.provider, providerConfig)
 
-  // 发送消息
-  await provider.chat(messages, onEvent, signal)
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    if (signal?.aborted) {
+      onEvent({ type: 'error', error: '请求已取消' })
+      return
+    }
+
+    try {
+      const timeoutId = setTimeout(() => {
+        onEvent({ type: 'error', error: `请求超时（${timeout / 1000}秒）` })
+      }, timeout)
+
+      await provider.chat(messages, onEvent, signal)
+      
+      clearTimeout(timeoutId)
+      return
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('未知错误')
+      
+      if (signal?.aborted) {
+        onEvent({ type: 'error', error: '请求已取消' })
+        return
+      }
+
+      if (!isRetryableError(lastError)) {
+        onEvent({ type: 'error', error: lastError.message })
+        return
+      }
+
+      if (attempt < maxRetries - 1) {
+        onEvent({ 
+          type: 'error', 
+          error: `连接失败，${retryDelay / 1000}秒后重试 (${attempt + 1}/${maxRetries})...` 
+        })
+        await sleep(retryDelay * (attempt + 1))
+      }
+    }
+  }
+
+  onEvent({ type: 'error', error: lastError?.message || '请求失败，请稍后重试' })
 }
 
 /**
  * 测试连接
  */
 export async function testAIConnection(
-  providerType: AIConfig['provider'],
+  providerType: string,
   modelConfig: AIModelConfig,
   systemPrompt?: string
 ): Promise<TestConnectionResult> {

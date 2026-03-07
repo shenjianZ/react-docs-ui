@@ -57,7 +57,7 @@
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <React.StrictMode>
         <DocsApp />
-      </React.StrictMode>,
+      </React.StrictMode>
     )
     ```
 5.  **确保 `index.html` 中有 `<div id="root"></div>`**

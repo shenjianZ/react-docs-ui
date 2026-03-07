@@ -16,6 +16,7 @@ import {
   deleteProvider,
   getAllProviders,
 } from '../../lib/ai'
+import { useToast } from '../ui/use-toast'
 import {
   X,
   Check,
@@ -34,14 +35,13 @@ type TabType = 'providers' | 'settings'
 
 export function AISettingsPanel() {
   const { isSettingsOpen, closeSettings, config, updateConfig } = useAI()
+  const { toast } = useToast()
 
-  // 表单状态
   const [currentProvider, setCurrentProvider] = useState<string>('openai')
   const [modelConfig, setModelConfig] = useState<AIModelConfig>(getDefaultModelConfig('openai'))
   const [systemPrompt, setSystemPrompt] = useState('')
   const [tab, setTab] = useState<TabType>('providers')
 
-  // 新增 Provider 状态
   const [isAddingProvider, setIsAddingProvider] = useState(false)
   const [newProviderName, setNewProviderName] = useState('')
   const [newProviderConfig, setNewProviderConfig] = useState<Partial<AIModelConfig>>({
@@ -53,36 +53,34 @@ export function AISettingsPanel() {
     enabled: true,
   })
 
-  // UI状态
   const [showApiKey, setShowApiKey] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [allProviders, setAllProviders] = useState<string[]>(['openai', 'claude', 'gemini'])
 
-  // 预定义的 Provider 列表
   const builtinProviders = ['openai', 'claude', 'gemini'] as const
+  type BuiltinProvider = typeof builtinProviders[number]
+  
+  const isBuiltinProvider = (provider: string): provider is BuiltinProvider => {
+    return builtinProviders.includes(provider as BuiltinProvider)
+  }
 
-  // 初始化表单
   useEffect(() => {
     if (config) {
       const provider = config.provider || 'openai'
       setCurrentProvider(provider)
       setModelConfig(config.models[provider] || getDefaultModelConfig('openai'))
       setSystemPrompt(config.systemPrompt || '')
-
-      // 加载所有 Provider 列表
       loadAllProviders()
     }
   }, [config])
 
-  // 加载所有 Provider
   const loadAllProviders = async () => {
     const providers = await getAllProviders()
     setAllProviders(providers)
   }
 
-  // 切换Provider时更新默认配置
   const handleProviderChange = (newProvider: string) => {
     if (!newProvider) return
     
@@ -92,31 +90,48 @@ export function AISettingsPanel() {
     setTestResult(null)
   }
 
-  // 更新模型配置
   const updateModelConfig = (updates: Partial<AIModelConfig>) => {
     setModelConfig(prev => ({ ...prev, ...updates }))
     setTestResult(null)
   }
 
-  // 测试连接
   const handleTestConnection = async () => {
     setIsTesting(true)
     setTestResult(null)
 
     try {
-      const result = await testAIConnection(currentProvider as any, modelConfig)
+      const result = await testAIConnection(currentProvider, modelConfig)
       setTestResult(result)
+      
+      if (result.success) {
+        toast({
+          title: '连接成功',
+          description: result.message,
+          variant: 'success',
+        })
+      } else {
+        toast({
+          title: '连接失败',
+          description: result.message,
+          variant: 'destructive',
+        })
+      }
     } catch (err) {
+      const message = err instanceof Error ? err.message : '测试失败'
       setTestResult({
         success: false,
-        message: err instanceof Error ? err.message : '测试失败',
+        message,
+      })
+      toast({
+        title: '连接失败',
+        description: message,
+        variant: 'destructive',
       })
     } finally {
       setIsTesting(false)
     }
   }
 
-  // 保存配置
   const handleSave = async () => {
     setIsSaving(true)
 
@@ -127,36 +142,60 @@ export function AISettingsPanel() {
         models: {
           ...(config?.models || {}),
           [currentProvider]: modelConfig,
-        } as any,
+        },
       })
+      
+      toast({
+        title: '保存成功',
+        description: '配置已保存',
+        variant: 'success',
+      })
+      
       closeSettings()
     } catch (err) {
       console.error('Failed to save config:', err)
+      toast({
+        title: '保存失败',
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive',
+      })
     } finally {
       setIsSaving(false)
     }
   }
 
-  // 添加新 Provider
   const handleAddProvider = async () => {
     if (!newProviderName.trim()) {
-      alert('请输入 Provider 名称')
+      toast({
+        title: '请输入 Provider 名称',
+        variant: 'destructive',
+      })
       return
     }
 
-    if (builtinProviders.includes(newProviderName as any)) {
-      alert('不能使用预定义的 Provider 名称')
+    if (isBuiltinProvider(newProviderName)) {
+      toast({
+        title: '不能使用预定义的 Provider 名称',
+        variant: 'destructive',
+      })
       return
     }
 
     if (config?.models[newProviderName]) {
-      alert('Provider 名称已存在')
+      toast({
+        title: 'Provider 名称已存在',
+        variant: 'destructive',
+      })
       return
     }
 
     const validation = validateModelConfig(newProviderConfig as AIModelConfig)
     if (!validation.valid) {
-      alert(validation.message)
+      toast({
+        title: '配置无效',
+        description: validation.message,
+        variant: 'destructive',
+      })
       return
     }
 
@@ -165,7 +204,7 @@ export function AISettingsPanel() {
         models: {
           ...(config?.models || {}),
           [newProviderName]: newProviderConfig as AIModelConfig,
-        } as any,
+        },
       })
 
       setIsAddingProvider(false)
@@ -179,22 +218,31 @@ export function AISettingsPanel() {
         enabled: true,
       })
 
-      // 重新加载 Provider 列表
       await loadAllProviders()
       setCurrentProvider(newProviderName)
       setModelConfig(newProviderConfig as AIModelConfig)
 
-      alert('Provider 添加成功')
+      toast({
+        title: '添加成功',
+        description: `Provider "${newProviderName}" 已添加`,
+        variant: 'success',
+      })
     } catch (err) {
       console.error('Failed to add provider:', err)
-      alert('添加失败')
+      toast({
+        title: '添加失败',
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive',
+      })
     }
   }
 
-  // 删除 Provider
   const handleDeleteProvider = async (providerName: string) => {
-    if (builtinProviders.includes(providerName as any)) {
-      alert('不能删除预定义的 Provider')
+    if (isBuiltinProvider(providerName)) {
+      toast({
+        title: '不能删除预定义的 Provider',
+        variant: 'destructive',
+      })
       return
     }
 
@@ -206,29 +254,43 @@ export function AISettingsPanel() {
       await deleteProvider(providerName)
       await loadAllProviders()
 
-      // 如果删除的是当前选中的 Provider，切换到 openai
       if (currentProvider === providerName) {
         setCurrentProvider('openai')
         setModelConfig(config?.models['openai'] || getDefaultModelConfig('openai'))
       }
 
-      alert('删除成功')
+      toast({
+        title: '删除成功',
+        description: `Provider "${providerName}" 已删除`,
+        variant: 'success',
+      })
     } catch (err) {
       console.error('Failed to delete provider:', err)
-      alert('删除失败')
+      toast({
+        title: '删除失败',
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive',
+      })
     }
   }
 
-  // 保存系统提示词
   const handleSaveSystemPrompt = async () => {
     setIsSaving(true)
 
     try {
       await updateConfig({ systemPrompt })
-      alert('保存成功')
+      toast({
+        title: '保存成功',
+        description: '系统提示词已更新',
+        variant: 'success',
+      })
     } catch (err) {
       console.error('Failed to save system prompt:', err)
-      alert('保存失败')
+      toast({
+        title: '保存失败',
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -240,17 +302,15 @@ export function AISettingsPanel() {
 
   const helpInfo = getProviderHelpInfo(currentProvider)
   const defaultModels = getProviderDefaultModels(currentProvider)
-  const isBuiltin = builtinProviders.includes(currentProvider as any)
+  const isBuiltin = isBuiltinProvider(currentProvider)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={closeSettings}
       />
 
-      {/* 设置面板 */}
       <div
         className={cn(
           'relative bg-background border rounded-xl shadow-2xl',
@@ -259,7 +319,6 @@ export function AISettingsPanel() {
           'animate-in zoom-in-95 duration-200'
         )}
       >
-        {/* 头部 */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">AI 设置</h2>
           <button
@@ -270,7 +329,6 @@ export function AISettingsPanel() {
           </button>
         </div>
 
-        {/* 标签页导航 */}
         <div className="flex border-b">
           <button
             onClick={() => setTab('providers')}
@@ -296,11 +354,9 @@ export function AISettingsPanel() {
           </button>
         </div>
 
-        {/* 内容 */}
         <div className="flex-1 overflow-y-auto">
           {tab === 'providers' && (
             <div className="p-4 space-y-6">
-              {/* Provider 列表 */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">选择 Provider</label>
@@ -350,12 +406,10 @@ export function AISettingsPanel() {
                 </div>
               </div>
 
-              {/* Provider 配置表单 */}
               {!isAddingProvider && (
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium">{getProviderDisplayName(currentProvider)} 配置</h3>
 
-                  {/* API 密钥 */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">API 密钥</label>
@@ -393,7 +447,6 @@ export function AISettingsPanel() {
                     </div>
                   </div>
 
-                  {/* API 地址 */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">API 地址</label>
                     <input
@@ -405,7 +458,6 @@ export function AISettingsPanel() {
                     />
                   </div>
 
-                  {/* 模型选择 */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">模型</label>
                     {defaultModels.length > 0 ? (
@@ -432,7 +484,6 @@ export function AISettingsPanel() {
                     )}
                   </div>
 
-                  {/* 高级设置 */}
                   <details className="group">
                     <summary className="cursor-pointer text-sm font-medium flex items-center gap-1">
                       <span>高级设置</span>
@@ -442,7 +493,6 @@ export function AISettingsPanel() {
                     </summary>
 
                     <div className="mt-4 space-y-4 pl-2">
-                      {/* 温度 */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <label className="text-sm">温度 (Temperature)</label>
@@ -463,7 +513,6 @@ export function AISettingsPanel() {
                         />
                       </div>
 
-                      {/* 最大Token */}
                       <div className="space-y-2">
                         <label className="text-sm">最大输出长度 (Max Tokens)</label>
                         <input
@@ -480,7 +529,6 @@ export function AISettingsPanel() {
                     </div>
                   </details>
 
-                  {/* 测试结果 */}
                   {testResult && (
                     <div
                       className={cn(
@@ -499,7 +547,6 @@ export function AISettingsPanel() {
                     </div>
                   )}
 
-                  {/* 底部按钮 */}
                   <div className="flex items-center gap-2 pt-4 border-t">
                     <button
                       onClick={handleTestConnection}
@@ -542,7 +589,6 @@ export function AISettingsPanel() {
                 </div>
               )}
 
-              {/* 添加新 Provider 表单 */}
               {isAddingProvider && (
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium">添加自定义 Provider</h3>
@@ -600,7 +646,6 @@ export function AISettingsPanel() {
                     />
                   </div>
 
-                  {/* 底部按钮 */}
                   <div className="flex items-center gap-2 pt-4 border-t">
                     <button
                       onClick={() => setIsAddingProvider(false)}

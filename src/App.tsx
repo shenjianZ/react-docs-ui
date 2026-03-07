@@ -8,6 +8,7 @@ import { GlobalContextMenu } from "@/components/GlobalContextMenu"
 import { DocsPage } from "@/pages/DocsPage"
 import { HomePage } from "@/pages/HomePage"
 import { AIProvider } from "@/components/ai"
+import { Toaster } from "@/components/ui/toaster"
 
 function App() {
   const [aiEnabled, setAiEnabled] = useState(false)
@@ -53,6 +54,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </GlobalContextMenu>
+        <Toaster />
       </AIProvider>
     </ThemeProvider>
   )

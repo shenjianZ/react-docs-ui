@@ -32,7 +32,7 @@ async function getDeviceFingerprint(): Promise<string> {
   components.push(String(navigator.hardwareConcurrency || 0))
 
   // 设备内存（如果可用）
-  const nav = navigator as any
+  const nav = navigator as Navigator & { deviceMemory?: number }
   if (nav.deviceMemory) {
     components.push(String(nav.deviceMemory))
   }

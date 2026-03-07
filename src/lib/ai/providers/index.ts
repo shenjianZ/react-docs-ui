@@ -17,6 +17,11 @@ export { GeminiProvider } from './gemini'
  * 预定义的 Provider 列表
  */
 const BUILTIN_PROVIDERS = ['openai', 'claude', 'gemini'] as const
+type BuiltinProvider = typeof BUILTIN_PROVIDERS[number]
+
+const isBuiltinProvider = (provider: string): provider is BuiltinProvider => {
+  return BUILTIN_PROVIDERS.includes(provider as BuiltinProvider)
+}
 
 /**
  * 创建 AI Provider 实例
@@ -27,8 +32,7 @@ export function createAIProvider(
   providerName: string,
   config: AIProviderConfig
 ): BaseAIProvider {
-  // 检查是否是预定义的 Provider
-  if (BUILTIN_PROVIDERS.includes(providerName as any)) {
+  if (isBuiltinProvider(providerName)) {
     switch (providerName) {
       case 'openai':
         return new OpenAIProvider(config)

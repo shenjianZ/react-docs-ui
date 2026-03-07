@@ -95,9 +95,9 @@ export class OpenAIProvider extends BaseAIProvider {
       const data = await response.json()
 
       // 检查配置的模型是否可用
-      const models = data.data || data.models || []
+      const models: Array<{ id?: string }> = data.data || data.models || []
       const targetModel = models.find(
-        (m: any) => m.id === this.config.modelId || m.id?.includes(this.config.modelId)
+        (m) => m.id === this.config.modelId || m.id?.includes(this.config.modelId)
       )
 
       return {

@@ -6,8 +6,9 @@
 
 使用官方脚手架是最高效的方式。打开你的终端，运行以下命令：
 
-```bash
+``` shell
 # 这会创建一个名为 "my-awesome-docs" 的项目
+cd $HOME 
 npx create-react-docs-ui@latest my-awesome-docs
 ```
 

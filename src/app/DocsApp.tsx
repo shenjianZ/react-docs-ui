@@ -18,6 +18,7 @@ import {
   AIChatDialog,
   AISettingsPanel,
 } from "../components/ai"
+import { Toaster } from "../components/ui/toaster"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents } from "../lib/component-scanner"
@@ -117,6 +118,7 @@ function RootShell(): React.JSX.Element {
             <Outlet />
           </GlobalContextMenu>
         </ComponentProvider>
+        <Toaster />
       </AIProvider>
     </ThemeProvider>
   )
