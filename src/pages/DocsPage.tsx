@@ -3,15 +3,19 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
-import remarkRehype from "remark-rehype"
 
 import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { rehypeToc } from "../lib/rehype-toc"
+import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
 
-export function DocsPage() {
+interface DocsPageProps {
+  aiEnabled?: boolean
+}
+
+export function DocsPage({ aiEnabled = false }: DocsPageProps) {
   const params = useParams<{ lang: string; "*": string }>()
   const langParam = params.lang
   const slug = params["*"]
@@ -139,6 +143,13 @@ export function DocsPage() {
       next={next}
     >
       {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} />}
+      {aiEnabled && (
+        <>
+          <AISelectionTrigger />
+          <AIChatDialog />
+          <AISettingsPanel />
+        </>
+      )}
     </DocsLayout>
   )
 }

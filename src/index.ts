@@ -108,4 +108,52 @@ export { DocsApp } from "./app/DocsApp"
 export { rehypeToc } from './lib/rehype-toc'
 export type { TocItem } from './lib/rehype-toc'
 
+// AI components
+export {
+  AIProvider,
+  useAI,
+  AISelectionTrigger,
+  AIChatDialog,
+  AIChatMessage,
+  AIChatInput,
+  AISettingsPanel,
+} from './components/ai'
 
+// AI utilities and types
+export {
+  getDefaultModelConfig,
+  getDefaultAIConfig,
+  saveAIConfig,
+  getAIConfig,
+  isAIConfigured,
+  getCurrentProviderConfig,
+  updateProviderConfig,
+  deleteProvider,
+  clearAIConfig,
+  validateModelConfig,
+  createAIProvider,
+  getProviderDisplayName,
+  getProviderDefaultModels,
+  getProviderHelpInfo,
+  sendChatMessage,
+  testAIConnection,
+  generateMessageId,
+  createUserMessage,
+  createAssistantMessage,
+} from './lib/ai'
+
+export type {
+  AIModelConfig,
+  AIFeaturesConfig,
+  AIUIConfig,
+  AIConfig,
+  ChatMessageRole,
+  ChatMessage,
+  ChatContext,
+  ChatSession,
+  ChatOptions,
+  AIProviderConfig,
+  StreamEvent,
+  TestConnectionResult,
+  AIState,
+} from './lib/ai'

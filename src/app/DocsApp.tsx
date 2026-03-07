@@ -12,6 +12,12 @@ import { GlobalContextMenu } from "../components/GlobalContextMenu"
 import { CommandMenu } from "../components/CommandMenu"
 import { MdxContent } from "../components/MdxContent"
 import { ComponentProvider } from "../components/ComponentProvider"
+import {
+  AIProvider,
+  AISelectionTrigger,
+  AIChatDialog,
+  AISettingsPanel,
+} from "../components/ai"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents } from "../lib/component-scanner"
@@ -59,6 +65,7 @@ function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>
 function RootShell(): React.JSX.Element {
   const [contextMenuConfig, setContextMenuConfig] = useState<SiteConfig["contextMenu"] | undefined>(undefined)
   const [components, setComponents] = useState<Record<string, React.ComponentType<any>>>({})
+  const [aiEnabled, setAiEnabled] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -68,16 +75,16 @@ function RootShell(): React.JSX.Element {
         const loadedConfig = await getConfig("zh-cn")
         if (!cancelled) {
           setContextMenuConfig(loadedConfig?.contextMenu)
-          
+          setAiEnabled(loadedConfig?.ai?.enabled === true)
+
           // 加载组件
           const componentsPath = loadedConfig?.mdx?.componentsPath || '/src/components'
           const componentsConfig = loadedConfig?.mdx?.components
-          
+
           if (loadedConfig?.mdx?.enabled !== false) {
             try {
               const componentList = await scanComponents(componentsPath)
               const loadedComponents = await loadComponents(componentList, componentsConfig)
-              console.log('[MDX] 已加载的组件:', Object.keys(loadedComponents))
               setComponents(loadedComponents)
             } catch (error) {
               console.warn('[MDX] 加载组件失败:', error)
@@ -96,12 +103,21 @@ function RootShell(): React.JSX.Element {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <ComponentProvider components={components}>
-        <GlobalContextMenu config={contextMenuConfig}>
-          <CommandMenu />
-          <Outlet />
-        </GlobalContextMenu>
-      </ComponentProvider>
+      <AIProvider>
+        <ComponentProvider components={components}>
+          <GlobalContextMenu config={contextMenuConfig}>
+            <CommandMenu />
+            {aiEnabled && (
+              <>
+                <AISelectionTrigger />
+                <AIChatDialog />
+                <AISettingsPanel />
+              </>
+            )}
+            <Outlet />
+          </GlobalContextMenu>
+        </ComponentProvider>
+      </AIProvider>
     </ThemeProvider>
   )
 }

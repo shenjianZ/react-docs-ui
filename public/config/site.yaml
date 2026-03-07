@@ -204,3 +204,6 @@ contextMenu:
 mdx:
     componentsPath: "/src/components" # 组件扫描路径
     enabled: true # 启用 MDX 支持
+
+ai:
+    enabled: true

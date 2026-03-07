@@ -26,12 +26,6 @@ export function FloatingActionBall({
   const hasNav = navItems && navItems.length > 0;
   const hasToc = toc && toc.length > 0;
 
-  // 调试日志
-  if (typeof window !== 'undefined') {
-    console.log('[FloatingActionBall] toc:', toc);
-    console.log('[FloatingActionBall] hasToc:', hasToc);
-  }
-
   // 打开导航菜单
   const handleOpenNav = () => {
     setShowNavMenu(true);

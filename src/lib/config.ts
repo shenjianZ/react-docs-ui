@@ -132,6 +132,11 @@ export interface SiteConfig {
     maxLevel?: number        // 最大标题层级，默认 3（h1-h3）
     title?: string           // 目录标题，默认 "本页目录"
   }
+  // AI功能配置
+  ai?: {
+    enabled?: boolean        // 是否启用AI功能，默认 true
+    // AI功能可通过UI配置，此处仅作为站点级开关
+  }
 }
 
 export async function getConfig(
