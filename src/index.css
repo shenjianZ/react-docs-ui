@@ -2,6 +2,23 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Fragment Mono 字体定义 */
+@font-face {
+  font-family: 'Fragment Mono';
+  src: url('/fonts/FragmentMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fragment Mono';
+  src: url('/fonts/FragmentMono-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -75,12 +92,14 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  /* 为 Prose 代码块背景定义专用变量 */
   --prose-pre-bg: oklch(0.97 0 0 / 0.4);
+  --font-family-zh-cn: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-family-en: "Fragment Mono", system-ui, sans-serif;
+  --font-family-primary: var(--font-family-zh-cn);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #090d0d;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -119,8 +138,14 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html.dark,
+  html.dark body {
+    background-color: #090d0d;
+  }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-family-en), var(--font-family-zh-cn);
   }
 }
 

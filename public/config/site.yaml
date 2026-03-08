@@ -205,5 +205,10 @@ mdx:
     componentsPath: "/src/components" # 组件扫描路径
     enabled: true # 启用 MDX 支持
 
+# 字体配置
+fonts:
+    fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif"
+    fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
+
 ai:
     enabled: true

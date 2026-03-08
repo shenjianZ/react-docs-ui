@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
 import {
   createBrowserRouter,
   RouterProvider,
@@ -8,6 +8,7 @@ import {
 
 import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
+import { FontProvider } from "../components/FontProvider"
 import { GlobalContextMenu } from "../components/GlobalContextMenu"
 import { CommandMenu } from "../components/CommandMenu"
 import { MdxContent } from "../components/MdxContent"
@@ -25,6 +26,15 @@ import { scanComponents, loadComponents } from "../lib/component-scanner"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc } from "../lib/rehype-toc"
+
+const SiteConfigContext = createContext<{
+  config: SiteConfig | null
+  lang: string
+}>({ config: null, lang: "zh-cn" })
+
+export function useSiteConfig() {
+  return useContext(SiteConfigContext)
+}
 
 // 简单的 markdown frontmatter 解析函数，不依赖 Buffer
 function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>; content: string } {
@@ -64,7 +74,7 @@ function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>
 }
 
 function RootShell(): React.JSX.Element {
-  const [contextMenuConfig, setContextMenuConfig] = useState<SiteConfig["contextMenu"] | undefined>(undefined)
+  const [config, setConfig] = useState<SiteConfig | null>(null)
   const [components, setComponents] = useState<Record<string, React.ComponentType<any>>>({})
   const [aiEnabled, setAiEnabled] = useState(false)
 
@@ -75,10 +85,9 @@ function RootShell(): React.JSX.Element {
       try {
         const loadedConfig = await getConfig("zh-cn")
         if (!cancelled) {
-          setContextMenuConfig(loadedConfig?.contextMenu)
+          setConfig(loadedConfig)
           setAiEnabled(loadedConfig?.ai?.enabled === true)
 
-          // 加载组件
           const componentsPath = loadedConfig?.mdx?.componentsPath || '/src/components'
           const componentsConfig = loadedConfig?.mdx?.components
 
@@ -104,22 +113,26 @@ function RootShell(): React.JSX.Element {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <AIProvider>
-        <ComponentProvider components={components}>
-          <GlobalContextMenu config={contextMenuConfig}>
-            <CommandMenu />
-            {aiEnabled && (
-              <>
-                <AISelectionTrigger />
-                <AIChatDialog />
-                <AISettingsPanel />
-              </>
-            )}
-            <Outlet />
-          </GlobalContextMenu>
-        </ComponentProvider>
-        <Toaster />
-      </AIProvider>
+      <SiteConfigContext.Provider value={{ config, lang: "zh-cn" }}>
+        <FontProvider config={config} lang="zh-cn">
+          <AIProvider>
+            <ComponentProvider components={components}>
+              <GlobalContextMenu config={config?.contextMenu}>
+                <CommandMenu />
+                {aiEnabled && (
+                  <>
+                    <AISelectionTrigger />
+                    <AIChatDialog />
+                    <AISettingsPanel />
+                  </>
+                )}
+                <Outlet />
+              </GlobalContextMenu>
+            </ComponentProvider>
+            <Toaster />
+          </AIProvider>
+        </FontProvider>
+      </SiteConfigContext.Provider>
     </ThemeProvider>
   )
 }

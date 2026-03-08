@@ -137,6 +137,11 @@ export interface SiteConfig {
     enabled?: boolean        // 是否启用AI功能，默认 true
     // AI功能可通过UI配置，此处仅作为站点级开关
   }
+  // 字体配置
+  fonts?: {
+    fontFamilyZhCn?: string  // 中文字体族，多个字体用逗号分隔
+    fontFamilyEn?: string    // 英文字体族，多个字体用逗号分隔
+  }
 }
 
 export async function getConfig(

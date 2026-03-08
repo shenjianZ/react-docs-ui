@@ -24,6 +24,7 @@ export { PageNavigation } from "./components/PageNavigation"
 
 // Theming
 export { ThemeProvider, useTheme } from "./components/theme-provider"
+export { FontProvider, useFonts } from "./components/FontProvider"
 export { ModeToggle } from "./components/mode-toggle"
 export { LanguageSwitcher } from "./components/LanguageSwitcher"
 

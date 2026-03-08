@@ -205,3 +205,8 @@ contextMenu:
 mdx:
     componentsPath: "/src/components" # Component scan path
     enabled: true # Enable MDX support
+
+# Fonts Configuration
+fonts:
+    fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif"
+    fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
