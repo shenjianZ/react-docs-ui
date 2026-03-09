@@ -8,6 +8,7 @@ Welcome to the React Docs UI documentation system.
 - [Installation](/docs/guide/installation) - Learn how to install and configure
 - [Quick Start](/docs/guide/quick-start) - Create your first documentation site in 5 minutes
 - [Configuration](/docs/guide/configuration) - Deep dive into configuration options
+- [PDF Server Deployment](/docs/guide/pdf-server) - Deploy PDF generation service
 
 ## Documentation Tests
 

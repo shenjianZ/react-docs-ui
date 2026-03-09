@@ -8,6 +8,7 @@
 - [安装](/docs/guide/installation) - 学习如何安装和配置
 - [快速上手](/docs/guide/quick-start) - 在 5 分钟内创建你的第一个文档网站
 - [配置说明](/docs/guide/configuration) - 深入了解配置选项
+- [PDF Server 部署](/docs/guide/pdf-server) - 部署 PDF 生成服务
 
 ## 文档测试
 

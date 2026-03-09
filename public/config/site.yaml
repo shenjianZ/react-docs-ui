@@ -45,6 +45,8 @@ sidebar:
                         path: "/docs/guide/quick-start"
                       - title: "配置说明"
                         path: "/docs/guide/configuration"
+                      - title: "PDF Server 部署"
+                        path: "/docs/guide/pdf-server"
                 - title: "文档测试"
                   path: "/docs/test"
                   children:

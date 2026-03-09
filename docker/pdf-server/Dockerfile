@@ -18,6 +18,7 @@ RUN apk add --no-cache \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV NODE_ENV=production
+ENV PDF_SERVER_PORT=6965
 
 COPY package.json pnpm-lock.yaml* package-lock.json* ./
 
