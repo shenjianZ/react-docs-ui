@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.gitignore
+*.md
+!README.md
+public
+src
+*.log
+.DS_Store
+Thumbs.db

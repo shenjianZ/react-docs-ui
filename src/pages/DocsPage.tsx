@@ -187,6 +187,8 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       frontmatter={frontmatter}
       prev={prev}
       next={next}
+      content={content}
+      availableLangs={["zh-cn", "en"]}
     >
       {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} skipFirstH1={!!frontmatter?.title} />}
       {aiEnabled && (

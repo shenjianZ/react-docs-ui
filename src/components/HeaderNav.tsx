@@ -114,7 +114,7 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
         }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" data-print-hidden>
       <div className="container flex h-14 max-w-screen-2xl items-center px-4 md:px-8">
         {(((navbar.showLogo ?? true) as boolean) || ((navbar.showTitle ?? true) as boolean)) && (
           <div className="mr-6 flex items-center space-x-2 flex-shrink-0">

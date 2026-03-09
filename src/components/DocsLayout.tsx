@@ -10,6 +10,7 @@ import { TableOfContents } from "@/components/TableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
+import { ExportToolbar } from "@/components/ExportToolbar"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearch } from "@/components/search"
 import type { TocItem } from "@/lib/rehype-toc"
@@ -44,6 +45,13 @@ interface SiteConfig {
     enabled?: boolean
     placeholder?: string
   }
+  export?: {
+    enabled?: boolean
+    pdfServer?: {
+      enabled?: boolean
+      url?: string
+    }
+  }
 }
 
 interface DocsLayoutProps {
@@ -53,6 +61,8 @@ interface DocsLayoutProps {
   children: React.ReactNode
   prev?: { title: string; path: string } | null
   next?: { title: string; path: string } | null
+  content?: string
+  availableLangs?: string[]
 }
 
 export function DocsLayout({
@@ -62,6 +72,8 @@ export function DocsLayout({
   children,
   prev,
   next,
+  content = "",
+  availableLangs,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
   
@@ -121,8 +133,27 @@ export function DocsLayout({
             {/* Frontmatter 元信息展示 */}
             {frontmatter && (frontmatter.title || frontmatter.description || frontmatter.author || frontmatter.date) && (
               <header className="mb-8 pb-6 border-b border-border">
-                {frontmatter.title && (
-                  <h1 className="text-3xl font-bold tracking-tight mb-3">{frontmatter.title}</h1>
+                {frontmatter.title ? (
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <h1 className="text-3xl font-bold tracking-tight">{frontmatter.title}</h1>
+                    <ExportToolbar
+                      content={content}
+                      title={frontmatter.title}
+                      lang={lang}
+                      availableLangs={availableLangs}
+                      pdfServerConfig={config.export?.pdfServer}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex justify-end mb-3">
+                    <ExportToolbar
+                      content={content}
+                      title={frontmatter.firstH1}
+                      lang={lang}
+                      availableLangs={availableLangs}
+                      pdfServerConfig={config.export?.pdfServer}
+                    />
+                  </div>
                 )}
                 {frontmatter.description && (
                   <p className="text-lg text-muted-foreground mb-4">{frontmatter.description}</p>
@@ -146,6 +177,17 @@ export function DocsLayout({
                   </div>
                 )}
               </header>
+            )}
+            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !frontmatter.author && !frontmatter.date)) && (
+              <div className="flex justify-end mb-4">
+                <ExportToolbar
+                  content={content}
+                  title={frontmatter?.firstH1}
+                  lang={lang}
+                  availableLangs={availableLangs}
+                  pdfServerConfig={config.export?.pdfServer}
+                />
+              </div>
             )}
             {children}
           </main>

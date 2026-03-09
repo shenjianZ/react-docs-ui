@@ -508,3 +508,280 @@
 .dark .CodeBlock:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+/* 打印样式 */
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
+@media print {
+  @page {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  /* 隐藏页眉页脚 */
+  @page :first {
+    margin-top: 0;
+  }
+
+  /* 隐藏导航栏、侧边栏、目录、页脚等 */
+  header,
+  nav,
+  aside,
+  footer,
+  [data-print-hidden],
+  .no-print {
+    display: none !important;
+  }
+
+  /* 隐藏导出按钮 */
+  [data-export-exclude] {
+    display: none !important;
+  }
+
+  /* 隐藏页面导航 (上一页/下一页) */
+  [class*="PageNavigation"],
+  [class*="page-navigation"] {
+    display: none !important;
+  }
+
+  /* 隐藏悬浮球 */
+  [class*="FloatingActionBall"],
+  [class*="floating-action"] {
+    display: none !important;
+  }
+
+  /* 隐藏搜索对话框和下拉菜单 */
+  [role="dialog"],
+  [role="menu"],
+  [role="listbox"],
+  [role="tooltip"],
+  [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+
+  /* 重置页面布局 */
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 移除暗色模式样式 */
+  .dark {
+    background: white !important;
+  }
+
+  /* 确保内容区域占满宽度 */
+  main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+
+  /* 移除网格布局 */
+  .md\:grid {
+    display: block !important;
+  }
+
+  /* 防止元素跨页切分 - 关键样式 */
+  .prose > *,
+  .prose pre,
+  .prose blockquote,
+  .prose table,
+  .prose figure,
+  .prose img,
+  .prose ul,
+  .prose ol,
+  .prose li,
+  .prose p,
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6,
+  .shiki-code-block,
+  pre,
+  blockquote,
+  table,
+  figure,
+  img,
+  tr,
+  th,
+  td,
+  [data-rehype-pretty-code-title],
+  [data-rehype-pretty-code-foot] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 代码块打印样式 */
+  pre {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow: visible !important;
+    background: #f6f8fa !important;
+    border: 1px solid #e5e7eb !important;
+    color: #1a1a1a !important;
+    break-before: auto !important;
+    break-after: auto !important;
+  }
+
+  code {
+    color: #1a1a1a !important;
+    break-inside: avoid !important;
+  }
+
+  /* 表格打印样式 */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+    break-inside: avoid !important;
+    break-after: avoid !important;
+  }
+
+  tbody {
+    break-before: avoid !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  th, td {
+    border: 1px solid #e5e7eb !important;
+    padding: 8px !important;
+    color: #1a1a1a !important;
+  }
+
+  th {
+    background: #f3f4f6 !important;
+  }
+
+  /* 链接样式 */
+  a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+  }
+
+  /* 标题样式 - 避免标题后立即换页 */
+  h1, h2, h3, h4, h5, h6 {
+    color: #1a1a1a !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 标题前可以换页，但优先保持与内容在一起 */
+  h1 {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  h1:first-of-type {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  h2, h3, h4, h5, h6 {
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
+
+  /* 确保图片不超出页面 */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* 引用块样式 */
+  blockquote {
+    border-left: 4px solid #e5e7eb !important;
+    padding-left: 16px !important;
+    color: #4b5563 !important;
+    margin: 16px 0 !important;
+    background: #f9fafb !important;
+    padding: 12px !important;
+    border-radius: 4px !important;
+  }
+
+  /* 段落样式 */
+  p {
+    color: #1a1a1a !important;
+    line-height: 1.75 !important;
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
+
+  /* 列表样式 */
+  ul, ol {
+    color: #1a1a1a !important;
+    break-inside: avoid !important;
+  }
+
+  li {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 提示框等容器 */
+  .prose [class*="tip"],
+  .prose [class*="warning"],
+  .prose [class*="danger"],
+  .prose [class*="note"],
+  [data-tip],
+  [data-warning],
+  [data-danger] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 12px !important;
+    border-radius: 4px !important;
+    margin: 16px 0 !important;
+  }
+
+  /* 代码块容器 */
+  .shiki-code-block,
+  [data-rehype-pretty-code-fragment] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin: 16px 0 !important;
+  }
+
+  /* 代码块标题 */
+  [data-rehype-pretty-code-title] {
+    background: #f3f4f6 !important;
+    padding: 8px 12px !important;
+    border: 1px solid #e5e7eb !important;
+    border-bottom: none !important;
+    border-radius: 4px 4px 0 0 !important;
+    font-size: 12px !important;
+    color: #4b5563 !important;
+  }
+
+  /* Frontmatter 头部 */
+  header {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding-bottom: 16px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 作者和日期 */
+  .text-muted-foreground {
+    color: #4b5563 !important;
+  }
+}

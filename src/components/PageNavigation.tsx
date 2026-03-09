@@ -60,7 +60,7 @@ export function PageNavigation({ prev, next, lang }: PageNavigationProps) {
   const texts = i18n[lang as keyof typeof i18n] || i18n["zh-cn"]
 
   return (
-    <div className="flex flex-row gap-4 mt-8 pt-8 border-t">
+    <div className="flex flex-row gap-4 mt-8 pt-8 border-t" data-print-hidden>
       {prev && (
         <Link
           to={`/${lang}${prev.path}`}

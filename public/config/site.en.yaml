@@ -219,3 +219,16 @@ search:
     placeholder: "Search docs..."
     maxResults: 20
     snippetLength: 120
+
+# Export Configuration
+export:
+    enabled: true
+    markdown: true
+    pdf: true
+    word: true
+    allDocs: true
+    # PDF Server Configuration (optional)
+    # When enabled, PDF will be generated server-side, otherwise use browser native print
+    pdfServer:
+        enabled: false
+        url: "http://localhost:3001"

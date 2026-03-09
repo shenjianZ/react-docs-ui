@@ -186,3 +186,22 @@ export type {
   SearchResult,
   SearchOptions,
 } from './lib/search'
+
+// Export components
+export { ExportToolbar } from './components/ExportToolbar'
+export { ExportAllDialog } from './components/ExportAllDialog'
+
+// Export utilities
+export {
+  copyAsMarkdown,
+  exportAsMarkdown,
+  exportAsPDF,
+  exportAsWord,
+  exportAllDocs,
+  htmlToMarkdown,
+} from './lib/export-utils'
+
+export type {
+  ExportOptions,
+  ExportAllOptions,
+} from './lib/export-utils'

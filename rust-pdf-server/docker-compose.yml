@@ -1,0 +1,26 @@
+services:
+  pdf-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: react-docs-pdf-server:latest
+    container_name: react-docs-pdf-server
+    ports:
+      - "6965:6965"
+    environment:
+      - PDF_SERVER_PORT=6965
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:6965/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+        reservations:
+          cpus: '0.1'
+          memory: 16M

@@ -148,6 +148,18 @@ export interface SiteConfig {
     placeholder?: string     // 搜索框占位符
     maxResults?: number      // 最大返回结果数，默认 20
   }
+  // 导出功能配置
+  export?: {
+    enabled?: boolean        // 是否启用导出功能，默认 true
+    markdown?: boolean       // 是否启用 Markdown 导出，默认 true
+    pdf?: boolean            // 是否启用 PDF 导出，默认 true
+    word?: boolean           // 是否启用 Word 导出，默认 true
+    allDocs?: boolean        // 是否启用批量导出，默认 true
+    pdfServer?: {
+      enabled?: boolean      // 是否启用服务器端 PDF 生成
+      url?: string           // PDF 服务器地址
+    }
+  }
 }
 
 export async function getConfig(

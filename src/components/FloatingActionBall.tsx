@@ -66,7 +66,7 @@ export function FloatingActionBall({
   };
 
   return (
-    <>
+    <div data-print-hidden>
       {/* 主按钮 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -228,6 +228,6 @@ export function FloatingActionBall({
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }

@@ -219,5 +219,18 @@ search:
     maxResults: 20
     snippetLength: 120
 
+# 导出功能配置
+export:
+    enabled: true
+    markdown: true
+    pdf: true
+    word: true
+    allDocs: true
+    # PDF 服务器配置 (可选)
+    # 启用后将使用服务器端生成 PDF，否则使用浏览器原生打印
+    pdfServer:
+        enabled: true
+        url: "http://localhost:3001"
+
 ai:
     enabled: true

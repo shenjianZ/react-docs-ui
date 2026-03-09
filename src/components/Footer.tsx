@@ -59,7 +59,7 @@ export function Footer({ footer, lang }: FooterProps) {
   }
 
   return (
-    <footer className="mt-8">
+    <footer className="mt-8" data-print-hidden>
       <div className="container max-w-screen-2xl px-4 md:px-8 py-8 rounded-md border">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2 text-sm text-muted-foreground">
