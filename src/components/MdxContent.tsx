@@ -80,18 +80,38 @@ function rehypeUnwrapComponentParagraphs() {
   return (tree: Root) => {
     visit(tree, 'element', (node: Element, index, parent) => {
       if (node.tagName === 'p' && parent && typeof index === 'number') {
-        if (node.children.length === 1) {
-          const child = node.children[0]
-          if (child.type === 'element') {
-            if (isCustomComponent(child)) {
-              parent.children[index] = child
-              return [SKIP, index]
-            }
-            if (child.tagName === 'pre') {
-              parent.children[index] = child
-              return [SKIP, index]
+        const hasBlockComponent = node.children.some(child => 
+          child.type === 'element' && (isCustomComponent(child) || child.tagName === 'pre')
+        )
+        
+        if (hasBlockComponent) {
+          const newNodes: any[] = []
+          let currentTextNodes: any[] = []
+          
+          const flushTextNodes = () => {
+            if (currentTextNodes.length > 0) {
+              newNodes.push({
+                type: 'element',
+                tagName: 'p',
+                properties: {},
+                children: currentTextNodes
+              })
+              currentTextNodes = []
             }
           }
+          
+          for (const child of node.children) {
+            if (child.type === 'element' && (isCustomComponent(child) || child.tagName === 'pre')) {
+              flushTextNodes()
+              newNodes.push(child)
+            } else {
+              currentTextNodes.push(child)
+            }
+          }
+          flushTextNodes()
+          
+          parent.children.splice(index, 1, ...newNodes)
+          return [SKIP, index]
         }
       }
     })
@@ -99,7 +119,10 @@ function rehypeUnwrapComponentParagraphs() {
 }
 
 function isCustomComponent(node: Element): boolean {
-  return Object.keys(node.properties || {}).some(key => key.startsWith('data-'))
+  const props = node.properties || {}
+  if (props.isComponent) return true
+  const tagName = node.tagName
+  return tagName.charAt(0) === tagName.charAt(0).toUpperCase() && tagName.charAt(0) !== tagName.charAt(0).toLowerCase()
 }
 
 function convertJSXToHTML(source: string): string {
@@ -400,19 +423,17 @@ export function MdxContent({ source, skipFirstH1 = false }: MdxContentProps) {
     const map = new Map<string, React.ComponentType<any>>()
     if (registeredComponents) {
       Object.entries(registeredComponents).forEach(([name, Component]) => {
-        const lowerName = name.toLowerCase()
-        
         const WrappedComponent = React.memo(({ children, ...props }: any) => {
           const componentProps = extractDataProps(props)
           return React.createElement(Component as any, componentProps, children)
         })
         
-        map.set(lowerName, WrappedComponent)
+        map.set(name, WrappedComponent)
         
         if (name.includes('.')) {
           const [parentName, subName] = name.split('.')
-          const combinedLower = `${parentName.toLowerCase()}-${subName.toLowerCase()}`
-          map.set(combinedLower, WrappedComponent)
+          const hyphenName = `${parentName.toLowerCase()}-${subName.toLowerCase()}`
+          map.set(hyphenName, WrappedComponent)
         }
       })
     }
