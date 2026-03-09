@@ -158,3 +158,31 @@ export type {
   TestConnectionResult,
   AIState,
 } from './lib/ai'
+
+// Search components
+export {
+  SearchProvider,
+  useSearch,
+  SearchDialog,
+  SearchInput,
+  SearchResults,
+  SearchItem,
+  SearchTrigger,
+} from './components/search'
+
+// Search utilities and types
+export {
+  SearchEngine,
+  searchEngine,
+  highlightText,
+  generateSnippet,
+  highlightSnippet,
+  tokenizeQuery,
+} from './lib/search'
+
+export type {
+  SearchSection,
+  SearchIndex,
+  SearchResult,
+  SearchOptions,
+} from './lib/search'

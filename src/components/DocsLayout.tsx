@@ -10,6 +10,7 @@ import { PageNavigation } from "@/components/PageNavigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
+import { useSearch } from "@/components/search"
 
 // Define SiteConfig types locally
 interface SiteConfig {
@@ -26,6 +27,10 @@ interface SiteConfig {
     enabled?: boolean
     maxLevel?: number
     title?: string
+  }
+  search?: {
+    enabled?: boolean
+    placeholder?: string
   }
 }
 
@@ -50,6 +55,8 @@ export function DocsLayout({
   const toc = config.toc?.enabled !== false
     ? (frontmatter?.toc || [])
     : []
+  
+  const { setOpen: setSearchOpen } = useSearch()
 
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -59,7 +66,7 @@ export function DocsLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <HeaderNav lang={lang} site={site} navbar={navbar} themeConfig={theme} />
+      <HeaderNav lang={lang} site={site} navbar={navbar} themeConfig={theme} searchConfig={config.search} />
       {/* 移动端侧边栏 */}
       {sidebar && (
         <MobileSidebar
@@ -75,7 +82,9 @@ export function DocsLayout({
         navItems={navbar.items || []}
         toc={toc}
         showSidebar={!!sidebar}
+        showSearch={config.search?.enabled !== false}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
+        onOpenSearch={() => setSearchOpen(true)}
       />
       <div 
   className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}

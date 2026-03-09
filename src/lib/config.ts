@@ -142,6 +142,12 @@ export interface SiteConfig {
     fontFamilyZhCn?: string  // 中文字体族，多个字体用逗号分隔
     fontFamilyEn?: string    // 英文字体族，多个字体用逗号分隔
   }
+  // 全文搜索配置
+  search?: {
+    enabled?: boolean        // 是否启用全文搜索，默认 true
+    placeholder?: string     // 搜索框占位符
+    maxResults?: number      // 最大返回结果数，默认 20
+  }
 }
 
 export async function getConfig(

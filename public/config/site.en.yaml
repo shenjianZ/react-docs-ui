@@ -210,3 +210,10 @@ mdx:
 fonts:
     fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
+
+# Full-text Search Configuration
+search:
+    enabled: true
+    placeholder: "Search docs..."
+    maxResults: 20
+    snippetLength: 120

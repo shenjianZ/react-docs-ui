@@ -10,7 +10,7 @@ import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
 import { FontProvider } from "../components/FontProvider"
 import { GlobalContextMenu } from "../components/GlobalContextMenu"
-import { CommandMenu } from "../components/CommandMenu"
+import { SearchProvider, SearchDialog } from "../components/search"
 import { MdxContent } from "../components/MdxContent"
 import { ComponentProvider } from "../components/ComponentProvider"
 import {
@@ -73,6 +73,22 @@ function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>
   }
 }
 
+function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
+  const params = useParams<{ lang: string }>()
+  const lang = useMemo(() => params.lang || "zh-cn", [params.lang])
+  const [config, setConfig] = useState<SiteConfig | null>(null)
+  
+  useEffect(() => {
+    getConfig(lang).then(setConfig).catch(console.error)
+  }, [lang])
+  
+  return (
+    <SearchProvider lang={lang} enabled={config?.search?.enabled !== false} maxResults={config?.search?.maxResults}>
+      {children}
+    </SearchProvider>
+  )
+}
+
 function RootShell(): React.JSX.Element {
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [components, setComponents] = useState<Record<string, React.ComponentType<any>>>({})
@@ -117,17 +133,19 @@ function RootShell(): React.JSX.Element {
         <FontProvider config={config} lang="zh-cn">
           <AIProvider>
             <ComponentProvider components={components}>
-              <GlobalContextMenu config={config?.contextMenu}>
-                <CommandMenu />
-                {aiEnabled && (
-                  <>
-                    <AISelectionTrigger />
-                    <AIChatDialog />
-                    <AISettingsPanel />
-                  </>
-                )}
-                <Outlet />
-              </GlobalContextMenu>
+              <SearchProviderWrapper>
+                <GlobalContextMenu config={config?.contextMenu}>
+                  <SearchDialog placeholder={config?.search?.placeholder} />
+                  {aiEnabled && (
+                    <>
+                      <AISelectionTrigger />
+                      <AIChatDialog />
+                      <AISettingsPanel />
+                    </>
+                  )}
+                  <Outlet />
+                </GlobalContextMenu>
+              </SearchProviderWrapper>
             </ComponentProvider>
             <Toaster />
           </AIProvider>

@@ -36,24 +36,42 @@ function publicHmrPlugin() {
     }
 }
 
-export default defineConfig({
-    appType: "spa",
-    plugins: [react(), tailwindcss(), nodePolyfills(), publicHmrPlugin()],
-    publicDir: "public",
-    server: {
-        host: "0.0.0.0",
-        port: 5173,
-    },
-    build: {
-        copyPublicDir: true,
-    },
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-            buffer: "buffer/",
+async function searchIndexPlugin() {
+    const { searchIndexPlugin: createPlugin } = await import('./src/lib/search/search-index-plugin.ts')
+    return createPlugin({
+        publicDir: 'public',
+        enabled: true,
+    })
+}
+
+export default defineConfig(async () => {
+    const searchPlugin = await searchIndexPlugin()
+    
+    return {
+        appType: "spa",
+        plugins: [react(), tailwindcss(), nodePolyfills(), publicHmrPlugin(), searchPlugin],
+        publicDir: "public",
+        server: {
+            host: "0.0.0.0",
+            port: 5173,
         },
-    },
-    define: {
-        global: "globalThis",
-    },
-});
+        build: {
+            copyPublicDir: true,
+        },
+        resolve: {
+            alias: {
+                "@": path.resolve(__dirname, "./src"),
+                buffer: "buffer/",
+            },
+        },
+        define: {
+            global: "globalThis",
+        },
+        optimizeDeps: {
+            exclude: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
+        },
+        ssr: {
+            external: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
+        },
+    }
+})

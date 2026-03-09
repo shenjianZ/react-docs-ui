@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Navigation, BookOpen, PanelLeftOpen, X } from 'lucide-react';
+import { Menu, Navigation, BookOpen, PanelLeftOpen, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TocItem } from '@/lib/rehype-toc';
 
@@ -8,7 +8,9 @@ interface FloatingActionBallProps {
   navItems?: { title: string; link: string; external?: boolean }[];
   toc?: TocItem[];
   showSidebar?: boolean;
+  showSearch?: boolean;
   onOpenSidebar?: () => void;
+  onOpenSearch?: () => void;
 }
 
 export function FloatingActionBall({
@@ -16,7 +18,9 @@ export function FloatingActionBall({
   navItems = [],
   toc = [],
   showSidebar = true,
-  onOpenSidebar
+  showSearch = true,
+  onOpenSidebar,
+  onOpenSearch
 }: FloatingActionBallProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showNavMenu, setShowNavMenu] = useState(false);
@@ -42,6 +46,14 @@ export function FloatingActionBall({
   const handleOpenSidebar = () => {
     if (onOpenSidebar) {
       onOpenSidebar();
+    }
+    setIsOpen(false);
+  };
+
+  // 打开搜索
+  const handleOpenSearch = () => {
+    if (onOpenSearch) {
+      onOpenSearch();
     }
     setIsOpen(false);
   };
@@ -74,6 +86,25 @@ export function FloatingActionBall({
 
       {/* 子按钮容器 - 竖向展开 */}
       <div className="fixed bottom-6 right-6 z-40 lg:hidden">
+        {/* 搜索按钮 */}
+        {showSearch && (
+          <button
+            onClick={handleOpenSearch}
+            className={cn(
+              "fixed h-10 w-10 rounded-full shadow-lg",
+              "bg-primary text-primary-foreground",
+              "flex items-center justify-center",
+              "transition-all duration-300 ease-in-out",
+              "hover:scale-110 active:scale-95",
+              isOpen ? "bottom-[7rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
+            )}
+            style={{ transitionDelay: isOpen ? '50ms' : '0ms' }}
+            title="搜索"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+        )}
+
         {/* 侧边栏按钮 */}
         {showSidebar && (
           <button
@@ -84,9 +115,9 @@ export function FloatingActionBall({
               "flex items-center justify-center",
               "transition-all duration-300 ease-in-out",
               "hover:scale-110 active:scale-95",
-              isOpen ? "bottom-[7rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
+              isOpen ? "bottom-[10rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
             )}
-            style={{ transitionDelay: isOpen ? '50ms' : '0ms' }}
+            style={{ transitionDelay: isOpen ? '100ms' : '0ms' }}
             title="侧边栏"
           >
             <PanelLeftOpen className="h-5 w-5" />
@@ -103,9 +134,9 @@ export function FloatingActionBall({
               "flex items-center justify-center",
               "transition-all duration-300 ease-in-out",
               "hover:scale-110 active:scale-95",
-              isOpen ? "bottom-[10rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
+              isOpen ? "bottom-[13rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
             )}
-            style={{ transitionDelay: isOpen ? '100ms' : '0ms' }}
+            style={{ transitionDelay: isOpen ? '150ms' : '0ms' }}
             title="导航菜单"
           >
             <Navigation className="h-5 w-5" />
@@ -122,9 +153,9 @@ export function FloatingActionBall({
               "flex items-center justify-center",
               "transition-all duration-300 ease-in-out",
               "hover:scale-110 active:scale-95",
-              isOpen ? "bottom-[13rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
+              isOpen ? "bottom-[16rem] right-6 opacity-100" : "bottom-6 right-6 opacity-0 pointer-events-none"
             )}
-            style={{ transitionDelay: isOpen ? '150ms' : '0ms' }}
+            style={{ transitionDelay: isOpen ? '200ms' : '0ms' }}
             title="目录导航"
           >
             <BookOpen className="h-5 w-5" />

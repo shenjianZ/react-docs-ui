@@ -34,6 +34,7 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.config.lib.ts",
+        "build:search": "node scripts/generate-search-index.mjs",
         "preview": "vite preview",
         "lint": "eslint .",
         "prepublishOnly": "npm run build:lib"
@@ -53,6 +54,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
+        "flexsearch": "^0.8.212",
         "gray-matter": "^4.0.3",
         "js-yaml": "^4.1.0",
         "katex": "^0.16.11",

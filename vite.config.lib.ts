@@ -61,6 +61,7 @@ export default defineConfig(() => {
           "unist-util-visit",
           "shiki",
           "@shikijs/transformers",
+          "flexsearch",
         ],
         output: {
           globals: {

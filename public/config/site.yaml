@@ -210,5 +210,12 @@ fonts:
     fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
 
+# 全文搜索配置
+search:
+    enabled: true
+    placeholder: "搜索文档..."
+    maxResults: 20
+    snippetLength: 120
+
 ai:
     enabled: true

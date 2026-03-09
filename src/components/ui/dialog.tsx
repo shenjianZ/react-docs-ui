@@ -129,6 +129,30 @@ function DialogDescription({
   )
 }
 
+function DialogVisuallyHiddenTitle({
+  children = "Dialog",
+}: {
+  children?: React.ReactNode
+}) {
+  return (
+    <DialogPrimitive.Title className="sr-only">
+      {children}
+    </DialogPrimitive.Title>
+  )
+}
+
+function DialogVisuallyHiddenDescription({
+  children = "Dialog content",
+}: {
+  children?: React.ReactNode
+}) {
+  return (
+    <DialogPrimitive.Description className="sr-only">
+      {children}
+    </DialogPrimitive.Description>
+  )
+}
+
 export {
   Dialog,
   DialogClose,
@@ -140,4 +164,6 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  DialogVisuallyHiddenTitle,
+  DialogVisuallyHiddenDescription,
 }

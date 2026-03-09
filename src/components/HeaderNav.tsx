@@ -1,7 +1,8 @@
-import { Github, MoreVertical } from "lucide-react"
+import { Github, MoreVertical, Search } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
+import { SearchTrigger } from "@/components/search"
 
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ModeToggle } from "@/components/mode-toggle"
@@ -50,29 +51,47 @@ interface HeaderNavProps {
   site: SiteConfig["site"]
   navbar: SiteConfig["navbar"]
   themeConfig?: { allowToggle?: boolean }
+  searchConfig?: {
+    enabled?: boolean
+    placeholder?: string
+  }
 }
 
-export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
+export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: HeaderNavProps) {
   const location = useLocation()
   const pathname = location.pathname
   const { theme } = useTheme()
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light")
+  const searchEnabled = searchConfig?.enabled !== false
 
   const translations = {
     "zh-cn": {
       switchLanguage: "切换语言",
       switchTheme: "切换主题",
       moreOptions: "更多选项",
+      searchPlaceholder: "搜索文档...",
+      search: "搜索",
     },
     en: {
       switchLanguage: "Switch language",
       switchTheme: "Toggle theme",
       moreOptions: "More options",
+      searchPlaceholder: "Search docs...",
+      search: "Search",
     },
   }
   
   const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
   const t = translations[currentLang]
+
+  useEffect(() => {
+    if (theme === "system") {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      setResolvedTheme(isDark ? "dark" : "light")
+    } else {
+      setResolvedTheme(theme)
+    }
+  }, [theme])
 
   useEffect(() => {
     if (theme === "system") {
@@ -132,6 +151,12 @@ export function HeaderNav({ lang, site, navbar, themeConfig }: HeaderNavProps) {
           )}
         </nav>
         <div className="flex flex-1 items-center justify-end">
+          {/* 搜索按钮 - 仅桌面端显示 */}
+          {searchEnabled && (
+            <div className="hidden md:block">
+              <SearchTrigger placeholder={searchConfig?.placeholder || t.searchPlaceholder} />
+            </div>
+          )}
           {/* 桌面端：显示独立图标 */}
           <nav className="flex items-center space-x-2 hidden md:flex">
             {(navbar.actions || [])
