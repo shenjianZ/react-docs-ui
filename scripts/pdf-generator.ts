@@ -174,7 +174,7 @@ export async function generatePdf(options: PdfOptions): Promise<Buffer> {
   }
 }
 
-export async function generatePdfFromHtml(html: string, options?: Partial<PdfOptions>): Promise<Buffer> {
+export async function generatePdfFromHtml(html: string, options?: Partial<PdfOptions> & { baseUrl?: string }): Promise<Buffer> {
   const mergedOptions = { ...defaultOptions, ...options }
   const browserInstance = await getBrowser()
   const page = await browserInstance.newPage()
@@ -186,6 +186,23 @@ export async function generatePdfFromHtml(html: string, options?: Partial<PdfOpt
       waitUntil: 'networkidle0',
       timeout: 30000,
     })
+
+    if (options?.baseUrl) {
+      await page.evaluate((baseUrl) => {
+        document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+          const href = link.getAttribute('href')
+          if (href && !href.startsWith('http') && !href.startsWith('//') && !href.startsWith('data:')) {
+            link.setAttribute('href', baseUrl + (href.startsWith('/') ? href : '/' + href))
+          }
+        })
+        document.querySelectorAll('img[src], script[src]').forEach((el) => {
+          const src = el.getAttribute('src')
+          if (src && !src.startsWith('http') && !src.startsWith('//') && !src.startsWith('data:')) {
+            el.setAttribute('src', baseUrl + (src.startsWith('/') ? src : '/' + src))
+          }
+        })
+      }, options.baseUrl)
+    }
 
     const pdfOptions: PDFOptions = {
       format: mergedOptions.format,

@@ -231,7 +231,7 @@ export:
     # PDF 服务器配置 (可选)
     # 启用后将使用服务器端生成 PDF，否则使用浏览器原生打印
     pdfServer:
-        enabled: false
+        enabled: true
         url: "http://localhost:3001"
 
 ai:

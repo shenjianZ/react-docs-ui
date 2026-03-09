@@ -52,30 +52,59 @@ export async function exportAsPDFWithServer(
   filename?: string
 ): Promise<boolean> {
   const currentUrl = window.location.href
+  const isLocalhost = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')
   
   try {
-    const response = await fetch(`${serverUrl}/generate-pdf`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url: currentUrl,
-        filename: filename || "document.pdf",
-        format: "A4",
-        scale: 1,
-        waitTime: 2000,
-      }),
-    })
+    if (isLocalhost) {
+      const html = document.documentElement.outerHTML
+      const baseUrl = window.location.origin
+      
+      const response = await fetch(`${serverUrl}/generate-pdf-from-html`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          html,
+          baseUrl,
+          filename: filename || "document.pdf",
+          format: "A4",
+          scale: 1,
+        }),
+      })
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.message || "Failed to generate PDF")
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || "Failed to generate PDF")
+      }
+
+      const blob = await response.blob()
+      saveAs(blob, filename || "document.pdf")
+      return true
+    } else {
+      const response = await fetch(`${serverUrl}/generate-pdf`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: currentUrl,
+          filename: filename || "document.pdf",
+          format: "A4",
+          scale: 1,
+          waitTime: 2000,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || "Failed to generate PDF")
+      }
+
+      const blob = await response.blob()
+      saveAs(blob, filename || "document.pdf")
+      return true
     }
-
-    const blob = await response.blob()
-    saveAs(blob, filename || "document.pdf")
-    return true
   } catch (error) {
     console.error("PDF server error:", error)
     return false
