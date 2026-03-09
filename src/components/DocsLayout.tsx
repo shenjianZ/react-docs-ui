@@ -1,5 +1,6 @@
 import * as React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Calendar, User } from "lucide-react"
 
 import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
@@ -11,6 +12,16 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearch } from "@/components/search"
+
+interface Frontmatter {
+  title?: string
+  description?: string
+  author?: string
+  date?: string | Date
+  toc?: Array<{ id: string; text: string; level: number }>
+  firstH1?: string
+  [key: string]: unknown
+}
 
 // Define SiteConfig types locally
 interface SiteConfig {
@@ -37,7 +48,7 @@ interface SiteConfig {
 interface DocsLayoutProps {
   lang: string
   config: SiteConfig
-  frontmatter: any
+  frontmatter: Frontmatter | null
   children: React.ReactNode
   prev?: { title: string; path: string } | null
   next?: { title: string; path: string } | null
@@ -52,6 +63,13 @@ export function DocsLayout({
   next,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
+  
+  const pageTitle = frontmatter?.title || frontmatter?.firstH1 || site?.title || "Docs"
+  
+  useEffect(() => {
+    document.title = pageTitle
+  }, [pageTitle])
+  
   const toc = config.toc?.enabled !== false
     ? (frontmatter?.toc || [])
     : []
@@ -98,7 +116,38 @@ export function DocsLayout({
         )}
         {/* 内容区域 */}
         <div className="relative flex md:col-start-2 min-w-0 overflow-hidden">
-          <main className="relative py-6 lg:py-8 flex-auto w-full">{children}</main>
+          <main className="relative py-6 lg:py-8 flex-auto w-full">
+            {/* Frontmatter 元信息展示 */}
+            {frontmatter && (frontmatter.title || frontmatter.description || frontmatter.author || frontmatter.date) && (
+              <header className="mb-8 pb-6 border-b border-border">
+                {frontmatter.title && (
+                  <h1 className="text-3xl font-bold tracking-tight mb-3">{frontmatter.title}</h1>
+                )}
+                {frontmatter.description && (
+                  <p className="text-lg text-muted-foreground mb-4">{frontmatter.description}</p>
+                )}
+                {(frontmatter.author || frontmatter.date) && (
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    {frontmatter.author && (
+                      <span className="flex items-center gap-1.5">
+                        <User className="h-4 w-4" />
+                        {frontmatter.author}
+                      </span>
+                    )}
+                    {frontmatter.date && (
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="h-4 w-4" />
+                        {frontmatter.date instanceof Date 
+                          ? frontmatter.date.toLocaleDateString('zh-CN') 
+                          : String(frontmatter.date)}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </header>
+            )}
+            {children}
+          </main>
         </div>
         <div className="md:col-start-2">
           <PageNavigation prev={prev} next={next} lang={lang} />

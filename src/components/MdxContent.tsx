@@ -19,6 +19,7 @@ import macros_physics from "katex-physics"
 
 interface MdxContentProps {
   source: string
+  skipFirstH1?: boolean
 }
 
 // 从节点子元素中提取文本
@@ -365,7 +366,7 @@ function ShikiCodeBlock({
   )
 }
 
-export function MdxContent({ source }: MdxContentProps) {
+export function MdxContent({ source, skipFirstH1 = false }: MdxContentProps) {
   const params = useParams<{ lang: string }>()
   const lang = params.lang || "zh-cn"
   const registeredComponents = useComponents()
@@ -375,9 +376,25 @@ export function MdxContent({ source }: MdxContentProps) {
     getHighlighter()
   }, [])
   
+  // 如果需要跳过第一个 H1，在转换前移除它
+  const processedSource = React.useMemo(() => {
+    if (!skipFirstH1) return source
+    // 移除第一个 # 开头的标题行
+    const lines = source.split('\n')
+    let foundFirstH1 = false
+    const filteredLines = lines.filter((line) => {
+      if (!foundFirstH1 && line.startsWith('# ')) {
+        foundFirstH1 = true
+        return false
+      }
+      return true
+    })
+    return filteredLines.join('\n')
+  }, [source, skipFirstH1])
+
   const transformedSource = React.useMemo(() => {
-    return convertJSXToHTML(source)
-  }, [source])
+    return convertJSXToHTML(processedSource)
+  }, [processedSource])
 
   const componentMap = React.useMemo(() => {
     const map = new Map<string, React.ComponentType<any>>()

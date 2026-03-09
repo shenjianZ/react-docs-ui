@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useState, ComponentType } from "react"
 import {
   createBrowserRouter,
   RouterProvider,
   useParams,
   Outlet,
+  useLocation,
 } from "react-router-dom"
+import matter from "gray-matter"
 
 import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
@@ -27,6 +29,26 @@ import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc } from "../lib/rehype-toc"
 
+interface Frontmatter {
+  title?: string
+  description?: string
+  author?: string
+  date?: string | Date
+  toc?: Array<{ id: string; text: string; level: number }>
+  firstH1?: string
+  [key: string]: unknown
+}
+
+function extractFirstH1(content: string): string | undefined {
+  const lines = content.split('\n')
+  for (const line of lines) {
+    if (line.startsWith('# ')) {
+      return line.slice(2).trim()
+    }
+  }
+  return undefined
+}
+
 const SiteConfigContext = createContext<{
   config: SiteConfig | null
   lang: string
@@ -34,43 +56,6 @@ const SiteConfigContext = createContext<{
 
 export function useSiteConfig() {
   return useContext(SiteConfigContext)
-}
-
-// 简单的 markdown frontmatter 解析函数，不依赖 Buffer
-function parseMarkdownFrontmatter(markdown: string): { data: Record<string, any>; content: string } {
-  const lines = markdown.split('\n')
-  let frontmatterData: Record<string, any> = {}
-  let contentStart = 0
-  
-  // 检查是否有 frontmatter
-  if (lines[0]?.startsWith('---')) {
-    let i = 1
-    while (i < lines.length && !lines[i]?.startsWith('---')) {
-      const line = lines[i]
-      const colonIndex = line.indexOf(':')
-      if (colonIndex > 0) {
-        const key = line.substring(0, colonIndex).trim()
-        const value = line.substring(colonIndex + 1).trim()
-        // 尝试解析值类型
-        if (value === 'true' || value === 'false') {
-          frontmatterData[key] = value === 'true'
-        } else if (!isNaN(Number(value))) {
-          frontmatterData[key] = Number(value)
-        } else {
-          frontmatterData[key] = value
-        }
-      }
-      i++
-    }
-    if (i < lines.length && lines[i]?.startsWith('---')) {
-      contentStart = i + 1
-    }
-  }
-  
-  return {
-    data: frontmatterData,
-    content: lines.slice(contentStart).join('\n')
-  }
 }
 
 function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
@@ -90,16 +75,22 @@ function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function RootShell(): React.JSX.Element {
+  const location = useLocation()
   const [config, setConfig] = useState<SiteConfig | null>(null)
-  const [components, setComponents] = useState<Record<string, React.ComponentType<any>>>({})
+  const [components, setComponents] = useState<Record<string, ComponentType<unknown>>>({})
   const [aiEnabled, setAiEnabled] = useState(false)
+
+  const lang = useMemo(() => {
+    const parts = location.pathname.split("/").filter(Boolean)
+    return parts[0] === "en" || parts[0] === "zh-cn" ? parts[0] : "zh-cn"
+  }, [location.pathname])
 
   useEffect(() => {
     let cancelled = false
 
     ;(async () => {
       try {
-        const loadedConfig = await getConfig("zh-cn")
+        const loadedConfig = await getConfig(lang)
         if (!cancelled) {
           setConfig(loadedConfig)
           setAiEnabled(loadedConfig?.ai?.enabled === true)
@@ -125,12 +116,12 @@ function RootShell(): React.JSX.Element {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [lang])
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <SiteConfigContext.Provider value={{ config, lang: "zh-cn" }}>
-        <FontProvider config={config} lang="zh-cn">
+      <SiteConfigContext.Provider value={{ config, lang }}>
+        <FontProvider config={config} lang={lang}>
           <AIProvider>
             <ComponentProvider components={components}>
               <SearchProviderWrapper>
@@ -164,8 +155,7 @@ function DocsPage() {
 
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [content, setContent] = useState<string | null>(null)
-  const [frontmatter, setFrontmatter] = useState<Record<string, any>>({})
-  const [isMdx, setIsMdx] = useState(false)
+  const [frontmatter, setFrontmatter] = useState<Frontmatter | null>(null)
   const [contentLoading, setContentLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -214,32 +204,24 @@ function DocsPage() {
     
     const loadContent = async () => {
       try {
-        // 同时请求两个文件
         const [mdResponse, mdxResponse] = await Promise.all([
           fetch(mdPath),
           fetch(mdxPath)
         ])
         
         let contentToUse: string | null = null
-        let isMdxFile = false
         
-        // 检查 MDX 文件
         if (mdxResponse.ok) {
           const mdxText = await mdxResponse.text()
-          // 检查是否是 HTML（表示文件不存在）
           if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
             contentToUse = mdxText
-            isMdxFile = true
           }
         }
         
-        // 如果 MDX 不可用，检查 MD 文件
         if (!contentToUse && mdResponse.ok) {
           const mdText = await mdResponse.text()
-          // 检查是否是 HTML（表示文件不存在）
           if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
             contentToUse = mdText
-            isMdxFile = false
           }
         }
         
@@ -249,36 +231,35 @@ function DocsPage() {
 
         if (cancelled) return
 
-        const { data, content: markdownContent } = parseMarkdownFrontmatter(contentToUse)
+        const { data, content: markdownContent } = matter(contentToUse)
 
-        // 获取配置中的 maxLevel
         const maxLevel = config?.toc?.maxLevel || 3
 
-        // 运行 remark 处理链生成 toc
         const remarkProcessor = unified()
           .use(remarkParse)
           .use(rehypeToc, { maxLevel });
 
         const remarkTree = await remarkProcessor.run(remarkProcessor.parse(markdownContent));
-        const toc = (remarkTree as any).data?.toc || [];
+        const treeWithToc = remarkTree as { data?: { toc?: Array<{ id: string; text: string; level: number }> } };
+        const toc = treeWithToc.data?.toc || [];
 
-        // 将 toc 合并到 frontmatter 中
-        const enrichedFrontmatter = {
+        const firstH1 = extractFirstH1(markdownContent)
+
+        const enrichedFrontmatter: Frontmatter = {
           ...data,
-          toc
+          toc,
+          firstH1
         };
 
         setFrontmatter(enrichedFrontmatter)
         setContent(markdownContent)
-        setIsMdx(isMdxFile)
         
       } catch (error) {
         if (cancelled) return
         const errorMessage =
           "# 404 - Not Found\n\nThe page you're looking for could not be found."
         setContent(errorMessage)
-        setFrontmatter({ title: "Not Found" })
-        setIsMdx(false)
+        setFrontmatter({ title: "Not Found", toc: [] })
         setError(error as Error)
       } finally {
         setContentLoading(false)
@@ -312,7 +293,7 @@ function DocsPage() {
 
   if (error) {
     return (
-      <DocsLayout lang={currentLang} config={config} frontmatter={{ title: '错误' }} prev={null} next={null}>
+      <DocsLayout lang={currentLang} config={config} frontmatter={{ title: '错误', toc: [] }} prev={null} next={null}>
         <div className="text-red-600">
           <h1>页面加载失败</h1>
           <p>{error.message}</p>
@@ -325,10 +306,8 @@ function DocsPage() {
     <DocsLayout lang={currentLang} config={config} frontmatter={frontmatter} prev={prev} next={next}>
       {contentLoading && !content ? (
         <div>Loading...</div>
-      ) : isMdx ? (
-        <MdxContent source={content || ''} />
       ) : (
-        <MdxContent source={content || ''} />
+        <MdxContent source={content || ''} skipFirstH1={!!frontmatter?.title} />
       )}
     </DocsLayout>
   )

@@ -140,7 +140,9 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
                   to={`/${lang}${item.link}`}
                   className={cn(
                     "transition-colors hover:text-foreground/80",
-                    pathname === `/${lang}${item.link}`
+                    (item.link === "/" 
+                      ? pathname === `/${lang}` || pathname === `/${lang}/`
+                      : pathname.startsWith(`/${lang}${item.link}`))
                       ? "text-foreground"
                       : "text-foreground/60"
                   )}

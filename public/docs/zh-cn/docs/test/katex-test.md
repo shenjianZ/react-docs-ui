@@ -1,3 +1,4 @@
+
 # 🧪 KaTeX 全功能测试
 
 > 用于验证 KaTeX 是否正确加载所有扩展（mhchem / physics / mathtools 等）

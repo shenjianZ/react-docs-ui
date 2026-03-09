@@ -11,6 +11,26 @@ import { getPrevNextPage } from "../lib/navigation"
 import { rehypeToc } from "../lib/rehype-toc"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
 
+interface Frontmatter {
+  title?: string
+  description?: string
+  author?: string
+  date?: string | Date
+  toc?: Array<{ id: string; text: string; level: number }>
+  firstH1?: string
+  [key: string]: unknown
+}
+
+function extractFirstH1(content: string): string | undefined {
+  const lines = content.split('\n')
+  for (const line of lines) {
+    if (line.startsWith('# ')) {
+      return line.slice(2).trim()
+    }
+  }
+  return undefined
+}
+
 interface DocsPageProps {
   aiEnabled?: boolean
 }
@@ -24,7 +44,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
 
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [content, setContent] = useState("")
-  const [frontmatter, setFrontmatter] = useState<any>(null)
+  const [frontmatter, setFrontmatter] = useState<Frontmatter | null>(null)
   const [configLoading, setConfigLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(true)
 
@@ -72,41 +92,55 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     setContentLoading(true)
 
     const pageSlug = slug || "index"
-    const docPath = `/docs/${currentLang}/${pageSlug}.md`
+    const mdPath = `/docs/${currentLang}/${pageSlug}.md`
+    const mdxPath = `/docs/${currentLang}/${pageSlug}.mdx`
 
-    ;(async () => {
+    const loadContent = async () => {
       try {
-        const response = await fetch(docPath)
-        const contentType = response.headers.get("content-type")
+        const [mdResponse, mdxResponse] = await Promise.all([
+          fetch(mdPath),
+          fetch(mdxPath)
+        ])
 
-        if (
-          !response.ok ||
-          !contentType ||
-          (!contentType.includes("text/markdown") &&
-            !contentType.includes("text/plain"))
-        ) {
-          throw new Error(`File not found or invalid content type for: ${docPath}`)
+        let contentToUse: string | null = null
+
+        if (mdxResponse.ok) {
+          const mdxText = await mdxResponse.text()
+          if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
+            contentToUse = mdxText
+          }
         }
 
-        const markdown = await response.text()
-        if (cancelled) return
-        const { data, content } = matter(markdown)
+        if (!contentToUse && mdResponse.ok) {
+          const mdText = await mdResponse.text()
+          if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
+            contentToUse = mdText
+          }
+        }
 
-        // 获取配置中的 maxLevel
+        if (!contentToUse) {
+          throw new Error(`Neither ${mdPath} nor ${mdxPath} found`)
+        }
+
+        if (cancelled) return
+        const { data, content } = matter(contentToUse)
+
         const maxLevel = config?.toc?.maxLevel || 3
 
-        // 运行 remark 处理链生成 toc
         const remarkProcessor = unified()
           .use(remarkParse)
           .use(rehypeToc, { maxLevel });
 
         const remarkTree = await remarkProcessor.run(remarkProcessor.parse(content));
-        const toc = (remarkTree as any).data?.toc || [];
+        const treeWithToc = remarkTree as { data?: { toc?: Array<{ id: string; text: string; level: number }> } };
+        const toc = treeWithToc.data?.toc || [];
 
-        // 将 toc 合并到 frontmatter 中
-        const enrichedFrontmatter = {
+        const firstH1 = extractFirstH1(content)
+
+        const enrichedFrontmatter: Frontmatter = {
           ...data,
-          toc
+          toc,
+          firstH1
         };
 
         setFrontmatter(enrichedFrontmatter)
@@ -115,15 +149,27 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
         console.error('[DocsPage] Error:', error);
         if (cancelled) return
         const errorMessage =
-          "# 404 - Not Found\n\nThe page you're looking for at `" +
-          docPath +
-          "` could not be found."
+          "# 404 - Not Found\n\nThe page you're looking for could not be found."
         setContent(errorMessage)
         setFrontmatter({ title: "Not Found" })
       } finally {
         if (!cancelled) setContentLoading(false)
       }
-    })()
+    }
+
+    loadContent()
+
+    if (import.meta.hot) {
+      const handleUpdate = () => {
+        loadContent()
+      }
+
+      const mdxFile = `/public/docs/${currentLang}/${pageSlug}.mdx`
+      const mdFile = `/public/docs/${currentLang}/${pageSlug}.md`
+
+      import.meta.hot.accept(mdxFile, handleUpdate)
+      import.meta.hot.accept(mdFile, handleUpdate)
+    }
 
     return () => {
       cancelled = true
@@ -142,7 +188,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       prev={prev}
       next={next}
     >
-      {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} />}
+      {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} skipFirstH1={!!frontmatter?.title} />}
       {aiEnabled && (
         <>
           <AISelectionTrigger />

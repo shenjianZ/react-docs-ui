@@ -54,6 +54,8 @@ sidebar:
                         path: "/docs/test/katex-test"
                       - title: "MDX 演示"
                         path: "/docs/test/mdx-test"
+                      - title: "Frontmatter测试"
+                        path: "/docs/test/frontmatter-test"
 
 # Theme Configuration
 theme:
