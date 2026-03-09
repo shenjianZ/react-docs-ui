@@ -111,7 +111,7 @@ export async function loadComponents(
   
   // 尝试从生成的索引文件加载用户组件
   const userComponents = await loadFromGeneratedIndex()
-  if (userComponents) {
+  if (userComponents && Object.keys(userComponents).length > 0) {
     Object.assign(registry, userComponents)
   }
   

@@ -11,12 +11,12 @@ import { DocsPage } from "@/pages/DocsPage"
 import { HomePage } from "@/pages/HomePage"
 import { AIProvider } from "@/components/ai"
 import { Toaster } from "@/components/ui/toaster"
-import { scanComponents, loadComponents } from "@/lib/component-scanner"
+import { scanComponents, loadComponents, getBuiltinComponents } from "@/lib/component-scanner"
 import type { SiteConfig } from "@/lib/config"
 
 function App() {
   const [config, setConfig] = useState<SiteConfig | null>(null)
-  const [components, setComponents] = useState<Record<string, ComponentType<unknown>>>({})
+  const [components, setComponents] = useState<Record<string, ComponentType<unknown>>>(() => getBuiltinComponents())
   const location = useLocation()
 
   const lang = useMemo(() => {

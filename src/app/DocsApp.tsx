@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, ComponentType } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
 import {
   createBrowserRouter,
   RouterProvider,
@@ -24,17 +24,17 @@ import {
 import { Toaster } from "../components/ui/toaster"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
-import { scanComponents, loadComponents } from "../lib/component-scanner"
+import { scanComponents, loadComponents, getBuiltinComponents } from "../lib/component-scanner"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
-import { rehypeToc } from "../lib/rehype-toc"
+import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 
 interface Frontmatter {
   title?: string
   description?: string
   author?: string
   date?: string | Date
-  toc?: Array<{ id: string; text: string; level: number }>
+  toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
 }
@@ -77,7 +77,7 @@ function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
 function RootShell(): React.JSX.Element {
   const location = useLocation()
   const [config, setConfig] = useState<SiteConfig | null>(null)
-  const [components, setComponents] = useState<Record<string, ComponentType<unknown>>>({})
+  const [components, setComponents] = useState<Record<string, React.ComponentType<unknown>>>(() => getBuiltinComponents())
   const [aiEnabled, setAiEnabled] = useState(false)
 
   const lang = useMemo(() => {
@@ -240,7 +240,7 @@ function DocsPage() {
           .use(rehypeToc, { maxLevel });
 
         const remarkTree = await remarkProcessor.run(remarkProcessor.parse(markdownContent));
-        const treeWithToc = remarkTree as { data?: { toc?: Array<{ id: string; text: string; level: number }> } };
+        const treeWithToc = remarkTree as { data?: { toc?: TocItem[] } };
         const toc = treeWithToc.data?.toc || [];
 
         const firstH1 = extractFirstH1(markdownContent)

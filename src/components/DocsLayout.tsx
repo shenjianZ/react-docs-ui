@@ -12,13 +12,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearch } from "@/components/search"
+import type { TocItem } from "@/lib/rehype-toc"
 
 interface Frontmatter {
   title?: string
   description?: string
   author?: string
   date?: string | Date
-  toc?: Array<{ id: string; text: string; level: number }>
+  toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
 }

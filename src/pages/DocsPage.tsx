@@ -8,7 +8,7 @@ import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
-import { rehypeToc } from "../lib/rehype-toc"
+import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
 
 interface Frontmatter {
@@ -16,7 +16,7 @@ interface Frontmatter {
   description?: string
   author?: string
   date?: string | Date
-  toc?: Array<{ id: string; text: string; level: number }>
+  toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
 }
@@ -132,7 +132,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
           .use(rehypeToc, { maxLevel });
 
         const remarkTree = await remarkProcessor.run(remarkProcessor.parse(content));
-        const treeWithToc = remarkTree as { data?: { toc?: Array<{ id: string; text: string; level: number }> } };
+        const treeWithToc = remarkTree as { data?: { toc?: TocItem[] } };
         const toc = treeWithToc.data?.toc || [];
 
         const firstH1 = extractFirstH1(content)
