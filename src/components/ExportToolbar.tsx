@@ -87,7 +87,12 @@ export function ExportToolbar({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2" data-export-exclude>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 border-0 shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 data-[state=open]:bg-accent"
+            data-export-exclude
+          >
             <FileDown className="h-4 w-4" />
             <span className="hidden sm:inline">{t.export}</span>
           </Button>

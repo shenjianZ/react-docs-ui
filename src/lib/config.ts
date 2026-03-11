@@ -19,7 +19,7 @@ export interface SiteConfig {
       visible?: boolean
     }[]
     actions?: {
-      type?: "github" | "custom"
+      type?: string
       title?: string
       link: string
       icon?: string

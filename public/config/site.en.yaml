@@ -27,6 +27,18 @@ navbar:
         - type: "github"
           link: "https://github.com/shenjianZ/React-docs-ui"
           enabled: true
+        # Common code hosting / external links are supported out of the box.
+        # Available icon/type examples: github, gitee, gitea, gitlab, link, external, globe
+        - type: "gitee"
+          link: "https://gitee.com/your-org/your-repo"
+          enabled: false
+        - type: "gitea"
+          link: "https://git.example.com/your-org/your-repo"
+          enabled: false
+        - title: "API"
+          icon: "link"
+          link: "https://example.com/api"
+          enabled: false
 
 # Sidebar Navigation Configuration
 sidebar:
