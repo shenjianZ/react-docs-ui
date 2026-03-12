@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react"
-import { ExternalLink, Gitlab, Github, Globe, MoreVertical } from "lucide-react"
-import { Link, useLocation } from "react-router-dom"
+import { ExternalLink, Gitlab, Github, Globe, Monitor, Moon, MoreVertical, Sun } from "lucide-react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
 import { SearchTrigger } from "@/components/search"
@@ -13,7 +13,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
@@ -132,8 +137,9 @@ function getActionIcon(action: { type?: string; icon?: string; title?: string; l
 
 export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: HeaderNavProps) {
   const location = useLocation()
+  const navigate = useNavigate()
   const pathname = location.pathname
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light")
   const searchEnabled = searchConfig?.enabled !== false
 
@@ -142,6 +148,11 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
       switchLanguage: "切换语言",
       switchTheme: "切换主题",
       moreOptions: "更多选项",
+      language: "语言",
+      theme: "主题",
+      light: "浅色",
+      dark: "深色",
+      system: "跟随系统",
       searchPlaceholder: "搜索文档...",
       search: "搜索",
     },
@@ -149,13 +160,32 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
       switchLanguage: "Switch language",
       switchTheme: "Toggle theme",
       moreOptions: "More options",
+      language: "Language",
+      theme: "Theme",
+      light: "Light",
+      dark: "Dark",
+      system: "System",
       searchPlaceholder: "Search docs...",
       search: "Search",
     },
   }
-  
+
   const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
   const t = translations[currentLang]
+  const locales = [
+    { code: "en", name: "English" },
+    { code: "zh-cn", name: "简体中文" },
+  ]
+
+  const handleLanguageChange = (newLocale: string) => {
+    const pathParts = location.pathname.split("/").filter(Boolean)
+    if (pathParts.length > 0 && (pathParts[0] === "en" || pathParts[0] === "zh-cn")) {
+      pathParts[0] = newLocale
+    } else {
+      pathParts.unshift(newLocale)
+    }
+    navigate(`/${pathParts.join("/")}`)
+  }
 
   useEffect(() => {
     if (theme === "system") {
@@ -324,17 +354,62 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
                 {navbar.showLanguageSwitcher !== false && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="flex items-center justify-center w-full h-9">
-                      <LanguageSwitcher />
-                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2">
+                        <Globe className="h-4 w-4" />
+                        <span>{t.language}</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent alignOffset={-4}>
+                        <DropdownMenuRadioGroup value={currentLang}>
+                          {locales.map((locale) => (
+                            <DropdownMenuRadioItem
+                              key={locale.code}
+                              value={locale.code}
+                              onClick={() => handleLanguageChange(locale.code)}
+                            >
+                              {locale.name}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
                   </>
                 )}
                 {(themeConfig?.allowToggle ?? true) && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="flex items-center justify-center w-full h-9">
-                      <ModeToggle />
-                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2">
+                        {resolvedTheme === "dark" ? (
+                          <Moon className="h-4 w-4" />
+                        ) : (
+                          <Sun className="h-4 w-4" />
+                        )}
+                        <span>{t.theme}</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent alignOffset={-4}>
+                        <DropdownMenuRadioGroup value={theme}>
+                          <DropdownMenuRadioItem value="light" onClick={() => setTheme("light")}>
+                            <span className="flex items-center gap-2">
+                              <Sun className="h-4 w-4" />
+                              <span>{t.light}</span>
+                            </span>
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="dark" onClick={() => setTheme("dark")}>
+                            <span className="flex items-center gap-2">
+                              <Moon className="h-4 w-4" />
+                              <span>{t.dark}</span>
+                            </span>
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="system" onClick={() => setTheme("system")}>
+                            <span className="flex items-center gap-2">
+                              <Monitor className="h-4 w-4" />
+                              <span>{t.system}</span>
+                            </span>
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
                   </>
                 )}
               </DropdownMenuContent>

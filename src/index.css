@@ -19,6 +19,30 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -93,7 +117,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --prose-pre-bg: oklch(0.97 0 0 / 0.4);
-  --font-family-zh-cn: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-family-zh-cn: "MiSans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   --font-family-en: "Fragment Mono", system-ui, sans-serif;
   --font-family-primary: var(--font-family-zh-cn);
 }
@@ -147,6 +171,10 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-family-en), var(--font-family-zh-cn);
+  }
+
+  html[data-docs-lang^="zh"] body {
+    font-family: var(--font-family-zh-cn), var(--font-family-en);
   }
 }
 

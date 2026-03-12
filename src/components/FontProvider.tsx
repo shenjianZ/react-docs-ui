@@ -13,7 +13,7 @@ type FontContextValue = {
 }
 
 const defaultFonts: FontContextValue = {
-  fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif",
+  fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif",
   fontFamilyEn: "Fragment Mono, system-ui, sans-serif",
 }
 
@@ -34,10 +34,49 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
     const root = document.documentElement
     root.style.setProperty("--font-family-zh-cn", fonts.fontFamilyZhCn)
     root.style.setProperty("--font-family-en", fonts.fontFamilyEn)
+    root.setAttribute("data-docs-lang", lang)
     
     const isZhCn = lang === "zh-cn" || lang.startsWith("zh")
     const primaryFont = isZhCn ? fonts.fontFamilyZhCn : fonts.fontFamilyEn
     root.style.setProperty("--font-family-primary", primaryFont)
+    let idleId: number | null = null
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    const requestIdle = "requestIdleCallback" in globalThis
+      ? globalThis.requestIdleCallback.bind(globalThis)
+      : null
+    const cancelIdle = "cancelIdleCallback" in globalThis
+      ? globalThis.cancelIdleCallback.bind(globalThis)
+      : null
+
+    if (isZhCn) {
+      const preloadMiSans = () => {
+        void Promise.allSettled([
+          document.fonts.load('normal 400 16px "MiSans"', "中文"),
+          document.fonts.load('normal 500 16px "MiSans"', "中文"),
+          document.fonts.load('normal 700 16px "MiSans"', "中文"),
+        ])
+      }
+
+      if (requestIdle) {
+        idleId = requestIdle(() => {
+          preloadMiSans()
+        })
+      } else {
+        timeoutId = globalThis.setTimeout(() => {
+          preloadMiSans()
+        }, 0)
+      }
+    }
+
+    return () => {
+      if (idleId !== null && cancelIdle) {
+        cancelIdle(idleId)
+      }
+      if (timeoutId !== null) {
+        globalThis.clearTimeout(timeoutId)
+      }
+      root.removeAttribute("data-docs-lang")
+    }
   }, [fonts, lang])
 
   return (

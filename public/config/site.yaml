@@ -223,7 +223,7 @@ mdx:
 
 # 字体配置
 fonts:
-    fontFamilyZhCn: "PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif"
+    fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
 
 # 全文搜索配置
