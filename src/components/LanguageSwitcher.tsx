@@ -1,5 +1,4 @@
 "use client"
-
 import { Globe } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -10,6 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  languageMenuContentClassName,
+  languageMenuItemClassName,
+} from "@/lib/language-menu"
 
 const translations = {
   "zh-cn": {
@@ -51,13 +54,17 @@ export function LanguageSwitcher() {
           <span className="sr-only">{t.switchLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className={languageMenuContentClassName}>
         {locales.map(locale => (
           <DropdownMenuItem
             key={locale.code}
             onClick={() => handleLanguageChange(locale.code)}
+            className={languageMenuItemClassName}
           >
-            {locale.name}
+            <span className="min-w-0 truncate">{locale.name}</span>
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">
+              {locale.code}
+            </span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

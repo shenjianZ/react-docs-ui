@@ -21,6 +21,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  languageMenuContentClassName,
+  languageMenuItemClassName,
+} from "@/lib/language-menu"
 import { cn } from "@/lib/utils"
 
 // Define SiteConfig types locally as they are not available in the Vite project
@@ -359,15 +363,22 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
                         <Globe className="h-4 w-4" />
                         <span>{t.language}</span>
                       </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent alignOffset={-4}>
+                      <DropdownMenuSubContent
+                        alignOffset={-4}
+                        className={languageMenuContentClassName}
+                      >
                         <DropdownMenuRadioGroup value={currentLang}>
                           {locales.map((locale) => (
                             <DropdownMenuRadioItem
                               key={locale.code}
                               value={locale.code}
                               onClick={() => handleLanguageChange(locale.code)}
+                              className={languageMenuItemClassName}
                             >
-                              {locale.name}
+                              <span className="min-w-0 truncate">{locale.name}</span>
+                              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                {locale.code}
+                              </span>
                             </DropdownMenuRadioItem>
                           ))}
                         </DropdownMenuRadioGroup>

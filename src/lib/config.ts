@@ -2,6 +2,32 @@
 // @ts-ignore types provided via ambient declaration
 import yaml from "js-yaml"
 
+export interface ImageViewerLabels {
+  preview?: string
+  zoomIn?: string
+  zoomOut?: string
+  fit?: string
+  actualSize?: string
+  reset?: string
+  rotateLeft?: string
+  rotateRight?: string
+  fullscreen?: string
+  download?: string
+  openInNewTab?: string
+  close?: string
+  imageAltFallback?: string
+  downloadSuccess?: string
+  downloadError?: string
+  fullscreenError?: string
+  openInNewTabError?: string
+  imageLoadError?: string
+}
+
+export interface ImageViewerConfig {
+  enabled?: boolean
+  labels?: ImageViewerLabels
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -141,6 +167,7 @@ export interface SiteConfig {
   fonts?: {
     fontFamilyZhCn?: string  // 中文字体族，多个字体用逗号分隔
     fontFamilyEn?: string    // 英文字体族，多个字体用逗号分隔
+    downloadFonts?: string[] // 启动 dev/build 时自动检查并下载到 public/fonts
   }
   // 全文搜索配置
   search?: {
@@ -160,6 +187,7 @@ export interface SiteConfig {
       url?: string           // PDF 服务器地址
     }
   }
+  imageViewer?: ImageViewerConfig
 }
 
 export async function getConfig(

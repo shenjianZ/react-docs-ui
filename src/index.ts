@@ -86,6 +86,7 @@ export {
 
 // Markdown renderer
 export { MdxContent } from "./components/MdxContent"
+export { ImageViewer } from "./components/ImageViewer"
 
 // MDX components
 export { Tip, Warning, Card } from './components/mdx-components'
@@ -100,6 +101,7 @@ export { cn } from "./lib/utils"
 export { getConfig } from "./lib/config"
 export { getPrevNextPage } from "./lib/navigation"
 export type { SiteConfig } from "./lib/config"
+export type { ImageViewerConfig, ImageViewerLabels } from "./lib/config"
 export type { NavigationResult } from "./lib/navigation"
 
 // Ready-to-use app

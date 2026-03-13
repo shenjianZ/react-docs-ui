@@ -190,7 +190,15 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       content={content}
       availableLangs={["zh-cn", "en"]}
     >
-      {contentLoading && !content ? <div>Loading...</div> : <MdxContent source={content} skipFirstH1={!!frontmatter?.title} />}
+      {contentLoading && !content ? (
+        <div>Loading...</div>
+      ) : (
+        <MdxContent
+          source={content}
+          skipFirstH1={!!frontmatter?.title}
+          imageViewer={config?.imageViewer}
+        />
+      )}
       {aiEnabled && (
         <>
           <AISelectionTrigger />

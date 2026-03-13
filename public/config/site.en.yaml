@@ -93,6 +93,23 @@ toc:
     # TOC title
     title: "On This Page"
 
+# Image viewer configuration
+imageViewer:
+    enabled: true
+    labels:
+        preview: "Preview image"
+        zoomIn: "Zoom in"
+        zoomOut: "Zoom out"
+        fit: "Fit to viewport"
+        actualSize: "Actual size"
+        reset: "Reset"
+        rotateLeft: "Rotate left"
+        rotateRight: "Rotate right"
+        fullscreen: "Fullscreen"
+        download: "Download"
+        openInNewTab: "Open in new tab"
+        close: "Close image viewer"
+
 # Footer Configuration
 footer:
     enabled: true
@@ -226,6 +243,12 @@ mdx:
 fonts:
     fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
+    downloadFonts:
+        - "FragmentMono-Italic.woff2"
+        - "FragmentMono-Regular.woff2"
+        - "MiSans-Bold.woff2"
+        - "MiSans-Medium.woff2"
+        - "MiSans-Regular.woff2"
 
 # Full-text Search Configuration
 search:

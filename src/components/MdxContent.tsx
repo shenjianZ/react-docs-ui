@@ -13,6 +13,9 @@ import type { Element, Root } from "hast"
 import { rehypeComponent } from "../lib/rehype-component"
 import { highlightCode, resolveLang, getHighlighter } from "../lib/shiki-highlighter"
 import { Copy, Check } from "lucide-react"
+import { getImageViewerLabels } from "../lib/image-viewer"
+import { ImageViewer } from "./ImageViewer"
+import type { ImageViewerConfig } from "../lib/config"
 import "katex/dist/katex.min.css"
 import "katex/contrib/mhchem/mhchem.js"
 import macros_physics from "katex-physics"
@@ -20,6 +23,7 @@ import macros_physics from "katex-physics"
 interface MdxContentProps {
   source: string
   skipFirstH1?: boolean
+  imageViewer?: ImageViewerConfig
 }
 
 // 从节点子元素中提取文本
@@ -389,7 +393,105 @@ function ShikiCodeBlock({
   )
 }
 
-export function MdxContent({ source, skipFirstH1 = false }: MdxContentProps) {
+function MarkdownImage({
+  lang,
+  viewerConfig,
+  src,
+  alt,
+  title,
+  className,
+  node,
+  ...props
+}: {
+  lang: string
+  viewerConfig?: ImageViewerConfig
+  src?: string
+  alt?: string
+  title?: string
+  className?: string
+  node?: unknown
+  [key: string]: any
+}) {
+  void node
+  const [open, setOpen] = React.useState(false)
+  const labels = React.useMemo(
+    () => getImageViewerLabels(lang, viewerConfig?.labels),
+    [lang, viewerConfig?.labels]
+  )
+
+  if (!src) {
+    return null
+  }
+
+  if (viewerConfig?.enabled === false) {
+    return (
+      <img
+        src={src}
+        alt={alt || labels.imageAltFallback}
+        title={title}
+        className={className}
+        {...props}
+      />
+    )
+  }
+
+  return (
+    <>
+      <span className="not-prose group relative my-6 block">
+        <button
+          type="button"
+          className="block w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border/60 bg-muted/20 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          onClick={() => setOpen(true)}
+          aria-label={labels.preview}
+          title={labels.preview}
+        >
+          <img
+            src={src}
+            alt={alt || labels.imageAltFallback}
+            title={title}
+            className={className ?? "h-auto w-full rounded-2xl object-contain"}
+            {...props}
+          />
+        </button>
+
+        <button
+          type="button"
+          className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          onClick={() => setOpen(true)}
+          aria-label={labels.preview}
+        >
+          <span className="sr-only">{labels.preview}</span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>{labels.preview}</span>
+        </button>
+      </span>
+
+      <ImageViewer
+        open={open}
+        onOpenChange={setOpen}
+        src={src}
+        alt={alt}
+        title={title}
+        lang={lang}
+        labels={viewerConfig?.labels}
+      />
+    </>
+  )
+}
+
+export function MdxContent({ source, skipFirstH1 = false, imageViewer }: MdxContentProps) {
   const params = useParams<{ lang: string }>()
   const lang = params.lang || "zh-cn"
   const registeredComponents = useComponents()
@@ -535,6 +637,20 @@ export function MdxContent({ source, skipFirstH1 = false }: MdxContentProps) {
               <Link to={to} {...props}>
                 {children}
               </Link>
+            )
+          },
+          img({ src, alt, title, className, node, ...props }: any) {
+            return (
+              <MarkdownImage
+                lang={lang}
+                viewerConfig={imageViewer}
+                src={src}
+                alt={alt}
+                title={title}
+                className={className}
+                node={node}
+                {...props}
+              />
             )
           },
         } as any}

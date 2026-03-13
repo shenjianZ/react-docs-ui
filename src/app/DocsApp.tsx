@@ -307,7 +307,11 @@ function DocsPage() {
       {contentLoading && !content ? (
         <div>Loading...</div>
       ) : (
-        <MdxContent source={content || ''} skipFirstH1={!!frontmatter?.title} />
+        <MdxContent
+          source={content || ''}
+          skipFirstH1={!!frontmatter?.title}
+          imageViewer={config?.imageViewer}
+        />
       )}
     </DocsLayout>
   )

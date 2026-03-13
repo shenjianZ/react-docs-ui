@@ -1,20 +1,21 @@
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, type UserConfig, type ViteDevServer } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { fontDownloadPlugin } from "./plugins/font-download-plugin";
 
-function publicHmrPlugin() {
+function publicHmrPlugin(): Plugin {
     return {
         name: 'public-hmr',
-        configureServer(server) {
+        configureServer(server: ViteDevServer) {
             const publicDir = path.resolve(__dirname, 'public')
             const configDir = path.resolve(publicDir, 'config')
             const docsDir = path.resolve(publicDir, 'docs')
 
             server.watcher.add([configDir, docsDir])
 
-            const isTargetFile = (file) => {
+            const isTargetFile = (file: string) => {
                 const relativePath = path.relative(publicDir, file)
                 return (
                     relativePath.startsWith('config' + path.sep) && file.endsWith('.yaml')
@@ -24,7 +25,7 @@ function publicHmrPlugin() {
                 )
             }
 
-            const triggerReload = (file) => {
+            const triggerReload = (file: string) => {
                 if (isTargetFile(file)) {
                     server.ws.send({ type: 'full-reload', path: '*' })
                 }
@@ -44,34 +45,34 @@ async function searchIndexPlugin() {
     })
 }
 
-export default defineConfig(async () => {
-    const searchPlugin = await searchIndexPlugin()
-    
-    return {
-        appType: "spa",
-        plugins: [react(), tailwindcss(), nodePolyfills(), publicHmrPlugin(), searchPlugin],
-        publicDir: "public",
-        server: {
-            host: "0.0.0.0",
-            port: 5173,
+const searchPlugin = await searchIndexPlugin()
+
+const config: UserConfig = {
+    appType: "spa",
+    plugins: [react(), tailwindcss(), nodePolyfills(), fontDownloadPlugin(), publicHmrPlugin(), searchPlugin],
+    publicDir: "public",
+    server: {
+        host: "0.0.0.0",
+        port: 5173,
+    },
+    build: {
+        copyPublicDir: true,
+    },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
+            buffer: "buffer/",
         },
-        build: {
-            copyPublicDir: true,
-        },
-        resolve: {
-            alias: {
-                "@": path.resolve(__dirname, "./src"),
-                buffer: "buffer/",
-            },
-        },
-        define: {
-            global: "globalThis",
-        },
-        optimizeDeps: {
-            exclude: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
-        },
-        ssr: {
-            external: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
-        },
-    }
-})
+    },
+    define: {
+        global: "globalThis",
+    },
+    optimizeDeps: {
+        exclude: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
+    },
+    ssr: {
+        external: ['@node-rs/jieba', '@node-rs/jieba-wasm32-wasi'],
+    },
+}
+
+export default defineConfig(config)
