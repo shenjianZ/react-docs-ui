@@ -250,6 +250,34 @@ fonts:
         - "MiSans-Medium.woff2"
         - "MiSans-Regular.woff2"
 
+# Code highlight configuration
+codeHighlight:
+    # Common supported languages / aliases:
+    # bash, shell, sh
+    # javascript, js
+    # typescript, ts
+    # jsx, tsx
+    # json
+    # yaml, yml
+    # markdown, md
+    # html, css, scss, less
+    # python, py
+    # java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql
+    # vue, svelte, docker, dockerfile, nginx, xml, diff, regex
+    # Add more items to langs when needed; names should match Shiki language ids or these aliases.
+    # Preload only the languages used by this site. Unlisted fences fall back to plain code.
+    langs:
+        - "bash"
+        - "markdown"
+        - "yaml"
+        - "javascript"
+        - "jsx"
+        - "json"
+        - "tsx"
+        - "typescript"
+    lightTheme: "github-light"
+    darkTheme: "github-dark"
+
 # Full-text Search Configuration
 search:
     enabled: true

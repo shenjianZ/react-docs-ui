@@ -28,6 +28,7 @@ import { scanComponents, loadComponents, getBuiltinComponents } from "../lib/com
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
+import type { ShikiBundle } from "../lib/shiki-highlighter"
 
 interface Frontmatter {
   title?: string
@@ -146,7 +147,7 @@ function RootShell(): React.JSX.Element {
   )
 }
 
-function DocsPage() {
+function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
   const params = useParams<{ lang: string; "*": string }>()
   const langParam = params.lang
   const slug = params["*"]
@@ -327,13 +328,19 @@ function DocsPage() {
           source={content || ''}
           skipFirstH1={!!frontmatter?.title}
           imageViewer={config?.imageViewer}
+          codeHighlight={config?.codeHighlight}
+          shikiBundle={shikiBundle}
         />
       )}
     </DocsLayout>
   )
 }
 
-export function DocsApp(): React.JSX.Element {
+interface DocsAppProps {
+  shikiBundle?: ShikiBundle
+}
+
+export function DocsApp({ shikiBundle }: DocsAppProps = {}): React.JSX.Element {
   const router = useMemo(
     () =>
       createBrowserRouter([
@@ -341,13 +348,13 @@ export function DocsApp(): React.JSX.Element {
           path: "/",
           element: <RootShell />,
           children: [
-            { index: true, element: <DocsPage /> },
-            { path: ":lang", element: <DocsPage /> },
-            { path: ":lang/*", element: <DocsPage /> },
+            { index: true, element: <DocsPage shikiBundle={shikiBundle} /> },
+            { path: ":lang", element: <DocsPage shikiBundle={shikiBundle} /> },
+            { path: ":lang/*", element: <DocsPage shikiBundle={shikiBundle} /> },
           ],
         },
       ]),
-    []
+    [shikiBundle]
   )
 
   return <RouterProvider router={router} />

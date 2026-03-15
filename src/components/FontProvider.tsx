@@ -17,6 +17,49 @@ const defaultFonts: FontContextValue = {
   fontFamilyEn: "Fragment Mono, system-ui, sans-serif",
 }
 
+const FONT_STYLE_ID = "react-docs-ui-font-face-styles"
+const FONT_FACE_CSS = `
+@font-face {
+  font-family: 'Fragment Mono';
+  src: url('/fonts/FragmentMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fragment Mono';
+  src: url('/fonts/FragmentMono-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/MiSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+`
+
 const FontContext = createContext<FontContextValue>(defaultFonts)
 
 export function useFonts() {
@@ -29,6 +72,16 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
     const fontFamilyEn = config?.fonts?.fontFamilyEn || defaultFonts.fontFamilyEn
     return { fontFamilyZhCn, fontFamilyEn }
   }, [config?.fonts?.fontFamilyZhCn, config?.fonts?.fontFamilyEn])
+
+  useEffect(() => {
+    let styleElement = document.getElementById(FONT_STYLE_ID) as HTMLStyleElement | null
+    if (!styleElement) {
+      styleElement = document.createElement("style")
+      styleElement.id = FONT_STYLE_ID
+      styleElement.textContent = FONT_FACE_CSS
+      document.head.appendChild(styleElement)
+    }
+  }, [])
 
   useEffect(() => {
     const root = document.documentElement

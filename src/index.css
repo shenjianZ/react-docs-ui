@@ -2,47 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Fragment Mono 字体定义 */
-@font-face {
-  font-family: 'Fragment Mono';
-  src: url('/fonts/FragmentMono-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fragment Mono';
-  src: url('/fonts/FragmentMono-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'MiSans';
-  src: url('/fonts/MiSans-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'MiSans';
-  src: url('/fonts/MiSans-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'MiSans';
-  src: url('/fonts/MiSans-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

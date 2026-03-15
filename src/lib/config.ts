@@ -28,6 +28,12 @@ export interface ImageViewerConfig {
   labels?: ImageViewerLabels
 }
 
+export interface SyntaxHighlightConfig {
+  langs?: string[]
+  lightTheme?: string
+  darkTheme?: string
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -169,6 +175,8 @@ export interface SiteConfig {
     fontFamilyEn?: string    // 英文字体族，多个字体用逗号分隔
     downloadFonts?: string[] // 启动 dev/build 时自动检查并下载到 public/fonts
   }
+  // 代码高亮配置
+  codeHighlight?: SyntaxHighlightConfig
   // 全文搜索配置
   search?: {
     enabled?: boolean        // 是否启用全文搜索，默认 true

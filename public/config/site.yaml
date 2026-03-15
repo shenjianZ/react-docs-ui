@@ -249,6 +249,34 @@ fonts:
         - "MiSans-Medium.woff2"
         - "MiSans-Regular.woff2"
 
+# 代码高亮配置
+codeHighlight:
+    # 支持的常用语言/别名示例:
+    # bash, shell, sh
+    # javascript, js
+    # typescript, ts
+    # jsx, tsx
+    # json
+    # yaml, yml
+    # markdown, md
+    # html, css, scss, less
+    # python, py
+    # java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql
+    # vue, svelte, docker, dockerfile, nginx, xml, diff, regex
+    # 如需更多语言，可继续追加到 langs；名称需与 Shiki 语言名或这里的别名一致
+    # 仅预加载当前站点会用到的语言，未列出的代码块会回退为普通 code 显示
+    langs:
+        - "bash"
+        - "markdown"
+        - "yaml"
+        - "javascript"
+        - "jsx"
+        - "json"
+        - "tsx"
+        - "typescript"
+    lightTheme: "github-light"
+    darkTheme: "github-dark"
+
 # 全文搜索配置
 search:
     enabled: true

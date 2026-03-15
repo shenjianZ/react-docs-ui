@@ -10,6 +10,7 @@ import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
+import { siteShikiBundle } from "../generated/shiki-bundle"
 
 interface Frontmatter {
   title?: string
@@ -197,6 +198,8 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
           source={content}
           skipFirstH1={!!frontmatter?.title}
           imageViewer={config?.imageViewer}
+          codeHighlight={config?.codeHighlight}
+          shikiBundle={siteShikiBundle}
         />
       )}
       {aiEnabled && (

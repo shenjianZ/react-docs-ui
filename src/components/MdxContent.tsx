@@ -11,11 +11,11 @@ import { useComponents } from "./ComponentProvider"
 import { visit, SKIP } from "unist-util-visit"
 import type { Element, Root } from "hast"
 import { rehypeComponent } from "../lib/rehype-component"
-import { highlightCode, resolveLang, getHighlighter } from "../lib/shiki-highlighter"
+import { getCodeHighlightTheme, getHighlighter, highlightCode, resolveLang, type ShikiBundle } from "../lib/shiki-highlighter"
 import { Copy, Check } from "lucide-react"
 import { getImageViewerLabels } from "../lib/image-viewer"
 import { ImageViewer } from "./ImageViewer"
-import type { ImageViewerConfig } from "../lib/config"
+import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
 import "katex/dist/katex.min.css"
 import "katex/contrib/mhchem/mhchem.js"
 import macros_physics from "katex-physics"
@@ -24,6 +24,8 @@ interface MdxContentProps {
   source: string
   skipFirstH1?: boolean
   imageViewer?: ImageViewerConfig
+  codeHighlight?: SyntaxHighlightConfig
+  shikiBundle?: ShikiBundle
 }
 
 // 从节点子元素中提取文本
@@ -246,10 +248,14 @@ function ShikiCodeBlock({
   className, 
   children,
   meta,
+  codeHighlight,
+  shikiBundle,
 }: { 
   className?: string
   children?: React.ReactNode
   meta?: string
+  codeHighlight?: SyntaxHighlightConfig
+  shikiBundle?: ShikiBundle
 }) {
   const [html, setHtml] = React.useState<string>('')
   const [isDark, setIsDark] = React.useState(false)
@@ -318,9 +324,14 @@ function ShikiCodeBlock({
   
   // 高亮代码
   React.useEffect(() => {
-    const theme = isDark ? 'github-dark' : 'github-light'
-    highlightCode(code, { lang: resolvedLang, theme, showLineNumbers }).then(setHtml)
-  }, [code, resolvedLang, isDark, showLineNumbers])
+    const theme = getCodeHighlightTheme(isDark, codeHighlight, shikiBundle)
+    highlightCode(
+      code,
+      { lang: resolvedLang, theme, showLineNumbers },
+      codeHighlight,
+      shikiBundle
+    ).then(setHtml)
+  }, [code, resolvedLang, isDark, showLineNumbers, codeHighlight, shikiBundle])
   
   // 复制功能
   const handleCopy = React.useCallback(async () => {
@@ -491,15 +502,21 @@ function MarkdownImage({
   )
 }
 
-export function MdxContent({ source, skipFirstH1 = false, imageViewer }: MdxContentProps) {
+export function MdxContent({
+  source,
+  skipFirstH1 = false,
+  imageViewer,
+  codeHighlight,
+  shikiBundle,
+}: MdxContentProps) {
   const params = useParams<{ lang: string }>()
   const lang = params.lang || "zh-cn"
   const registeredComponents = useComponents()
   
   // 预加载 Shiki
   React.useEffect(() => {
-    getHighlighter()
-  }, [])
+    getHighlighter(codeHighlight, shikiBundle)
+  }, [codeHighlight, shikiBundle])
   
   // 如果需要跳过第一个 H1，在转换前移除它
   const processedSource = React.useMemo(() => {
@@ -603,7 +620,12 @@ export function MdxContent({ source, skipFirstH1 = false, imageViewer }: MdxCont
               const meta = node?.data?.meta || ''
               
               return (
-                <ShikiCodeBlock className={className} meta={meta}>
+                <ShikiCodeBlock
+                  className={className}
+                  meta={meta}
+                  codeHighlight={codeHighlight}
+                  shikiBundle={shikiBundle}
+                >
                   {codeChildren}
                 </ShikiCodeBlock>
               )

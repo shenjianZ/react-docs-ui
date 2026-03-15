@@ -103,6 +103,7 @@ export { getPrevNextPage } from "./lib/navigation"
 export type { SiteConfig } from "./lib/config"
 export type { ImageViewerConfig, ImageViewerLabels } from "./lib/config"
 export type { NavigationResult } from "./lib/navigation"
+export type { ShikiBundle } from "./lib/shiki-highlighter"
 
 // Ready-to-use app
 export { DocsApp } from "./app/DocsApp"
