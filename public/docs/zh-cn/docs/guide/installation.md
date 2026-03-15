@@ -9,7 +9,7 @@
 
 ## 推荐方式：使用脚手架
 
-我们强烈推荐使用官方的 `create-react-docs-ui` 脚手架来创建你的新文档项目。这是最快、最简单的方式，可以确保所有配置都已就绪。
+我们强烈推荐使用官方的 `create-react-docs-ui` 脚手架来创建你的新文档项目。这是当前唯一推荐的安装方式，可以确保配置文件、运行时行为和目录结构保持一致。
 
 1.  **运行创建命令**:
     ```bash
@@ -29,35 +29,6 @@
     ```
     现在，你的文档网站已经运行在 `http://localhost:5173` (或另一个可用端口) 上了。
 
-## 手动安装 (适用于现有项目)
+## 为什么不再建议手动安装
 
-如果你想在已有的 Vite + React 项目中手动集成 `react-docs-ui`，可以按照以下步骤操作：
-
-1.  **安装核心库**:
-    ```bash
-    npm install react-docs-ui
-    ```
-
-2.  **创建配置文件**:
-    在你的 `public` 目录下创建一个 `config` 文件夹，并在其中新建一个 `site.yaml` 文件。你可以从[这里](https://github.com/shenjianZ/create-vue-docs-ui/blob/master/template/public/config/site.yaml)复制一个基础模板。
-
-3.  **创建文档目录**:
-    在 `public` 目录下创建一个 `docs` 文件夹，用于存放你的 Markdown 文件。例如: `public/docs/zh-cn/index.md`。
-
-4.  **修改应用入口文件**:
-    更新你的 `src/main.tsx` (或 `main.jsx`) 文件，渲染 `DocsApp` 组件来初始化应用。
-
-    ```tsx
-    // src/main.tsx
-    import React from 'react'
-    import ReactDOM from 'react-dom/client'
-    import { DocsApp } from 'react-docs-ui'
-    import 'react-docs-ui/dist/style.css' // 引入核心样式
-
-    ReactDOM.createRoot(document.getElementById('root')!).render(
-      <React.StrictMode>
-        <DocsApp />
-      </React.StrictMode>
-    )
-    ```
-5.  **确保 `index.html` 中有 `<div id="root"></div>`**
+当前文档站的配置解析、搜索索引、代码高亮以及部分运行时行为都依赖脚手架生成的项目结构与构建流程。手动集成容易出现配置丢失、行为不一致或构建产物不完整的问题，因此文档不再提供手动安装步骤。

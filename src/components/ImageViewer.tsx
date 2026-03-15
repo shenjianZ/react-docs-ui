@@ -111,6 +111,22 @@ export function ImageViewer({
   const [fitMode, setFitMode] = React.useState<FitMode>("fit")
   const [isFullscreen, setIsFullscreen] = React.useState(false)
   const [loadError, setLoadError] = React.useState(false)
+  const [translate, setTranslate] = React.useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = React.useState(false)
+  const pointersRef = React.useRef(
+    new Map<number, { x: number; y: number }>()
+  )
+  const dragStateRef = React.useRef<{
+    pointerId: number
+    startX: number
+    startY: number
+    originX: number
+    originY: number
+  } | null>(null)
+  const pinchStateRef = React.useRef<{
+    startDistance: number
+    startScale: number
+  } | null>(null)
 
   const effectiveAlt = alt?.trim() || title?.trim() || mergedLabels.imageAltFallback
 
@@ -119,6 +135,11 @@ export function ImageViewer({
     setRotation(0)
     setFitMode("fit")
     setLoadError(false)
+    setTranslate({ x: 0, y: 0 })
+    setIsDragging(false)
+    pointersRef.current.clear()
+    dragStateRef.current = null
+    pinchStateRef.current = null
   }, [])
 
   React.useEffect(() => {
@@ -149,10 +170,11 @@ export function ImageViewer({
 
   const transformStyle = React.useMemo<React.CSSProperties>(() => {
     return {
-      transform: `scale(${scale}) rotate(${rotation}deg)`,
-      transition: "transform 160ms ease",
+      transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale}) rotate(${rotation}deg)`,
+      transition: isDragging ? "none" : "transform 160ms ease",
+      cursor: loadError ? "default" : isDragging ? "grabbing" : "grab",
     }
-  }, [rotation, scale])
+  }, [isDragging, loadError, rotation, scale, translate.x, translate.y])
 
   const zoomIn = React.useCallback(() => {
     setFitMode("actual")
@@ -167,11 +189,13 @@ export function ImageViewer({
   const setFit = React.useCallback(() => {
     setFitMode("fit")
     setScale(1)
+    setTranslate({ x: 0, y: 0 })
   }, [])
 
   const setActualSize = React.useCallback(() => {
     setFitMode("actual")
     setScale(1)
+    setTranslate({ x: 0, y: 0 })
   }, [])
 
   const rotateLeft = React.useCallback(() => {
@@ -303,6 +327,89 @@ export function ImageViewer({
     }
   }, [handleWheel, open])
 
+  const handlePointerMove = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    pointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    const pointers = Array.from(pointersRef.current.values())
+    if (pointers.length === 2 && pinchStateRef.current) {
+      const [first, second] = pointers
+      const distance = Math.hypot(second.x - first.x, second.y - first.y)
+      const nextScale = clampScale(
+        pinchStateRef.current.startScale *
+          (distance / pinchStateRef.current.startDistance)
+      )
+      setFitMode("actual")
+      setScale(nextScale)
+      return
+    }
+
+    const dragState = dragStateRef.current
+    if (!dragState || dragState.pointerId !== event.pointerId) return
+
+    setTranslate({
+      x: dragState.originX + (event.clientX - dragState.startX),
+      y: dragState.originY + (event.clientY - dragState.startY),
+    })
+  }, [])
+
+  const stopDragging = React.useCallback((event?: React.PointerEvent<HTMLDivElement>) => {
+    if (event && viewportRef.current?.hasPointerCapture(event.pointerId)) {
+      viewportRef.current.releasePointerCapture(event.pointerId)
+    }
+    if (event) {
+      pointersRef.current.delete(event.pointerId)
+    }
+    dragStateRef.current = null
+    if (pointersRef.current.size < 2) {
+      pinchStateRef.current = null
+    }
+    setIsDragging(false)
+  }, [])
+
+  const handlePointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0 || loadError) {
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+      event.currentTarget.setPointerCapture(event.pointerId)
+      pointersRef.current.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      })
+
+      const pointers = Array.from(pointersRef.current.values())
+      if (pointers.length === 2) {
+        const [first, second] = pointers
+        pinchStateRef.current = {
+          startDistance: Math.max(
+            1,
+            Math.hypot(second.x - first.x, second.y - first.y)
+          ),
+          startScale: scale,
+        }
+        dragStateRef.current = null
+        setIsDragging(false)
+        return
+      }
+
+      dragStateRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        originX: translate.x,
+        originY: translate.y,
+      }
+      setIsDragging(true)
+    },
+    [loadError, scale, translate.x, translate.y]
+  )
+
   React.useEffect(() => {
     if (!open) return
 
@@ -431,7 +538,11 @@ export function ImageViewer({
 
         <div
           ref={viewportRef}
-          className="relative flex min-h-0 flex-1 items-center justify-center overflow-auto rounded-xl border border-zinc-800 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_40%),linear-gradient(180deg,_rgba(24,24,27,0.9),_rgba(9,9,11,1))] p-4"
+          className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl border border-zinc-800 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_40%),linear-gradient(180deg,_rgba(24,24,27,0.9),_rgba(9,9,11,1))] p-4 touch-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={stopDragging}
+          onPointerCancel={stopDragging}
         >
           {loadError ? (
             <div className="flex flex-col items-center gap-2 text-center">
@@ -452,6 +563,7 @@ export function ImageViewer({
               )}
               style={transformStyle}
               onError={() => setLoadError(true)}
+              draggable={false}
             />
           )}
         </div>

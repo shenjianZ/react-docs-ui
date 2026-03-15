@@ -26,6 +26,28 @@
 ##### H5 Heading
 ###### H6 Heading
 
+### TOC Heading Formatting Tests
+
+#### Heading with `inlineCode`
+
+#### Heading with **Bold**
+
+#### Heading with *Italic*
+
+#### Heading with ~~Strikethrough~~
+
+#### Mixed **Bold** and `inlineCode` Heading
+
+#### Mixed *Italic* and ~~Strikethrough~~ Heading
+
+#### Mixed **Bold** *Italic* `inlineCode` ~~Strikethrough~~ Heading
+
+#### Heading with [Link Text](https://example.com)
+
+#### Chinese `Code` English **Bold** Mixed Heading
+
+#### `create-react-docs-ui` and **site.yaml** Field Guide
+
 ---
 
 ## Text Styles

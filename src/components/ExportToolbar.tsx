@@ -16,6 +16,7 @@ import {
   exportAsWord,
   type PdfServerConfig,
 } from "@/lib/export-utils"
+import { useToast } from "@/components/ui/use-toast"
 import { ExportAllDialog } from "./ExportAllDialog"
 
 interface ExportToolbarProps {
@@ -35,7 +36,14 @@ const translations = {
     exportAsWord: "导出为 Word",
     exportAllDocs: "导出所有文档",
     copied: "已复制到剪贴板",
-    exporting: "正在导出...",
+    copyFailed: "复制失败，请稍后重试",
+    markdownExported: "Markdown 文件已开始下载",
+    markdownExportFailed: "Markdown 导出失败，请稍后重试",
+    pdfExported: "PDF 已开始导出",
+    pdfPrintOpened: "已打开浏览器打印窗口",
+    pdfExportFailed: "PDF 导出失败，请稍后重试",
+    wordExported: "Word 文件已开始下载",
+    wordExportFailed: "Word 导出失败，请稍后重试",
   },
   en: {
     export: "Export",
@@ -45,7 +53,14 @@ const translations = {
     exportAsWord: "Export as Word",
     exportAllDocs: "Export All Documents",
     copied: "Copied to clipboard",
-    exporting: "Exporting...",
+    copyFailed: "Copy failed. Please try again.",
+    markdownExported: "Markdown download started.",
+    markdownExportFailed: "Markdown export failed. Please try again.",
+    pdfExported: "PDF export started.",
+    pdfPrintOpened: "Print dialog opened.",
+    pdfExportFailed: "PDF export failed. Please try again.",
+    wordExported: "Word download started.",
+    wordExportFailed: "Word export failed. Please try again.",
   },
 }
 
@@ -57,33 +72,86 @@ export function ExportToolbar({
   pdfServerConfig,
 }: ExportToolbarProps) {
   const t = translations[lang as keyof typeof translations] || translations.en
+  const { toast } = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
   const [exportAllOpen, setExportAllOpen] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
   const copyTriggeredRef = useRef(false)
 
   const handleCopyAsMarkdown = useCallback(async () => {
-    const success = await copyAsMarkdown(content)
-    if (success) {
-      console.log(t.copied)
+    try {
+      const success = await copyAsMarkdown(content)
+      if (!success) {
+        toast({
+          variant: "destructive",
+          description: t.copyFailed,
+        })
+        return
+      }
+
+      toast({
+        description: t.copied,
+      })
       setMenuOpen(false)
+    } catch (error) {
+      console.error("Failed to copy markdown:", error)
+      toast({
+        variant: "destructive",
+        description: t.copyFailed,
+      })
     }
-  }, [content, t.copied])
+  }, [content, t.copyFailed, t.copied, toast])
 
   const handleExportMarkdown = useCallback(() => {
-    const filename = title ? `${title}.md` : "document.md"
-    exportAsMarkdown(content, { filename, title })
-  }, [content, title])
+    try {
+      const filename = title ? `${title}.md` : "document.md"
+      exportAsMarkdown(content, { filename, title })
+      toast({
+        description: t.markdownExported,
+      })
+      setMenuOpen(false)
+    } catch (error) {
+      console.error("Failed to export markdown:", error)
+      toast({
+        variant: "destructive",
+        description: t.markdownExportFailed,
+      })
+    }
+  }, [content, title, t.markdownExportFailed, t.markdownExported, toast])
 
   const handleExportPDF = useCallback(async () => {
-    const filename = title ? `${title}.pdf` : "document.pdf"
-    await exportAsPDFSmart(pdfServerConfig, filename)
-  }, [title, pdfServerConfig])
+    try {
+      const filename = title ? `${title}.pdf` : "document.pdf"
+      const result = await exportAsPDFSmart(pdfServerConfig, filename)
+      toast({
+        description: result.mode === "print" ? t.pdfPrintOpened : t.pdfExported,
+      })
+      setMenuOpen(false)
+    } catch (error) {
+      console.error("Failed to export PDF:", error)
+      toast({
+        variant: "destructive",
+        description: t.pdfExportFailed,
+      })
+    }
+  }, [title, pdfServerConfig, t.pdfExportFailed, t.pdfExported, t.pdfPrintOpened, toast])
 
   const handleExportWord = useCallback(async () => {
-    const filename = title ? `${title}.docx` : "document.docx"
-    await exportAsWord(content, { filename, title })
-  }, [content, title])
+    try {
+      const filename = title ? `${title}.docx` : "document.docx"
+      await exportAsWord(content, { filename, title })
+      toast({
+        description: t.wordExported,
+      })
+      setMenuOpen(false)
+    } catch (error) {
+      console.error("Failed to export Word:", error)
+      toast({
+        variant: "destructive",
+        description: t.wordExportFailed,
+      })
+    }
+  }, [content, title, t.wordExportFailed, t.wordExported, toast])
 
   return (
     <>

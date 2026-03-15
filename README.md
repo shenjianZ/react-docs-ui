@@ -7,20 +7,17 @@ React documentation site UI components. Build modern docs sites with a ready-to-
 ### Install
 
 ```bash
-npm install react-docs-ui
+npx create-react-docs-ui@latest my-docs
 ```
 
 ### Quick Start
 
-Full app (reads `public/config/site(.lang).yaml` and `public/docs/<lang>/**/*.md`):
+Use the official scaffolding tool. Manual integration is no longer recommended because configuration parsing and runtime behavior depend on the generated project structure.
 
-```tsx
-import 'react-docs-ui/dist/style.css'
-import { DocsApp } from 'react-docs-ui'
-
-export default function App() {
-  return <DocsApp />
-}
+```bash
+cd my-docs
+npm install
+npm run dev
 ```
 
 ### Features

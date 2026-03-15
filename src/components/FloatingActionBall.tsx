@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, Navigation, BookOpen, PanelLeftOpen, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TocItem } from '@/lib/rehype-toc';
+import { renderTocTitle } from '@/lib/toc-render';
 
 interface FloatingActionBallProps {
   lang: string;
@@ -220,7 +221,7 @@ export function FloatingActionBall({
                       item.depth === 3 && "pl-8"
                     )}
                   >
-                    {item.title}
+                    {renderTocTitle(item.title, item.richTitle)}
                   </a>
                 ))}
               </nav>

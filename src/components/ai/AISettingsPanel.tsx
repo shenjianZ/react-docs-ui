@@ -107,7 +107,6 @@ export function AISettingsPanel() {
         toast({
           title: '连接成功',
           description: result.message,
-          variant: 'success',
         })
       } else {
         toast({
@@ -148,7 +147,6 @@ export function AISettingsPanel() {
       toast({
         title: '保存成功',
         description: '配置已保存',
-        variant: 'success',
       })
       
       closeSettings()
@@ -225,7 +223,6 @@ export function AISettingsPanel() {
       toast({
         title: '添加成功',
         description: `Provider "${newProviderName}" 已添加`,
-        variant: 'success',
       })
     } catch (err) {
       console.error('Failed to add provider:', err)
@@ -262,7 +259,6 @@ export function AISettingsPanel() {
       toast({
         title: '删除成功',
         description: `Provider "${providerName}" 已删除`,
-        variant: 'success',
       })
     } catch (err) {
       console.error('Failed to delete provider:', err)
@@ -282,7 +278,6 @@ export function AISettingsPanel() {
       toast({
         title: '保存成功',
         description: '系统提示词已更新',
-        variant: 'success',
       })
     } catch (err) {
       console.error('Failed to save system prompt:', err)

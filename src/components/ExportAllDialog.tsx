@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/components/ui/use-toast"
 import { exportAllDocs, type ExportAllOptions } from "@/lib/export-utils"
 
 interface ExportAllDialogProps {
@@ -31,6 +32,8 @@ const translations = {
     export: "开始导出",
     exporting: "正在导出...",
     progress: "正在处理: {current}/{total} - {filename}",
+    exportSuccess: "文档导出完成，ZIP 文件已开始下载",
+    exportFailed: "导出失败，请稍后重试",
   },
   en: {
     title: "Export All Documents",
@@ -42,6 +45,8 @@ const translations = {
     export: "Start Export",
     exporting: "Exporting...",
     progress: "Processing: {current}/{total} - {filename}",
+    exportSuccess: "Export complete. ZIP download started.",
+    exportFailed: "Export failed. Please try again.",
   },
 }
 
@@ -54,6 +59,7 @@ export function ExportAllDialog({
   availableLangs = [lang],
 }: ExportAllDialogProps) {
   const t = translations[lang as keyof typeof translations] || translations.en
+  const { toast } = useToast()
 
   const [languageScope, setLanguageScope] = useState<LanguageScope>("current")
   const [isExporting, setIsExporting] = useState(false)
@@ -74,14 +80,21 @@ export function ExportAllDialog({
 
     try {
       await exportAllDocs(options)
+      toast({
+        description: t.exportSuccess,
+      })
       onOpenChange(false)
     } catch (error) {
       console.error("Export failed:", error)
+      toast({
+        variant: "destructive",
+        description: t.exportFailed,
+      })
     } finally {
       setIsExporting(false)
       setProgress(null)
     }
-  }, [languageScope, lang, availableLangs, onOpenChange])
+  }, [languageScope, lang, availableLangs, onOpenChange, t.exportFailed, t.exportSuccess, toast])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

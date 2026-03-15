@@ -5,6 +5,6 @@
 ## 目录
 
 - **[介绍](/docs/guide/introduction)**: 了解 React Docs UI 的核心理念和主要优势。
-- **[安装](/docs/guide/installation)**: 学习如何通过脚手架或手动方式安装。
+- **[安装](/docs/guide/installation)**: 使用官方脚手架创建项目，这是当前唯一推荐的安装方式。
 - **[快速上手](/docs/guide/quick-start)**: 在 5 分钟内创建并运行你的第一个文档网站。
 - **[配置说明 (`site.yaml`)](/docs/guide/configuration)**: 深入了解每个配置项，完全掌控你的网站。

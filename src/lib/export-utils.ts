@@ -51,6 +51,11 @@ export interface PdfServerConfig {
   url?: string
 }
 
+export interface PdfExportResult {
+  success: boolean
+  mode: "server" | "print"
+}
+
 const turndownService = new TurndownService({
   headingStyle: "atx",
   codeBlockStyle: "fenced",
@@ -837,15 +842,16 @@ export async function exportAsPDFWithServer(
 export async function exportAsPDFSmart(
   pdfServerConfig?: PdfServerConfig,
   filename?: string
-): Promise<void> {
+): Promise<PdfExportResult> {
   if (pdfServerConfig?.enabled && pdfServerConfig?.url) {
     const success = await exportAsPDFWithServer(pdfServerConfig.url, filename)
     if (success) {
-      return
+      return { success: true, mode: "server" }
     }
     console.log("PDF server failed, falling back to browser print")
   }
   window.print()
+  return { success: true, mode: "print" }
 }
 
 export async function exportAsWord(content: string, options: ExportOptions = {}): Promise<void> {

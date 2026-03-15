@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 
+import type { TocItem } from "@/lib/rehype-toc"
+import { renderTocTitle } from "@/lib/toc-render"
 import { cn } from "@/lib/utils"
-
-interface TocItem {
-  title: string
-  url: string
-  depth: number
-}
 
 interface TableOfContentsProps {
   toc: TocItem[]
@@ -95,7 +91,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
                 item.depth > 2 ? "pl-4" : ""
               )}
             >
-              {item.title}
+              {renderTocTitle(item.title, item.richTitle)}
             </a>
           </li>
         ))}
