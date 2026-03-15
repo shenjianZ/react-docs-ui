@@ -37,6 +37,7 @@ interface SearchProviderProps {
   lang?: string
   enabled?: boolean
   maxResults?: number
+  enableHotkeys?: boolean
 }
 
 export function SearchProvider({
@@ -44,6 +45,7 @@ export function SearchProvider({
   lang = 'zh-cn',
   enabled = true,
   maxResults = 20,
+  enableHotkeys = true,
 }: SearchProviderProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -162,6 +164,8 @@ export function SearchProvider({
   }, [open, isLoaded, loadIndex])
 
   useEffect(() => {
+    if (!enableHotkeys) return
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
@@ -175,7 +179,7 @@ export function SearchProvider({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [open])
+  }, [enableHotkeys, open])
 
   const value: SearchContextValue = {
     isLoaded,

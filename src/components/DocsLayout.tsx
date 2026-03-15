@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { ExportToolbar } from "@/components/ExportToolbar"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
-import { useSearch } from "@/components/search"
+import { useSearchLauncher } from "@/components/SearchLauncher"
 import type { TocItem } from "@/lib/rehype-toc"
 
 interface Frontmatter {
@@ -87,7 +87,7 @@ export function DocsLayout({
     ? (frontmatter?.toc || [])
     : []
   
-  const { setOpen: setSearchOpen } = useSearch()
+  const { openSearch } = useSearchLauncher()
 
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -115,7 +115,7 @@ export function DocsLayout({
         showSidebar={!!sidebar}
         showSearch={config.search?.enabled !== false}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
-        onOpenSearch={() => setSearchOpen(true)}
+        onOpenSearch={openSearch}
       />
       <div 
   className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}

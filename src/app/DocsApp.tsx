@@ -19,7 +19,7 @@ import matter from "gray-matter"
 import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
 import { FontProvider } from "../components/FontProvider"
-import { SearchProvider } from "../components/search"
+import { SearchLauncherProvider } from "../components/SearchLauncher"
 import { ComponentProvider } from "../components/ComponentProvider"
 import { AIProvider } from "../components/ai"
 import { Toaster } from "../components/ui/toaster"
@@ -34,12 +34,6 @@ import type { ShikiBundle } from "../lib/shiki-highlighter"
 const LazyGlobalContextMenu = lazy(() =>
   import("../components/GlobalContextMenu").then(module => ({
     default: module.GlobalContextMenu,
-  }))
-)
-
-const LazySearchDialog = lazy(() =>
-  import("../components/search").then(module => ({
-    default: module.SearchDialog,
   }))
 )
 
@@ -94,7 +88,7 @@ export function useSiteConfig() {
   return useContext(SiteConfigContext)
 }
 
-function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
+function SearchLauncherWrapper({ children }: { children: React.ReactNode }) {
   const params = useParams<{ lang: string }>()
   const lang = useMemo(() => params.lang || "zh-cn", [params.lang])
   const [config, setConfig] = useState<SiteConfig | null>(null)
@@ -104,9 +98,14 @@ function SearchProviderWrapper({ children }: { children: React.ReactNode }) {
   }, [lang])
   
   return (
-    <SearchProvider lang={lang} enabled={config?.search?.enabled !== false} maxResults={config?.search?.maxResults}>
+    <SearchLauncherProvider
+      lang={lang}
+      enabled={config?.search?.enabled !== false}
+      maxResults={config?.search?.maxResults}
+      placeholder={config?.search?.placeholder}
+    >
       {children}
-    </SearchProvider>
+    </SearchLauncherProvider>
   )
 }
 
@@ -160,12 +159,9 @@ function RootShell(): React.JSX.Element {
         <FontProvider config={config} lang={lang}>
           <AIProvider>
             <ComponentProvider components={components}>
-              <SearchProviderWrapper>
+              <SearchLauncherWrapper>
                 <Suspense fallback={<Outlet />}>
                   <LazyGlobalContextMenu config={config?.contextMenu}>
-                    <Suspense fallback={null}>
-                      <LazySearchDialog placeholder={config?.search?.placeholder} />
-                    </Suspense>
                     {aiEnabled && (
                       <Suspense fallback={null}>
                         <LazyAISelectionTrigger />
@@ -176,7 +172,7 @@ function RootShell(): React.JSX.Element {
                     <Outlet />
                   </LazyGlobalContextMenu>
                 </Suspense>
-              </SearchProviderWrapper>
+              </SearchLauncherWrapper>
             </ComponentProvider>
             <Toaster />
           </AIProvider>

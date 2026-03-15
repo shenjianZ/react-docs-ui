@@ -28,6 +28,10 @@
             "types": "./dist/types/index.d.ts",
             "import": "./dist/react-docs-ui.es.js"
         },
+        "./docs-app": {
+            "types": "./dist/types/docs-app.d.ts",
+            "import": "./dist/docs-app.es.js"
+        },
         "./style.css": "./dist/react-docs-ui.css"
     },
     "scripts": {

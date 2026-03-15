@@ -1,9 +1,9 @@
 import type { LucideIcon } from "lucide-react"
-import { ExternalLink, Gitlab, Github, Globe, Monitor, Moon, MoreVertical, Sun } from "lucide-react"
+import { ExternalLink, Gitlab, Github, Globe, Monitor, Moon, MoreVertical, Search, Sun } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
-import { SearchTrigger } from "@/components/search"
+import { useSearchLauncher } from "@/components/SearchLauncher"
 
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ModeToggle } from "@/components/mode-toggle"
@@ -144,6 +144,7 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
   const navigate = useNavigate()
   const pathname = location.pathname
   const { theme, setTheme } = useTheme()
+  const { openSearch } = useSearchLauncher()
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light")
   const searchEnabled = searchConfig?.enabled !== false
 
@@ -263,7 +264,23 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
           {/* 搜索按钮 - 仅桌面端显示 */}
           {searchEnabled && (
             <div className="hidden md:block">
-              <SearchTrigger placeholder={searchConfig?.placeholder || t.searchPlaceholder} />
+              <button
+                type="button"
+                onClick={openSearch}
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "relative h-9 justify-start rounded-lg bg-muted/50 px-3 text-sm font-normal text-muted-foreground shadow-none sm:mr-2 sm:w-48 lg:w-64"
+                )}
+              >
+                <Search className="mr-2 h-4 w-4" />
+                <span className="hidden truncate lg:inline-flex">
+                  {searchConfig?.placeholder || t.searchPlaceholder}
+                </span>
+                <span className="inline-flex lg:hidden">{t.search}</span>
+                <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-6 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </button>
             </div>
           )}
           {/* 桌面端：显示独立图标 */}

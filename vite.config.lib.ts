@@ -77,9 +77,12 @@ export default defineConfig(() => {
     ],
     build: {
       lib: {
-        entry: path.resolve(__dirname, "src/index.ts"),
+        entry: {
+          "react-docs-ui": path.resolve(__dirname, "src/index.ts"),
+          "docs-app": path.resolve(__dirname, "src/docs-app.ts"),
+        },
         name: "ReactDocsUI",
-        fileName: format => `react-docs-ui.${format}.js`,
+        fileName: (format, entryName) => `${entryName}.${format}.js`,
         formats: ["es"],
       },
       rollupOptions: {
