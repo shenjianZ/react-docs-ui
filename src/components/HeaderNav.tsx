@@ -376,9 +376,6 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
                               className={languageMenuItemClassName}
                             >
                               <span className="min-w-0 truncate">{locale.name}</span>
-                              <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                                {locale.code}
-                              </span>
                             </DropdownMenuRadioItem>
                           ))}
                         </DropdownMenuRadioGroup>

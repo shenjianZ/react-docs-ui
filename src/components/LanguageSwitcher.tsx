@@ -62,9 +62,6 @@ export function LanguageSwitcher() {
             className={languageMenuItemClassName}
           >
             <span className="min-w-0 truncate">{locale.name}</span>
-            <span className="text-xs uppercase tracking-wide text-muted-foreground">
-              {locale.code}
-            </span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

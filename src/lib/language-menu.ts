@@ -1,5 +1,5 @@
 export const languageMenuContentClassName =
-  "w-[min(18rem,calc(100vw-1rem))] sm:w-44 md:w-48"
+  "min-w-[10rem] w-auto max-w-[calc(100vw-5rem)] sm:w-44 sm:max-w-none md:w-48"
 
 export const languageMenuItemClassName =
-  "flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-sm"
+  "flex w-full items-center gap-2 whitespace-nowrap rounded-sm"

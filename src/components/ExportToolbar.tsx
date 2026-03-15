@@ -98,24 +98,24 @@ export function ExportToolbar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={handleCopyAsMarkdown}>
+          <DropdownMenuItem onSelect={handleCopyAsMarkdown}>
             <Copy className="mr-2 h-4 w-4" />
             {t.copyAsMarkdown}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportMarkdown}>
+          <DropdownMenuItem onSelect={handleExportMarkdown}>
             <FileText className="mr-2 h-4 w-4" />
             {t.exportAsMarkdown}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportPDF}>
+          <DropdownMenuItem onSelect={handleExportPDF}>
             <FileType className="mr-2 h-4 w-4" />
             {t.exportAsPDF}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportWord}>
+          <DropdownMenuItem onSelect={handleExportWord}>
             <FileDown className="mr-2 h-4 w-4" />
             {t.exportAsWord}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setExportAllOpen(true)}>
+          <DropdownMenuItem onSelect={() => setExportAllOpen(true)}>
             <Package className="mr-2 h-4 w-4" />
             {t.exportAllDocs}
           </DropdownMenuItem>

@@ -293,7 +293,15 @@ function DocsPage() {
 
   if (error) {
     return (
-      <DocsLayout lang={currentLang} config={config} frontmatter={{ title: '错误', toc: [] }} prev={null} next={null}>
+      <DocsLayout
+        lang={currentLang}
+        config={config}
+        frontmatter={{ title: "错误", toc: [] }}
+        prev={null}
+        next={null}
+        content={content || ""}
+        availableLangs={["zh-cn", "en"]}
+      >
         <div className="text-red-600">
           <h1>页面加载失败</h1>
           <p>{error.message}</p>
@@ -303,7 +311,15 @@ function DocsPage() {
   }
 
   return (
-    <DocsLayout lang={currentLang} config={config} frontmatter={frontmatter} prev={prev} next={next}>
+    <DocsLayout
+      lang={currentLang}
+      config={config}
+      frontmatter={frontmatter}
+      prev={prev}
+      next={next}
+      content={content || ""}
+      availableLangs={["zh-cn", "en"]}
+    >
       {contentLoading && !content ? (
         <div>Loading...</div>
       ) : (
