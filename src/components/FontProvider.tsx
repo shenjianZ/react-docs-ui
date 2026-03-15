@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import type { SiteConfig } from "../lib/config"
 
 type FontProviderProps = {
@@ -15,6 +15,11 @@ type FontContextValue = {
 const defaultFonts: FontContextValue = {
   fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif",
   fontFamilyEn: "Fragment Mono, system-ui, sans-serif",
+}
+
+const fallbackFonts: FontContextValue = {
+  fontFamilyZhCn: "PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif",
+  fontFamilyEn: "system-ui, sans-serif",
 }
 
 const FONT_STYLE_ID = "react-docs-ui-font-face-styles"
@@ -62,16 +67,26 @@ const FONT_FACE_CSS = `
 
 const FontContext = createContext<FontContextValue>(defaultFonts)
 
+function extractPrimaryFontFamily(fontFamily: string): string | null {
+  const primary = fontFamily
+    .split(",")[0]
+    ?.trim()
+    .replace(/^['"]|['"]$/g, "")
+
+  return primary || null
+}
+
 export function useFonts() {
   return useContext(FontContext)
 }
 
 export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderProps) {
-  const fonts = useMemo(() => {
+  const configuredFonts = useMemo(() => {
     const fontFamilyZhCn = config?.fonts?.fontFamilyZhCn || defaultFonts.fontFamilyZhCn
     const fontFamilyEn = config?.fonts?.fontFamilyEn || defaultFonts.fontFamilyEn
     return { fontFamilyZhCn, fontFamilyEn }
   }, [config?.fonts?.fontFamilyZhCn, config?.fonts?.fontFamilyEn])
+  const [fontsReady, setFontsReady] = useState(false)
 
   useEffect(() => {
     let styleElement = document.getElementById(FONT_STYLE_ID) as HTMLStyleElement | null
@@ -84,16 +99,23 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
   }, [])
 
   useEffect(() => {
-    const root = document.documentElement
-    root.style.setProperty("--font-family-zh-cn", fonts.fontFamilyZhCn)
-    root.style.setProperty("--font-family-en", fonts.fontFamilyEn)
-    root.setAttribute("data-docs-lang", lang)
-    
-    const isZhCn = lang === "zh-cn" || lang.startsWith("zh")
-    const primaryFont = isZhCn ? fonts.fontFamilyZhCn : fonts.fontFamilyEn
-    root.style.setProperty("--font-family-primary", primaryFont)
+    setFontsReady(false)
+
+    let cancelled = false
     let idleId: number | null = null
     let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    const root = document.documentElement
+    root.style.setProperty("--font-family-zh-cn", fallbackFonts.fontFamilyZhCn)
+    root.style.setProperty("--font-family-en", fallbackFonts.fontFamilyEn)
+    root.setAttribute("data-docs-lang", lang)
+
+    const isZhCn = lang === "zh-cn" || lang.startsWith("zh")
+    const primaryFont = isZhCn
+      ? fallbackFonts.fontFamilyZhCn
+      : fallbackFonts.fontFamilyEn
+    root.style.setProperty("--font-family-primary", primaryFont)
+
     const requestIdle = "requestIdleCallback" in globalThis
       ? globalThis.requestIdleCallback.bind(globalThis)
       : null
@@ -101,27 +123,67 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
       ? globalThis.cancelIdleCallback.bind(globalThis)
       : null
 
-    if (isZhCn) {
-      const preloadMiSans = () => {
-        void Promise.allSettled([
-          document.fonts.load('normal 400 16px "MiSans"', "中文"),
-          document.fonts.load('normal 500 16px "MiSans"', "中文"),
-          document.fonts.load('normal 700 16px "MiSans"', "中文"),
-        ])
+    const applyConfiguredFonts = () => {
+      if (cancelled) {
+        return
       }
 
-      if (requestIdle) {
-        idleId = requestIdle(() => {
-          preloadMiSans()
-        })
-      } else {
-        timeoutId = globalThis.setTimeout(() => {
-          preloadMiSans()
-        }, 0)
+      root.style.setProperty("--font-family-zh-cn", configuredFonts.fontFamilyZhCn)
+      root.style.setProperty("--font-family-en", configuredFonts.fontFamilyEn)
+      root.style.setProperty(
+        "--font-family-primary",
+        isZhCn ? configuredFonts.fontFamilyZhCn : configuredFonts.fontFamilyEn
+      )
+      setFontsReady(true)
+    }
+
+    const zhPrimaryFont = extractPrimaryFontFamily(configuredFonts.fontFamilyZhCn)
+    const enPrimaryFont = extractPrimaryFontFamily(configuredFonts.fontFamilyEn)
+
+    const loadConfiguredFonts = async () => {
+      const tasks: Promise<unknown>[] = []
+
+      if (zhPrimaryFont) {
+        tasks.push(
+          document.fonts.load(`normal 400 16px "${zhPrimaryFont}"`, "中文"),
+          document.fonts.load(`normal 500 16px "${zhPrimaryFont}"`, "中文"),
+          document.fonts.load(`normal 700 16px "${zhPrimaryFont}"`, "中文")
+        )
       }
+
+      if (enPrimaryFont) {
+        tasks.push(
+          document.fonts.load(`normal 400 16px "${enPrimaryFont}"`, "Docs"),
+          document.fonts.load(`italic 400 16px "${enPrimaryFont}"`, "Docs")
+        )
+      }
+
+      if (tasks.length === 0) {
+        applyConfiguredFonts()
+        return
+      }
+
+      await Promise.allSettled(tasks)
+      applyConfiguredFonts()
+    }
+
+    const startLoadingFonts = () => {
+      void loadConfiguredFonts()
+    }
+
+    if (requestIdle) {
+      idleId = requestIdle(() => {
+        startLoadingFonts()
+      })
+    } else {
+      timeoutId = globalThis.setTimeout(() => {
+        startLoadingFonts()
+      }, 0)
     }
 
     return () => {
+      cancelled = true
+
       if (idleId !== null && cancelIdle) {
         cancelIdle(idleId)
       }
@@ -130,10 +192,10 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
       }
       root.removeAttribute("data-docs-lang")
     }
-  }, [fonts, lang])
+  }, [configuredFonts, lang])
 
   return (
-    <FontContext.Provider value={fonts}>
+    <FontContext.Provider value={fontsReady ? configuredFonts : fallbackFonts}>
       {children}
     </FontContext.Provider>
   )

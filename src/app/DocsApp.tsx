@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
+import React, {
+  Suspense,
+  createContext,
+  lazy,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import {
   createBrowserRouter,
   RouterProvider,
@@ -11,16 +19,9 @@ import matter from "gray-matter"
 import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
 import { FontProvider } from "../components/FontProvider"
-import { GlobalContextMenu } from "../components/GlobalContextMenu"
-import { SearchProvider, SearchDialog } from "../components/search"
-import { MdxContent } from "../components/MdxContent"
+import { SearchProvider } from "../components/search"
 import { ComponentProvider } from "../components/ComponentProvider"
-import {
-  AIProvider,
-  AISelectionTrigger,
-  AIChatDialog,
-  AISettingsPanel,
-} from "../components/ai"
+import { AIProvider } from "../components/ai"
 import { Toaster } from "../components/ui/toaster"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
@@ -29,6 +30,40 @@ import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 import type { ShikiBundle } from "../lib/shiki-highlighter"
+
+const LazyGlobalContextMenu = lazy(() =>
+  import("../components/GlobalContextMenu").then(module => ({
+    default: module.GlobalContextMenu,
+  }))
+)
+
+const LazySearchDialog = lazy(() =>
+  import("../components/search").then(module => ({
+    default: module.SearchDialog,
+  }))
+)
+
+const LazyMdxContent = lazy(() =>
+  import("../components/MdxContent.lazy")
+)
+
+const LazyAISelectionTrigger = lazy(() =>
+  import("../components/ai").then(module => ({
+    default: module.AISelectionTrigger,
+  }))
+)
+
+const LazyAIChatDialog = lazy(() =>
+  import("../components/ai").then(module => ({
+    default: module.AIChatDialog,
+  }))
+)
+
+const LazyAISettingsPanel = lazy(() =>
+  import("../components/ai").then(module => ({
+    default: module.AISettingsPanel,
+  }))
+)
 
 interface Frontmatter {
   title?: string
@@ -126,17 +161,21 @@ function RootShell(): React.JSX.Element {
           <AIProvider>
             <ComponentProvider components={components}>
               <SearchProviderWrapper>
-                <GlobalContextMenu config={config?.contextMenu}>
-                  <SearchDialog placeholder={config?.search?.placeholder} />
-                  {aiEnabled && (
-                    <>
-                      <AISelectionTrigger />
-                      <AIChatDialog />
-                      <AISettingsPanel />
-                    </>
-                  )}
-                  <Outlet />
-                </GlobalContextMenu>
+                <Suspense fallback={<Outlet />}>
+                  <LazyGlobalContextMenu config={config?.contextMenu}>
+                    <Suspense fallback={null}>
+                      <LazySearchDialog placeholder={config?.search?.placeholder} />
+                    </Suspense>
+                    {aiEnabled && (
+                      <Suspense fallback={null}>
+                        <LazyAISelectionTrigger />
+                        <LazyAIChatDialog />
+                        <LazyAISettingsPanel />
+                      </Suspense>
+                    )}
+                    <Outlet />
+                  </LazyGlobalContextMenu>
+                </Suspense>
               </SearchProviderWrapper>
             </ComponentProvider>
             <Toaster />
@@ -324,13 +363,15 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
       {contentLoading && !content ? (
         <div>Loading...</div>
       ) : (
-        <MdxContent
-          source={content || ''}
-          skipFirstH1={!!frontmatter?.title}
-          imageViewer={config?.imageViewer}
-          codeHighlight={config?.codeHighlight}
-          shikiBundle={shikiBundle}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <LazyMdxContent
+            source={content || ''}
+            skipFirstH1={!!frontmatter?.title}
+            imageViewer={config?.imageViewer}
+            codeHighlight={config?.codeHighlight}
+            shikiBundle={shikiBundle}
+          />
+        </Suspense>
       )}
     </DocsLayout>
   )
