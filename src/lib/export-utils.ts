@@ -701,13 +701,63 @@ async function renderBlockNode(node: Content, depth = 0): Promise<FileChild[]> {
 }
 
 export async function copyAsMarkdown(content: string): Promise<boolean> {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(content)
+      return true
+    } catch (error) {
+      console.warn("Clipboard API copy failed, falling back to execCommand copy:", error)
+    }
+  }
+
+  let success = false
+  const selection = document.getSelection()
+  const originalRanges =
+    selection && selection.rangeCount > 0
+      ? Array.from({ length: selection.rangeCount }, (_, index) => selection.getRangeAt(index).cloneRange())
+      : []
+
+  const mark = document.createElement("span")
+  mark.textContent = content
+  mark.setAttribute("data-copy-source", "markdown")
+  mark.style.all = "unset"
+  mark.style.position = "fixed"
+  mark.style.top = "0"
+  mark.style.left = "0"
+  mark.style.whiteSpace = "pre-wrap"
+  mark.style.userSelect = "text"
+  mark.style.webkitUserSelect = "text"
+  mark.style.opacity = "0"
+  mark.style.pointerEvents = "none"
+
+  const onCopy = (event: ClipboardEvent) => {
+    event.preventDefault()
+    event.clipboardData?.setData("text/plain", content)
+    success = true
+  }
+
+  document.body.appendChild(mark)
+  document.addEventListener("copy", onCopy, true)
+
   try {
-    await navigator.clipboard.writeText(content)
-    return true
+    const range = document.createRange()
+    range.selectNodeContents(mark)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+    mark.focus?.()
+    success = document.execCommand("copy")
   } catch (error) {
     console.error("Failed to copy to clipboard:", error)
-    return false
+  } finally {
+    document.removeEventListener("copy", onCopy, true)
+    selection?.removeAllRanges()
+    for (const range of originalRanges) {
+      selection?.addRange(range)
+    }
+    document.body.removeChild(mark)
   }
+
+  return success
 }
 
 export function exportAsMarkdown(content: string, options: ExportOptions = {}): void {

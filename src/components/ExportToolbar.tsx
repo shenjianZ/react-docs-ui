@@ -57,14 +57,16 @@ export function ExportToolbar({
   pdfServerConfig,
 }: ExportToolbarProps) {
   const t = translations[lang as keyof typeof translations] || translations.en
+  const [menuOpen, setMenuOpen] = useState(false)
   const [exportAllOpen, setExportAllOpen] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
+  const copyTriggeredRef = useRef(false)
 
   const handleCopyAsMarkdown = useCallback(async () => {
     const success = await copyAsMarkdown(content)
     if (success) {
-      // 可以添加 toast 提示
       console.log(t.copied)
+      setMenuOpen(false)
     }
   }, [content, t.copied])
 
@@ -85,7 +87,7 @@ export function ExportToolbar({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -98,7 +100,27 @@ export function ExportToolbar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onSelect={handleCopyAsMarkdown}>
+          <DropdownMenuItem
+            onPointerDown={(event) => {
+              event.preventDefault()
+              if (copyTriggeredRef.current) return
+              copyTriggeredRef.current = true
+              void handleCopyAsMarkdown().finally(() => {
+                window.setTimeout(() => {
+                  copyTriggeredRef.current = false
+                }, 0)
+              })
+            }}
+            onClick={() => {
+              if (copyTriggeredRef.current) return
+              void handleCopyAsMarkdown()
+            }}
+            onSelect={(event) => {
+              event.preventDefault()
+              if (copyTriggeredRef.current) return
+              void handleCopyAsMarkdown()
+            }}
+          >
             <Copy className="mr-2 h-4 w-4" />
             {t.copyAsMarkdown}
           </DropdownMenuItem>
