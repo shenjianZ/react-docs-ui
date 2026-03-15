@@ -16,8 +16,6 @@ import { Copy, Check } from "lucide-react"
 import { getImageViewerLabels } from "../lib/image-viewer"
 import { ImageViewer } from "./ImageViewer"
 import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
-import "katex/dist/katex.min.css"
-import "katex/contrib/mhchem/mhchem.js"
 import macros_physics from "katex-physics"
 
 interface MdxContentProps {

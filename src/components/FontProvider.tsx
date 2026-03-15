@@ -23,6 +23,7 @@ const fallbackFonts: FontContextValue = {
 }
 
 const FONT_STYLE_ID = "react-docs-ui-font-face-styles"
+const CONTENT_READY_EVENT = "react-docs-ui:content-ready"
 const FONT_FACE_CSS = `
 @font-face {
   font-family: 'Fragment Mono';
@@ -65,6 +66,16 @@ const FONT_FACE_CSS = `
 }
 `
 
+function ensureFontFaceStyle() {
+  let styleElement = document.getElementById(FONT_STYLE_ID) as HTMLStyleElement | null
+  if (!styleElement) {
+    styleElement = document.createElement("style")
+    styleElement.id = FONT_STYLE_ID
+    styleElement.textContent = FONT_FACE_CSS
+    document.head.appendChild(styleElement)
+  }
+}
+
 const FontContext = createContext<FontContextValue>(defaultFonts)
 
 function extractPrimaryFontFamily(fontFamily: string): string | null {
@@ -89,21 +100,14 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
   const [fontsReady, setFontsReady] = useState(false)
 
   useEffect(() => {
-    let styleElement = document.getElementById(FONT_STYLE_ID) as HTMLStyleElement | null
-    if (!styleElement) {
-      styleElement = document.createElement("style")
-      styleElement.id = FONT_STYLE_ID
-      styleElement.textContent = FONT_FACE_CSS
-      document.head.appendChild(styleElement)
-    }
-  }, [])
-
-  useEffect(() => {
     setFontsReady(false)
 
     let cancelled = false
     let idleId: number | null = null
     let timeoutId: ReturnType<typeof setTimeout> | null = null
+    let loadTimeoutId: ReturnType<typeof setTimeout> | null = null
+    let removeLoadListener: (() => void) | null = null
+    let contentReadyTimeoutId: ReturnType<typeof setTimeout> | null = null
 
     const root = document.documentElement
     root.style.setProperty("--font-family-zh-cn", fallbackFonts.fontFamilyZhCn)
@@ -141,6 +145,8 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
     const enPrimaryFont = extractPrimaryFontFamily(configuredFonts.fontFamilyEn)
 
     const loadConfiguredFonts = async () => {
+      ensureFontFaceStyle()
+
       const tasks: Promise<unknown>[] = []
 
       if (zhPrimaryFont) {
@@ -171,15 +177,67 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
       void loadConfiguredFonts()
     }
 
-    if (requestIdle) {
-      idleId = requestIdle(() => {
-        startLoadingFonts()
-      })
-    } else {
+    const scheduleFontLoading = () => {
+      if (cancelled) {
+        return
+      }
+
+      if (requestIdle) {
+        idleId = requestIdle(() => {
+          startLoadingFonts()
+        })
+        return
+      }
+
       timeoutId = globalThis.setTimeout(() => {
         startLoadingFonts()
-      }, 0)
+      }, 2000)
     }
+
+    const beginAfterContentReady = () => {
+      if (cancelled) {
+        return
+      }
+
+      if (contentReadyTimeoutId !== null) {
+        globalThis.clearTimeout(contentReadyTimeoutId)
+        contentReadyTimeoutId = null
+      }
+
+      scheduleFontLoading()
+    }
+
+    const onContentReady = () => {
+      beginAfterContentReady()
+    }
+
+    globalThis.addEventListener(CONTENT_READY_EVENT, onContentReady, { once: true })
+
+    if (document.readyState !== "complete") {
+      const onWindowLoad = () => {
+        removeLoadListener?.()
+        removeLoadListener = null
+        if (loadTimeoutId !== null) {
+          globalThis.clearTimeout(loadTimeoutId)
+          loadTimeoutId = null
+        }
+      }
+
+      globalThis.addEventListener("load", onWindowLoad, { once: true })
+      removeLoadListener = () => {
+        globalThis.removeEventListener("load", onWindowLoad)
+      }
+
+      // Fallback for environments where load is delayed or missed.
+      loadTimeoutId = globalThis.setTimeout(() => {
+        onWindowLoad()
+      }, 1500)
+    }
+
+    // Fallback: fonts still eventually load, but only well after the page has settled.
+    contentReadyTimeoutId = globalThis.setTimeout(() => {
+      beginAfterContentReady()
+    }, 8000)
 
     return () => {
       cancelled = true
@@ -190,6 +248,14 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
       if (timeoutId !== null) {
         globalThis.clearTimeout(timeoutId)
       }
+      if (loadTimeoutId !== null) {
+        globalThis.clearTimeout(loadTimeoutId)
+      }
+      if (contentReadyTimeoutId !== null) {
+        globalThis.clearTimeout(contentReadyTimeoutId)
+      }
+      removeLoadListener?.()
+      globalThis.removeEventListener(CONTENT_READY_EVENT, onContentReady)
       root.removeAttribute("data-docs-lang")
     }
   }, [configuredFonts, lang])

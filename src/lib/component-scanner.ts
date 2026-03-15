@@ -26,22 +26,39 @@ const BUILTIN_MDX_COMPONENTS: ComponentRegistry = {
   Card
 }
 
+let generatedComponentsPromise: Promise<ComponentRegistry | null> | null = null
+
+function getGeneratedComponentsPromise(): Promise<ComponentRegistry | null> {
+  if (!generatedComponentsPromise) {
+    const componentPath = '/src/generated/mdx-components.ts'
+    // @ts-ignore Vite resolves this runtime-only entry inside the consuming app.
+    generatedComponentsPromise = import(/* @vite-ignore */ componentPath)
+      .then(module => {
+        if (module && module.MDX_COMPONENTS) {
+          return module.MDX_COMPONENTS as ComponentRegistry
+        }
+        return null
+      })
+      .catch(() => null)
+  }
+
+  return generatedComponentsPromise
+}
+
 /**
  * 尝试从 template 生成的组件索引文件加载组件
  */
 async function loadFromGeneratedIndex(): Promise<ComponentRegistry | null> {
   try {
-    // 使用完全动态的导入路径，避免构建时解析
-    const componentPath = '/src/generated/mdx-components.ts'
-    const module = await import(/* @vite-ignore */ componentPath)
-    if (module && module.MDX_COMPONENTS) {
-      return module.MDX_COMPONENTS
-    }
+    return await getGeneratedComponentsPromise()
   } catch (error) {
     // 索引文件不存在或加载失败，返回 null
     return null
   }
-  return null
+}
+
+export function prefetchGeneratedComponents(): void {
+  void getGeneratedComponentsPromise()
 }
 
 /**

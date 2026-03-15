@@ -76,8 +76,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --prose-pre-bg: oklch(0.97 0 0 / 0.4);
-  --font-family-zh-cn: "MiSans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  --font-family-en: "Fragment Mono", system-ui, sans-serif;
+  --font-family-zh-cn: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-family-en: system-ui, sans-serif;
   --font-family-primary: var(--font-family-zh-cn);
 }
 

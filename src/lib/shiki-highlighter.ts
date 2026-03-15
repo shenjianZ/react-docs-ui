@@ -14,6 +14,7 @@ export interface ShikiBundle {
 let highlighterInstance: Highlighter | null = null
 let highlighterPromise: Promise<Highlighter | null> | null = null
 let highlighterCacheKey: string | null = null
+const preloadedShikiAssets = new Set<string>()
 
 export const DEFAULT_SHIKI_LANGS = [
   'javascript',
@@ -160,6 +161,54 @@ export async function getHighlighter(
       highlighterCacheKey = null
     }
     throw error
+  }
+}
+
+export function extractCodeLanguages(source: string): string[] {
+  const languages = new Set<string>()
+  const fenceRegex = /```([^\s`]+)?/g
+
+  for (const match of source.matchAll(fenceRegex)) {
+    const rawLang = match[1]?.trim()
+    const resolved = resolveLang(rawLang)
+    if (resolved && resolved !== 'text') {
+      languages.add(resolved)
+    }
+  }
+
+  return Array.from(languages)
+}
+
+export function prefetchShikiAssets(
+  source: string,
+  config?: SyntaxHighlightConfig,
+  bundle?: ShikiBundle
+): void {
+  if (!bundle) {
+    return
+  }
+
+  const resolvedConfig = normalizeSyntaxHighlightConfig(config, bundle)
+  const preferredLangs = resolvedConfig.langs.length > 0
+    ? resolvedConfig.langs
+    : Object.keys(bundle.langs)
+  const sourceLangs = extractCodeLanguages(source)
+  const targetLangs = sourceLangs.length > 0
+    ? sourceLangs.filter(lang => preferredLangs.includes(lang))
+    : preferredLangs.slice(0, 2)
+
+  for (const theme of resolvedConfig.themes) {
+    if (!preloadedShikiAssets.has(`theme:${theme}`) && bundle.themes[theme]) {
+      preloadedShikiAssets.add(`theme:${theme}`)
+      void bundle.themes[theme]()
+    }
+  }
+
+  for (const lang of targetLangs) {
+    if (!preloadedShikiAssets.has(`lang:${lang}`) && bundle.langs[lang]) {
+      preloadedShikiAssets.add(`lang:${lang}`)
+      void bundle.langs[lang]()
+    }
   }
 }
 

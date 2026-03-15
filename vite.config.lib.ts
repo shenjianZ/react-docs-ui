@@ -20,7 +20,6 @@ function extractFontDataUrisPlugin() {
       const css = fs.readFileSync(cssPath, "utf8")
       const fontDir = path.resolve(distDir, "fonts")
       const fontAssetMap = new Map<string, string>()
-
       const nextCss = css.replace(
         /url\(data:font\/([a-z0-9+.-]+);base64,([A-Za-z0-9+/=]+)\)/gi,
         (_match, mimeSubtype: string, base64Value: string) => {

@@ -25,11 +25,11 @@ import { AIProvider } from "../components/ai"
 import { Toaster } from "../components/ui/toaster"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
-import { scanComponents, loadComponents, getBuiltinComponents } from "../lib/component-scanner"
+import { scanComponents, loadComponents, getBuiltinComponents, prefetchGeneratedComponents } from "../lib/component-scanner"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
-import type { ShikiBundle } from "../lib/shiki-highlighter"
+import { prefetchShikiAssets, type ShikiBundle } from "../lib/shiki-highlighter"
 
 const LazyGlobalContextMenu = lazy(() =>
   import("../components/GlobalContextMenu").then(module => ({
@@ -40,6 +40,14 @@ const LazyGlobalContextMenu = lazy(() =>
 const LazyMdxContent = lazy(() =>
   import("../components/MdxContent.lazy")
 )
+
+export function prefetchMdxRuntime() {
+  void import("../components/MdxContent.lazy")
+}
+
+function notifyContentReady() {
+  globalThis.dispatchEvent(new Event("react-docs-ui:content-ready"))
+}
 
 const LazyAISelectionTrigger = lazy(() =>
   import("../components/ai").then(module => ({
@@ -125,6 +133,8 @@ function RootShell(): React.JSX.Element {
 
     ;(async () => {
       try {
+        prefetchGeneratedComponents()
+
         const loadedConfig = await getConfig(lang)
         if (!cancelled) {
           setConfig(loadedConfig)
@@ -233,6 +243,8 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
     let cancelled = false
     setContentLoading(true)
 
+    prefetchMdxRuntime()
+
     const pageSlug = slug || "index"
     
     const mdPath = `/docs/${currentLang}/${pageSlug}.md`
@@ -289,6 +301,7 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
 
         setFrontmatter(enrichedFrontmatter)
         setContent(markdownContent)
+        prefetchShikiAssets(markdownContent, config?.codeHighlight, shikiBundle)
         
       } catch (error) {
         if (cancelled) return
@@ -322,6 +335,15 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
       cancelled = true
     }
   }, [currentLang, slug])
+
+  useEffect(() => {
+    if (!content || contentLoading) {
+      return
+    }
+
+    notifyContentReady()
+    prefetchShikiAssets(content, config?.codeHighlight, shikiBundle)
+  }, [content, contentLoading, config?.codeHighlight, shikiBundle])
 
   if (!config) {
     return <div>Loading...</div>
