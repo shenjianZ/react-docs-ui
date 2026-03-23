@@ -1,6 +1,7 @@
 export const siteShikiBundle = {
   langs: {
     bash: () => import("shiki/langs/bash"),
+    powershell: () => import("shiki/langs/powershell"),
     markdown: () => import("shiki/langs/markdown"),
     yaml: () => import("shiki/langs/yaml"),
     javascript: () => import("shiki/langs/javascript"),

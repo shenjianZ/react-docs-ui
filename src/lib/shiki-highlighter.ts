@@ -315,8 +315,11 @@ export function resolveLang(lang: string | undefined): string {
   const langMap: Record<string, string> = {
     'js': 'javascript',
     'ts': 'typescript',
-    'sh': 'shell',
+    'sh': 'bash',
     'shell': 'bash',
+    'pwsh': 'powershell',
+    'ps1': 'powershell',
+    'psm1': 'powershell',
     'yml': 'yaml',
     'md': 'markdown',
     'rb': 'ruby',
