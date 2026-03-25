@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import type { SearchResult } from '@/lib/search'
 import { highlightSnippet, tokenizeQuery } from '@/lib/search'
 import { cn } from '@/lib/utils'

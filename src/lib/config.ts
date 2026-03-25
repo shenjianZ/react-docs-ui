@@ -116,7 +116,6 @@ export interface SiteConfig {
       link?: string
       icon?: string
     }[]
-    builtWith?: { name: string; url?: string }[]
   }
   pwa?: {
     enabled?: boolean

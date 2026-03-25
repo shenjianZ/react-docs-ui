@@ -171,7 +171,6 @@
 | `groups` | `FooterGroup[]` | 页脚分组链接区 |
 | `links` | `FooterLink[]` | 简单链接列表 |
 | `social` | `FooterSocial[]` | 社交链接图标 |
-| `builtWith` | array | 保留字段，当前页脚未直接使用 |
 
 `footer.repository`
 

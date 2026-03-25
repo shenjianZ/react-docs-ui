@@ -32,6 +32,19 @@ npm run dev
 - PWA support
 - AI integration (requires API key)
 
+### AI Agent Skills
+
+We provide AI Agent Skills to help you work more efficiently with react-docs-ui:
+
+- [React Docs UI Skills](https://github.com/shenjianZ/react-docs-skills)
+
+These skills can help you:
+- 📝 Write configuration files
+- 📚 Write documentation
+- 🚀 Create new projects
+
+Visit the [Skills repository](https://github.com/shenjianZ/react-docs-skills) to learn more.
+
 ### Exports
 
 - Layout: `DocsLayout`

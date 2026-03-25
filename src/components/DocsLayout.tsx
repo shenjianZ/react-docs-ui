@@ -14,6 +14,7 @@ import { ExportToolbar } from "@/components/ExportToolbar"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearchLauncher } from "@/components/SearchLauncher"
 import type { TocItem } from "@/lib/rehype-toc"
+import type { SiteConfig } from "@/lib/config"
 
 interface Frontmatter {
   title?: string
@@ -23,35 +24,6 @@ interface Frontmatter {
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
-}
-
-// Define SiteConfig types locally
-interface SiteConfig {
-  site: any
-  navbar: any
-  theme?: { allowToggle?: boolean }
-  sidebar: {
-    enabled?: boolean
-    sections?: any
-    collections?: Record<string, { sections: any }>
-  }
-  footer?: any
-  toc?: {
-    enabled?: boolean
-    maxLevel?: number
-    title?: string
-  }
-  search?: {
-    enabled?: boolean
-    placeholder?: string
-  }
-  export?: {
-    enabled?: boolean
-    pdfServer?: {
-      enabled?: boolean
-      url?: string
-    }
-  }
 }
 
 interface DocsLayoutProps {

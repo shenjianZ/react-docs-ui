@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import type { SiteConfig } from "@/lib/config"
 import {
   Globe,
   Github,
@@ -21,24 +22,8 @@ import {
 
 type FooterLink = { title: string; link: string; external?: boolean; action?: "scrollTop" }
 type FooterGroup = { title: string; items: FooterLink[] }
-
-interface FooterConfig {
-  enabled?: boolean
-  copyright?: string
-  repository?: {
-    url?: string
-    branch?: string
-  }
-  lastUpdated?: string
-  version?: string
-  groups?: FooterGroup[]
-  links?: FooterLink[]
-  social?: {
-    name: string
-    url: string
-    icon?: string
-  }[]
-}
+type FooterSocial = NonNullable<NonNullable<SiteConfig["footer"]>["social"]>[number]
+type FooterConfig = NonNullable<SiteConfig["footer"]>
 
 interface FooterProps {
   footer?: FooterConfig
@@ -51,6 +36,7 @@ export function Footer({ footer, lang }: FooterProps) {
   const links = footer.links || []
   const social = footer.social || []
   const groups: FooterGroup[] = footer.groups || []
+  const getSocialHref = (item: FooterSocial) => item.url || item.link || "#"
   const isScrollTop = (item: FooterLink) =>
     item.action === "scrollTop" || item.link === "#" || item.link?.startsWith("#")
   const handleScrollTop = (e: React.MouseEvent) => {
@@ -174,7 +160,7 @@ export function Footer({ footer, lang }: FooterProps) {
                     <Tooltip key={`${s.name}-${s.url}`}>
                       <TooltipTrigger asChild>
                         <a
-                          href={(s as any).url || (s as any).link}
+                          href={getSocialHref(s)}
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label={s.name}
@@ -193,7 +179,17 @@ export function Footer({ footer, lang }: FooterProps) {
         )}
         </div>
         <Separator className="my-6" />
-        <div className="text-xs text-muted-foreground">Built with React Docs UI</div>
+        <div className="text-xs text-muted-foreground">
+          Built with{" "}
+          <a
+            className="inline-flex items-center rounded-md border border-transparent bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-200"
+            href="https://react-docs-ui.shenjianl.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            React Docs UI
+          </a>
+        </div>
       </div>
     </footer>
   )

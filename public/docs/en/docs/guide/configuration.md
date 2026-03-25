@@ -171,7 +171,6 @@ You only need to define the labels you want to override.
 | `groups` | `FooterGroup[]` | Grouped footer link blocks |
 | `links` | `FooterLink[]` | Simple footer links |
 | `social` | `FooterSocial[]` | Social icon links |
-| `builtWith` | array | Reserved field. Not directly rendered by the current footer |
 
 `footer.repository`
 

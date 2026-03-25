@@ -52,27 +52,6 @@ function extractHeadingPlainText(node: any): string {
   }
 }
 
-function extractHeadingDisplayText(node: any): string {
-  try {
-    if (!node) return '';
-    if (Array.isArray(node)) {
-      return node.map(extractHeadingDisplayText).join('');
-    }
-    if (node.type === 'text') {
-      return node.value || '';
-    }
-    if (node.type === 'inlineCode') {
-      return `\`${node.value || ''}\``;
-    }
-    if (typeof node === 'object' && 'children' in node && Array.isArray((node as Parent).children)) {
-      return (node as Parent).children.map(extractHeadingDisplayText).join('');
-    }
-    return '';
-  } catch {
-    return '';
-  }
-}
-
 function serializeInlineNodes(node: any): TocInlineNode[] {
   try {
     if (!node) return [];

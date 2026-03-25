@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom"
-import { useState, useEffect, useMemo, ComponentType } from "react"
+import { useState, useEffect, useMemo } from "react"
+import type { ComponentType } from "react"
 import yaml from "js-yaml"
 
 import { ThemeProvider } from "@/components/theme-provider"

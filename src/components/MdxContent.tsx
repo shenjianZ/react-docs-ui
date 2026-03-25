@@ -26,60 +26,6 @@ interface MdxContentProps {
   shikiBundle?: ShikiBundle
 }
 
-// 从节点子元素中提取文本
-function extractTextFromChildren(node: Element): string {
-  // 常见的 HTML 标签列表
-  const htmlTags = new Set([
-    'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo',
-    'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup',
-    'data', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed',
-    'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'head', 'header', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'label', 'legend',
-    'li', 'link', 'main', 'map', 'mark', 'menu', 'meta', 'meter', 'nav', 'noscript', 'object',
-    'ol', 'optgroup', 'option', 'output', 'p', 'param', 'picture', 'pre', 'progress', 'q', 'rp',
-    'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong',
-    'style', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot',
-    'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr',
-    // React 特殊元素
-    'react', 'react.strictmode', 'react.fragment',
-  ])
-  
-  const extract = (n: any): string => {
-    if (n.type === 'text') return n.value || ''
-    if (n.type === 'element') {
-      const tagName = n.tagName || ''
-      const childText = (n.children || []).map(extract).join('')
-      
-      if (tagName && tagName !== 'span') {
-        // 判断是否是标准 HTML 标签
-        const isHtmlTag = htmlTags.has(tagName.toLowerCase())
-        
-        if (!n.children || n.children.length === 0) {
-          // 自闭合标签形式
-          if (isHtmlTag) {
-            return `<${tagName} />`
-          }
-          // React 组件：转为 PascalCase
-          const pascalName = tagName.charAt(0).toUpperCase() + tagName.slice(1)
-          return `<${pascalName} />`
-        }
-        
-        // 有内容的标签
-        if (isHtmlTag) {
-          return `<${tagName}>${childText}</${tagName}>`
-        }
-        // React 组件：转为 PascalCase
-        const pascalName = tagName.charAt(0).toUpperCase() + tagName.slice(1)
-        return `<${pascalName}>${childText}</${pascalName}>`
-      }
-      return childText
-    }
-    return ''
-  }
-  
-  return (node.children || []).map(extract).join('')
-}
-
 function rehypeUnwrapComponentParagraphs() {
   return (tree: Root) => {
     visit(tree, 'element', (node: Element, index, parent) => {

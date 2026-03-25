@@ -1,4 +1,4 @@
-import type { Plugin, ViteDevServer, ResolvedConfig } from 'vite'
+import type { Plugin, ResolvedConfig } from 'vite'
 import path from 'node:path'
 import {
   generateSearchIndex,
@@ -19,9 +19,7 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): Plugi
     langs,
   } = options
 
-  let server: ViteDevServer | null = null
   let isGenerating = false
-  let lastGenerated = 0
   let config: ResolvedConfig | null = null
 
   const resolvePublicDir = (root: string) => {
@@ -46,7 +44,6 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): Plugi
           writeSearchIndex(publicDirPath, lang, index)
         }
       }
-      lastGenerated = Date.now()
     } catch (error) {
       console.error('[search-index-plugin] Failed to generate search index:', error)
     } finally {
@@ -59,7 +56,6 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): Plugi
     enforce: 'post',
 
     configureServer(devServer) {
-      server = devServer
       config = devServer.config
       const root = devServer.config.root
       
@@ -79,7 +75,6 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): Plugi
       const debouncedGenerate = debounce(async () => {
         await generateIndices(root)
         
-        const publicDirPath = resolvePublicDir(root)
         const indexFiles = langs || ['zh-cn', 'en']
         
         for (const lang of indexFiles) {
@@ -124,10 +119,6 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): Plugi
       
       const root = config?.root || process.cwd()
       await generateIndices(root)
-    },
-
-    async closeBundle() {
-      server = null
     },
   }
 }

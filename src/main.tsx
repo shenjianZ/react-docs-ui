@@ -3,10 +3,14 @@ import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
 import App from "./App.tsx"
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error types provided via ambient declaration
 import yaml from "js-yaml"
 import "./index.css"
+
+type ThemeBootstrapConfig = {
+  theme?: {
+    defaultMode?: "light" | "dark" | "auto" | "system"
+  }
+}
 
 async function bootstrap() {
   try {
@@ -25,7 +29,7 @@ async function bootstrap() {
       const res = (await tryFetch(filePath)) || (await tryFetch(`/config/site.yaml`))
       if (res) {
         const text = await res.text()
-        const cfg = yaml.load(text) as any
+        const cfg = yaml.load(text) as ThemeBootstrapConfig
         const mode = cfg?.theme?.defaultMode
         const normalized = mode === "auto" ? "system" : mode
         if (normalized === "light" || normalized === "dark" || normalized === "system") {

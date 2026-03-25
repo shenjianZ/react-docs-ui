@@ -2,7 +2,7 @@ import { unified } from 'unified'
 import remarkParse from 'remark-parse'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import type { Root, Heading, Text, InlineCode, List } from 'mdast'
+import type { Root, Heading, Text, InlineCode } from 'mdast'
 import type { ParsedDocument, ParsedSection } from './types'
 
 function parseFrontmatter(content: string): { data: Record<string, unknown>; content: string } {
@@ -45,11 +45,11 @@ function extractTextContent(node: unknown): string {
   const n = node as Record<string, unknown>
   
   if (n.type === 'text') {
-    return (n as Text).value || ''
+    return (n as unknown as Text).value || ''
   }
   
   if (n.type === 'inlineCode') {
-    return (n as InlineCode).value || ''
+    return (n as unknown as InlineCode).value || ''
   }
   
   if (n.type === 'code') {

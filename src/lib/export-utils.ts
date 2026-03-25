@@ -29,7 +29,6 @@ import type {
   ListItem,
   Parent,
   Image as MdastImage,
-  InlineMath,
   Math as MdastMath,
 } from "mdast"
 import { scanDocuments, type DocItem } from "./doc-scanner"
@@ -84,7 +83,9 @@ function extractText(node: Content | PhrasingContent): string {
   }
 
   if ("children" in node && Array.isArray(node.children)) {
-    return node.children.map(child => extractText(child as Content | PhrasingContent)).join("")
+    return node.children
+      .map((child: Content | PhrasingContent) => extractText(child))
+      .join("")
   }
 
   if (node.type === "image") {
@@ -98,17 +99,17 @@ function renderInlineNodes(nodes: PhrasingContent[], style: Partial<IRunOptions>
   return nodes.flatMap(node => {
     switch (node.type) {
       case "text":
-        return [new TextRun({ text: node.value, ...style })]
+        return [new TextRun({ text: node.value || "", ...style })]
       case "strong":
-        return renderInlineNodes(node.children, { ...style, bold: true })
+        return renderInlineNodes(node.children || [], { ...style, bold: true })
       case "emphasis":
-        return renderInlineNodes(node.children, { ...style, italics: true })
+        return renderInlineNodes(node.children || [], { ...style, italics: true })
       case "delete":
-        return renderInlineNodes(node.children, { ...style, strike: true })
+        return renderInlineNodes(node.children || [], { ...style, strike: true })
       case "inlineCode":
         return [
           new TextRun({
-            text: node.value,
+            text: node.value || "",
             font: "Courier New",
             size: 20,
             ...style,
@@ -135,7 +136,7 @@ function renderInlineNodes(nodes: PhrasingContent[], style: Partial<IRunOptions>
       case "inlineMath": {
         return [
           new TextRun({
-            text: node.value,
+            text: node.value || "",
             font: "Cambria Math",
             italics: true,
             color: "1E293B",
@@ -326,7 +327,7 @@ async function renderParagraphNode(node: Parent): Promise<FileChild[]> {
   for (const child of children) {
     if (child.type === "image") {
       flushTextBuffer()
-      blocks.push(...await renderImageNode(child))
+      blocks.push(...await renderImageNode(child as MdastImage))
       continue
     }
 
@@ -365,7 +366,7 @@ function renderTableCellChildren(cell: Content, isHeader: boolean): FileChild[] 
     ]
   }
 
-  const children = cell.children.flatMap(child => {
+  const children = cell.children.flatMap((child: Content) => {
     if (child.type === "paragraph") {
       const text = extractText(child).trim()
       return [
@@ -382,7 +383,9 @@ function renderTableCellChildren(cell: Content, isHeader: boolean): FileChild[] 
     }
 
     if (child.type === "list") {
-      return child.children.flatMap((item, index) => renderListItem(item, !!child.ordered, 0, index))
+      return (child.children || []).flatMap((item, index) =>
+        renderListItem(item as ListItem, !!child.ordered, 0, index)
+      )
     }
 
     const text = extractText(child).trim()
@@ -550,9 +553,9 @@ function renderListItem(item: ListItem, ordered: boolean, depth: number, index: 
         : "☐ "
       : null
 
-  for (const child of item.children) {
+  for (const child of item.children || []) {
     if (child.type === "paragraph") {
-      const runs = renderInlineNodes(child.children)
+      const runs = renderInlineNodes(child.children || [])
       if (!markerUsed) {
         runs.unshift(new TextRun(taskMarker ?? marker))
         markerUsed = true
@@ -590,10 +593,10 @@ function renderTable(node: Parent): FileChild[] {
     .map((row, rowIndex) => {
       return new TableRow({
         tableHeader: rowIndex === 0,
-        children: row.children.map(cell => {
+        children: (row.children || []).map((cell: Content) => {
           return new TableCell({
             width: {
-              size: 100 / Math.max(row.children.length, 1),
+              size: 100 / Math.max((row.children || []).length, 1),
               type: WidthType.PERCENTAGE,
             },
             shading: rowIndex === 0 ? { fill: "F3F4F6" } : undefined,
@@ -638,8 +641,8 @@ function renderBlockNodeSync(node: Content, depth = 0): FileChild[] {
     case "heading":
       return [
         new Paragraph({
-          children: renderInlineNodes(node.children),
-          heading: getHeadingLevel(node.depth),
+          children: renderInlineNodes(node.children || []),
+          heading: getHeadingLevel(node.depth || 1),
           spacing: { before: 220, after: 100 },
         }),
       ]
@@ -647,7 +650,7 @@ function renderBlockNodeSync(node: Content, depth = 0): FileChild[] {
       return (node.children as Content[]).flatMap(child => {
         if (child.type === "paragraph") {
           return [
-            renderParagraphFromPhrasing(child.children, {
+            renderParagraphFromPhrasing(child.children || [], {
               spacing: { before: 60, after: 60 },
               indent: { left: 420 + depth * 240 },
               shading: { fill: "F8FAFC" },
@@ -660,9 +663,11 @@ function renderBlockNodeSync(node: Content, depth = 0): FileChild[] {
         return renderBlockNodeSync(child, depth + 1)
       })
     case "code":
-      return renderCodeBlock(node.value, node.lang)
+      return renderCodeBlock(node.value || "", node.lang)
     case "list":
-      return node.children.flatMap((item, index) => renderListItem(item, !!node.ordered, depth, index))
+      return (node.children || []).flatMap((item, index) =>
+        renderListItem(item as ListItem, !!node.ordered, depth, index)
+      )
     case "thematicBreak":
       return [
         new Paragraph({
@@ -678,9 +683,11 @@ function renderBlockNodeSync(node: Content, depth = 0): FileChild[] {
         }),
       ]
     case "table":
-      return renderTable(node)
+      return renderTable(node as Parent)
     case "html":
-      return node.value.trim() ? [new Paragraph({ text: node.value, spacing: { before: 50, after: 50 } })] : []
+      return node.value?.trim()
+        ? [new Paragraph({ text: node.value, spacing: { before: 50, after: 50 } })]
+        : []
     default:
       if ("children" in node && Array.isArray(node.children)) {
         return (node.children as Content[]).flatMap(child => renderBlockNodeSync(child, depth + 1))
@@ -691,15 +698,15 @@ function renderBlockNodeSync(node: Content, depth = 0): FileChild[] {
 
 async function renderBlockNode(node: Content, depth = 0): Promise<FileChild[]> {
   if (node.type === "paragraph") {
-    return renderParagraphNode(node)
+    return renderParagraphNode(node as Parent)
   }
 
   if (node.type === "image") {
-    return renderImageNode(node)
+    return renderImageNode(node as MdastImage)
   }
 
   if (node.type === "math") {
-    return renderMathBlock(node)
+    return renderMathBlock(node as MdastMath)
   }
 
   return renderBlockNodeSync(node, depth)
