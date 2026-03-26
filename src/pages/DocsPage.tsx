@@ -1,4 +1,3 @@
-import matter from "gray-matter"
 import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { unified } from "unified"
@@ -7,6 +6,7 @@ import remarkParse from "remark-parse"
 import { DocsLayout } from "../components/DocsLayout"
 import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
+import { parseFrontmatter } from "../lib/frontmatter"
 import { getPrevNextPage } from "../lib/navigation"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
@@ -124,7 +124,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
         }
 
         if (cancelled) return
-        const { data, content } = matter(contentToUse)
+        const { data, content } = parseFrontmatter(contentToUse)
 
         const maxLevel = config?.toc?.maxLevel || 3
 

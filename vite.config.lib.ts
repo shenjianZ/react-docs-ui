@@ -60,6 +60,17 @@ function extractFontDataUrisPlugin() {
   }
 }
 
+function docsAppTypeShimPlugin() {
+  return {
+    name: "docs-app-type-shim",
+    closeBundle() {
+      const distDir = path.resolve(__dirname, "dist")
+      const shimPath = path.resolve(distDir, "docs-app.es.d.ts")
+      fs.writeFileSync(shimPath, 'export * from "./types/docs-app"\n')
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(() => {
   return {
@@ -67,6 +78,7 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       extractFontDataUrisPlugin(),
+      docsAppTypeShimPlugin(),
       dts({
         tsconfigPath: "./tsconfig.lib.json",
         outDir: "./dist/types",

@@ -14,18 +14,18 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom"
-import matter from "gray-matter"
 
 import { DocsLayout } from "../components/DocsLayout"
 import { ThemeProvider } from "../components/theme-provider"
 import { FontProvider } from "../components/FontProvider"
 import { SearchLauncherProvider } from "../components/SearchLauncher"
 import { ComponentProvider } from "../components/ComponentProvider"
-import { AIProvider } from "../components/ai"
+import { AIProvider } from "../components/ai/AIProvider"
 import { Toaster } from "../components/ui/toaster"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents, getBuiltinComponents, prefetchGeneratedComponents } from "../lib/component-scanner"
+import { parseFrontmatter } from "../lib/frontmatter"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
@@ -50,19 +50,19 @@ function notifyContentReady() {
 }
 
 const LazyAISelectionTrigger = lazy(() =>
-  import("../components/ai").then(module => ({
+  import("../components/ai/AISelectionTrigger").then(module => ({
     default: module.AISelectionTrigger,
   }))
 )
 
 const LazyAIChatDialog = lazy(() =>
-  import("../components/ai").then(module => ({
+  import("../components/ai/AIChatDialog").then(module => ({
     default: module.AIChatDialog,
   }))
 )
 
 const LazyAISettingsPanel = lazy(() =>
-  import("../components/ai").then(module => ({
+  import("../components/ai/AISettingsPanel").then(module => ({
     default: module.AISettingsPanel,
   }))
 )
@@ -279,7 +279,7 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
 
         if (cancelled) return
 
-        const { data, content: markdownContent } = matter(contentToUse)
+        const { data, content: markdownContent } = parseFrontmatter(contentToUse)
 
         const maxLevel = config?.toc?.maxLevel || 3
 

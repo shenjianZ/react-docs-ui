@@ -1,7 +1,6 @@
 import { saveAs } from "file-saver"
 import JSZip from "jszip"
 import TurndownService from "turndown"
-import matter from "gray-matter"
 import {
   Document,
   Packer,
@@ -32,6 +31,7 @@ import type {
   Math as MdastMath,
 } from "mdast"
 import { scanDocuments, type DocItem } from "./doc-scanner"
+import { parseFrontmatter } from "./frontmatter"
 
 export interface ExportOptions {
   filename?: string
@@ -865,7 +865,7 @@ export async function exportAsWord(content: string, options: ExportOptions = {})
   const filename = options.filename || "document.docx"
   const title = options.title || "Document"
 
-  const { data, content: bodyContent } = matter(content)
+  const { data, content: bodyContent } = parseFrontmatter(content)
   const docTitle = data.title || title
 
   const children: FileChild[] = []
