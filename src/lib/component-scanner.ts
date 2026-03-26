@@ -27,12 +27,15 @@ const BUILTIN_MDX_COMPONENTS: ComponentRegistry = {
 }
 
 let generatedComponentsPromise: Promise<ComponentRegistry | null> | null = null
+const importGeneratedComponents = new Function(
+  'componentPath',
+  'return import(componentPath)'
+) as (componentPath: string) => Promise<{ MDX_COMPONENTS?: ComponentRegistry }>
 
 function getGeneratedComponentsPromise(): Promise<ComponentRegistry | null> {
   if (!generatedComponentsPromise) {
-    const componentPath = '/src/generated/mdx-components.ts'
-    // @ts-ignore Vite resolves this runtime-only entry inside the consuming app.
-    generatedComponentsPromise = import(/* @vite-ignore */ componentPath)
+    const componentPath = ['src', 'generated', 'mdx-components.ts'].join('/')
+    generatedComponentsPromise = importGeneratedComponents(`/${componentPath}`)
       .then(module => {
         if (module && module.MDX_COMPONENTS) {
           return module.MDX_COMPONENTS as ComponentRegistry
