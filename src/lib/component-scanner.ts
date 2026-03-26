@@ -27,15 +27,10 @@ const BUILTIN_MDX_COMPONENTS: ComponentRegistry = {
 }
 
 let generatedComponentsPromise: Promise<ComponentRegistry | null> | null = null
-const importGeneratedComponents = new Function(
-  'componentPath',
-  'return import(componentPath)'
-) as (componentPath: string) => Promise<{ MDX_COMPONENTS?: ComponentRegistry }>
 
 function getGeneratedComponentsPromise(): Promise<ComponentRegistry | null> {
   if (!generatedComponentsPromise) {
-    const componentPath = ['src', 'generated', 'mdx-components.ts'].join('/')
-    generatedComponentsPromise = importGeneratedComponents(`/${componentPath}`)
+    generatedComponentsPromise = import('../generated/mdx-components')
       .then(module => {
         if (module && module.MDX_COMPONENTS) {
           return module.MDX_COMPONENTS as ComponentRegistry
