@@ -1,5 +1,4 @@
-import type { LucideIcon } from "lucide-react"
-import { ExternalLink, Gitlab, Github, Globe, Monitor, Moon, MoreVertical, Search, Sun } from "lucide-react"
+import { ExternalLink, Globe, Monitor, Moon, MoreVertical, Search, Sun } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
@@ -75,6 +74,22 @@ function GiteeIcon({ className }: { className?: string }) {
   )
 }
 
+function GitHubIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.2.8-.6v-2.2c-3.3.7-4-1.4-4-1.4c-.5-1.3-1.3-1.7-1.3-1.7c-1.1-.8.1-.8.1-.8c1.2.1 1.9 1.3 1.9 1.3c1.1 1.9 2.9 1.3 3.6 1c.1-.8.4-1.3.8-1.6c-2.7-.3-5.5-1.4-5.5-6A4.7 4.7 0 0 1 5.8 8.6c-.1-.3-.5-1.5.1-3.1c0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2c.6 1.6.2 2.8.1 3.1a4.7 4.7 0 0 1 1.3 3.3c0 4.6-2.8 5.7-5.5 6c.4.4.8 1 .8 2.1v3.1c0 .4.2.7.8.6A12 12 0 0 0 12 .5Z" />
+    </svg>
+  )
+}
+
+function GitLabIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="m12 21.7l4.4-13.5h-8.8L12 21.7Zm0 0L7.6 8.2H2.3L12 21.7Zm-9.7-13.5l-1.3 4c-.1.4 0 .9.3 1.2L12 21.7L2.3 8.2Zm0 0h5.3L5.3 1.5c-.1-.3-.5-.3-.6 0L2.3 8.2Zm9.7 13.5l4.4-13.5h5.3L12 21.7Zm9.7-13.5l1.3 4c.1.4 0 .9-.3 1.2L12 21.7l9.7-13.5Zm0 0h-5.3l2.3-6.7c.1-.3.5-.3.6 0l2.4 6.7Z" />
+    </svg>
+  )
+}
+
 function GiteaIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -114,9 +129,9 @@ function getActionIcon(action: { type?: string; icon?: string; title?: string; l
   const kind = resolveActionKind(action)
   const iconClassName =
     kind === "github" ? "h-4 w-4" : kind === "gitee" ? "h-[18px] w-[18px]" : "h-5 w-5"
-  const iconMap: Record<string, LucideIcon> = {
-    github: Github,
-    gitlab: Gitlab,
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    github: GitHubIcon,
+    gitlab: GitLabIcon,
     globe: Globe,
     link: ExternalLink,
     external: ExternalLink,

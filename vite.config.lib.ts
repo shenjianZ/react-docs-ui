@@ -87,6 +87,8 @@ export default defineConfig(() => {
       rollupOptions: {
         external: [
           "react",
+          "react/jsx-runtime",
+          "react/jsx-dev-runtime",
           "react-dom",
           "react-router-dom",
           "clsx",

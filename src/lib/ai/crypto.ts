@@ -6,6 +6,13 @@
 /** 存储键名 */
 const STORAGE_KEY = 'ai-device-key'
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength
+  ) as ArrayBuffer
+}
+
 /**
  * 获取设备指纹作为加密密钥的一部分
  * 使用多个浏览器特征生成相对唯一的标识
@@ -62,7 +69,7 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: toArrayBuffer(salt),
       iterations: 100000,
       hash: 'SHA-256',
     },

@@ -51,7 +51,7 @@ function getGeneratedComponentsPromise(): Promise<ComponentRegistry | null> {
 async function loadFromGeneratedIndex(): Promise<ComponentRegistry | null> {
   try {
     return await getGeneratedComponentsPromise()
-  } catch (error) {
+  } catch (_error) {
     // 索引文件不存在或加载失败，返回 null
     return null
   }

@@ -222,7 +222,7 @@ export interface HighlightOptions {
 function createLineNumberTransformer(): ShikiTransformer {
   return {
     name: 'line-numbers',
-    line(node, line) {
+    line(node: any, line: number) {
       node.properties['data-line'] = line
     }
   }
@@ -253,14 +253,14 @@ export async function highlightCode(
     
     const transformers: ShikiTransformer[] = [
       {
-        pre(node) {
+        pre(node: any) {
           node.properties.class = 'shiki-code-block'
           if (showLineNumbers) {
             this.addClassToHast(node, 'show-line-numbers')
           }
           node.properties.style = ''
         },
-        code(node) {
+        code(node: any) {
           node.properties.class = ''
         },
       },
