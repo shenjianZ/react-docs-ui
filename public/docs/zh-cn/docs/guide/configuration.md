@@ -327,6 +327,24 @@
 | `maxResults` | number | 最多返回多少条结果 | `20` |
 | `snippetLength` | number | 示例/保留字段，当前运行时未直接使用 | `120` |
 
+## SEO `seo`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用页面 SEO 标签注入 |
+| `defaultTitle` | string | 默认页面标题 |
+| `titleTemplate` | string | 标题模板，支持 `{title}` 与 `{siteTitle}` |
+| `defaultDescription` | string | 默认描述 |
+| `defaultOgImage` | string | 默认社交分享图片 |
+| `robots` | string | 默认 robots 内容 |
+| `twitterCard` | string | Twitter 卡片类型 |
+
+说明：
+
+- `site.url` 是生成 `canonical`、`hreflang`、`og:url` 的前置项。
+- 页面 frontmatter 可覆盖 `title`、`description`、`canonical`，并支持 `noindex: true`。
+- 版本化文档会自动保留 `/v/:version` 前缀。
+
 ## 导出 `export`
 
 | 字段 | 类型 | 说明 |

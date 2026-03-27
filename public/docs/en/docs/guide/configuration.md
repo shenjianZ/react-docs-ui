@@ -327,6 +327,24 @@ Notes:
 | `maxResults` | number | Maximum number of returned results | `20` |
 | `snippetLength` | number | Sample/reserved field. Not directly used by the current runtime | `120` |
 
+## SEO `seo`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Enable page-level SEO tag injection |
+| `defaultTitle` | string | Default page title |
+| `titleTemplate` | string | Title template with `{title}` and `{siteTitle}` |
+| `defaultDescription` | string | Default description |
+| `defaultOgImage` | string | Default social share image |
+| `robots` | string | Default robots content |
+| `twitterCard` | string | Twitter card type |
+
+Notes:
+
+- `site.url` is required for `canonical`, `hreflang`, and `og:url`.
+- Page frontmatter can override `title`, `description`, `canonical`, and supports `noindex: true`.
+- Versioned pages automatically keep the `/v/:version` prefix.
+
 ## Export `export`
 
 | Field | Type | Description |

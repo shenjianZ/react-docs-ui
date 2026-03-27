@@ -2,6 +2,7 @@
 site:
     title: "React Docs UI Example"
     description: "Example documentation website built with React Docs UI"
+    url: "https://react-docs-ui.example.com"
     # Logo formats supported:
     # 1. emoji: "🤖"
     # 2. image URL: "https://example.com/logo.png"
@@ -299,6 +300,15 @@ search:
     placeholder: "Search docs..."
     maxResults: 20
     snippetLength: 120
+
+seo:
+    enabled: true
+    defaultTitle: "React Docs UI Example"
+    titleTemplate: "{title} | {siteTitle}"
+    defaultDescription: "Example documentation website built with React Docs UI"
+    defaultOgImage: "https://react-docs-ui.example.com/images/og-default.png"
+    robots: "index, follow"
+    twitterCard: "summary_large_image"
 
 # Export Configuration
 export:

@@ -2,6 +2,7 @@
 site:
     title: "React Docs UI 示例项目"
     description: "基于 React Docs UI 构建的文档网站示例"
+    url: "https://react-docs-ui.example.com"
     # logo支持以下格式：
     # 1. emoji: "🤖"
     # 2. 图片URL: "https://example.com/logo.png"
@@ -298,6 +299,15 @@ search:
     placeholder: "搜索文档..."
     maxResults: 20
     snippetLength: 120
+
+seo:
+    enabled: true
+    defaultTitle: "React Docs UI 示例项目"
+    titleTemplate: "{title} | {siteTitle}"
+    defaultDescription: "基于 React Docs UI 构建的文档网站示例"
+    defaultOgImage: "https://react-docs-ui.example.com/images/og-default.png"
+    robots: "index, follow"
+    twitterCard: "summary_large_image"
 
 # 导出功能配置
 export:

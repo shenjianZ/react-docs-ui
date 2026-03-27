@@ -30,3 +30,5 @@ theme.md
 
 public/search-index-*.json
 public/doc-git-meta.json
+public/llms-full.txt
+public/llms.txt

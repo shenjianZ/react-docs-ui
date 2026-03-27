@@ -23,9 +23,24 @@ interface Frontmatter {
   author?: string
   authors?: string[]
   createdAt?: string | Date
+  canonical?: string
+  noindex?: boolean
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
+}
+
+function joinSiteUrl(baseUrl: string, pathname: string) {
+  return `${baseUrl.replace(/\/+$/, "")}${pathname.startsWith("/") ? pathname : `/${pathname}`}`
+}
+
+function upsertHeadTag(selector: string, create: () => HTMLElement, apply: (node: HTMLElement) => void) {
+  let node = document.head.querySelector(selector) as HTMLElement | null
+  if (!node) {
+    node = create()
+    document.head.appendChild(node)
+  }
+  apply(node)
 }
 
 interface DocsLayoutProps {
@@ -68,11 +83,86 @@ export function DocsLayout({
       : String(createdAtValue)
     : undefined
   
-  const pageTitle = frontmatter?.title || frontmatter?.firstH1 || site?.title || "Docs"
+  const rawTitle = frontmatter?.title || frontmatter?.firstH1 || config.seo?.defaultTitle || site?.title || "Docs"
+  const pageTitle = config.seo?.titleTemplate && rawTitle
+    ? config.seo.titleTemplate.replace(/\{title\}/g, rawTitle).replace(/\{siteTitle\}/g, site?.title || "Docs")
+    : rawTitle
+  const pageDescription = frontmatter?.description || config.seo?.defaultDescription || site?.description
+  const siteUrl = site?.url?.replace(/\/+$/, "")
+  const pagePath = version ? `/${lang}/v/${version}${slug ? `/${slug}` : ""}` : `/${lang}${slug ? `/${slug}` : ""}`
   
   useEffect(() => {
     document.title = pageTitle
   }, [pageTitle])
+
+  useEffect(() => {
+    if (config.seo?.enabled === false) return
+
+    const robotsContent = frontmatter?.noindex ? "noindex, nofollow" : config.seo?.robots || "index, follow"
+    const canonicalUrl = frontmatter?.noindex
+      ? undefined
+      : typeof frontmatter?.canonical === "string"
+        ? frontmatter.canonical
+        : siteUrl
+          ? joinSiteUrl(siteUrl, pagePath)
+          : undefined
+    const alternateLangs = frontmatter?.noindex || !siteUrl ? [] : [
+      { hreflang: "zh-CN", href: joinSiteUrl(siteUrl, version ? `/zh-cn/v/${version}${slug ? `/${slug}` : ""}` : `/zh-cn${slug ? `/${slug}` : ""}`) },
+      { hreflang: "en", href: joinSiteUrl(siteUrl, version ? `/en/v/${version}${slug ? `/${slug}` : ""}` : `/en${slug ? `/${slug}` : ""}`) },
+      { hreflang: "x-default", href: joinSiteUrl(siteUrl, version ? `/zh-cn/v/${version}${slug ? `/${slug}` : ""}` : `/zh-cn${slug ? `/${slug}` : ""}`) },
+    ]
+
+    upsertHeadTag('meta[name="description"]', () => document.createElement("meta"), node => {
+      node.setAttribute("name", "description")
+      node.setAttribute("content", pageDescription || "")
+    })
+    upsertHeadTag('meta[name="robots"]', () => document.createElement("meta"), node => {
+      node.setAttribute("name", "robots")
+      node.setAttribute("content", robotsContent)
+    })
+
+    const ogEntries = [
+      { key: "og:title", value: pageTitle },
+      { key: "og:description", value: pageDescription || "" },
+      { key: "og:type", value: "article" },
+      { key: "og:url", value: canonicalUrl },
+      { key: "og:image", value: config.seo?.defaultOgImage },
+    ]
+    ogEntries.filter((entry) => entry.value).forEach(({ key, value }) => upsertHeadTag(`meta[property="${key}"]`, () => document.createElement("meta"), node => {
+      node.setAttribute("property", key)
+      node.setAttribute("content", value || "")
+    }))
+
+    const twitterEntries = [
+      { key: "twitter:card", value: config.seo?.twitterCard || "summary_large_image" },
+      { key: "twitter:title", value: pageTitle },
+      { key: "twitter:description", value: pageDescription || "" },
+      { key: "twitter:image", value: config.seo?.defaultOgImage },
+    ]
+    twitterEntries.filter((entry) => entry.value).forEach(({ key, value }) => upsertHeadTag(`meta[name="${key}"]`, () => document.createElement("meta"), node => {
+      node.setAttribute("name", key)
+      node.setAttribute("content", value || "")
+    }))
+
+    const canonicalNode = document.head.querySelector('link[rel="canonical"][data-rdu-seo="canonical"]')
+    if (canonicalUrl) {
+      upsertHeadTag('link[rel="canonical"][data-rdu-seo="canonical"]', () => document.createElement("link"), node => {
+        node.setAttribute("rel", "canonical")
+        node.setAttribute("href", canonicalUrl)
+        node.setAttribute("data-rdu-seo", "canonical")
+      })
+    } else if (canonicalNode) {
+      canonicalNode.remove()
+    }
+
+    document.head.querySelectorAll('link[rel="alternate"][data-rdu-seo="alternate"]').forEach(node => node.remove())
+    alternateLangs.forEach(({ hreflang, href }) => upsertHeadTag(`link[rel="alternate"][hreflang="${hreflang}"][data-rdu-seo="alternate"]`, () => document.createElement("link"), node => {
+      node.setAttribute("rel", "alternate")
+      node.setAttribute("hreflang", hreflang)
+      node.setAttribute("href", href)
+      node.setAttribute("data-rdu-seo", "alternate")
+    }))
+  }, [config.seo, frontmatter?.canonical, frontmatter?.noindex, lang, pageDescription, pagePath, pageTitle, siteUrl, slug, version])
   
   const toc = config.toc?.enabled !== false
     ? (frontmatter?.toc || [])

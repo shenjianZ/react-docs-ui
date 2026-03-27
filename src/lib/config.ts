@@ -71,6 +71,7 @@ export interface SiteConfig {
     logo: string | { light: string; dark: string }
     title: string
     description: string
+    url?: string
   }
   navbar: {
     showLogo?: boolean
@@ -239,6 +240,15 @@ export interface SiteConfig {
     showEditLink?: boolean
     showAuthors?: boolean
     preferGitMeta?: boolean
+  }
+  seo?: {
+    enabled?: boolean
+    defaultTitle?: string
+    titleTemplate?: string
+    defaultDescription?: string
+    defaultOgImage?: string
+    robots?: string
+    twitterCard?: "summary" | "summary_large_image"
   }
   imageViewer?: ImageViewerConfig
 }
