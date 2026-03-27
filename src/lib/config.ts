@@ -54,6 +54,13 @@ export interface EditLinkConfig {
   label?: string
 }
 
+export interface AnnouncementConfig {
+  enabled?: boolean
+  text?: string
+  link?: string
+  dismissible?: boolean
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -78,6 +85,7 @@ export interface SiteConfig {
       enabled?: boolean
     }[]
   }
+  announcement?: AnnouncementConfig
   sidebar: {
     // 全局开关，未设置时按数据存在与否自动判断
     enabled?: boolean

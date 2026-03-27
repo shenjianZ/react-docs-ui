@@ -85,7 +85,7 @@ export function DocsLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <HeaderNav lang={lang} site={site} navbar={navbar} themeConfig={theme} searchConfig={config.search} />
+      <HeaderNav lang={lang} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} />
       {/* 移动端侧边栏 */}
       {sidebar && (
         <MobileSidebar

@@ -4,6 +4,7 @@ import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
 import { useSearchLauncher } from "@/components/SearchLauncher"
 
+import { AnnouncementBar } from "@/components/AnnouncementBar"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ModeToggle } from "@/components/mode-toggle"
 import { buttonVariants } from "@/components/ui/button"
@@ -50,6 +51,12 @@ interface SiteConfig {
       enabled?: boolean
     }[]
   }
+  announcement?: {
+    enabled?: boolean
+    text?: string
+    link?: string
+    dismissible?: boolean
+  }
   theme?: {
     allowToggle?: boolean
   }
@@ -59,6 +66,7 @@ interface HeaderNavProps {
   lang: string
   site: SiteConfig["site"]
   navbar: SiteConfig["navbar"]
+  announcement?: SiteConfig["announcement"]
   themeConfig?: { allowToggle?: boolean }
   searchConfig?: {
     enabled?: boolean
@@ -154,7 +162,7 @@ function getActionIcon(action: { type?: string; icon?: string; title?: string; l
   return <ExternalLink className={iconClassName} />
 }
 
-export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: HeaderNavProps) {
+export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searchConfig }: HeaderNavProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const pathname = location.pathname
@@ -237,8 +245,9 @@ export function HeaderNav({ lang, site, navbar, themeConfig, searchConfig }: Hea
         }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" data-print-hidden>
-      <div className="container flex h-14 max-w-screen-2xl items-center px-4 md:px-8">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" data-print-hidden>
+      <AnnouncementBar lang={lang} announcement={announcement} />
+      <div className="container flex h-14 max-w-screen-2xl items-center border-b border-border/40 px-4 md:px-8">
         {(((navbar.showLogo ?? true) as boolean) || ((navbar.showTitle ?? true) as boolean)) && (
           <div className="mr-6 flex items-center space-x-2 flex-shrink-0">
             {(navbar.showLogo ?? true) && (

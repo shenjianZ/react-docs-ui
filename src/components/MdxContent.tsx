@@ -15,6 +15,7 @@ import { getCodeHighlightTheme, getHighlighter, highlightCode, resolveLang, type
 import { Copy, Check } from "lucide-react"
 import { getImageViewerLabels } from "../lib/image-viewer"
 import { ImageViewer } from "./ImageViewer"
+import { Mermaid } from "./mdx-components"
 import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
 import macros_physics from "katex-physics"
 
@@ -76,17 +77,25 @@ function isCustomComponent(node: Element): boolean {
 }
 
 function convertJSXToHTML(source: string): string {
-  return source
-    .replace(/<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)(\s+[^>]*)>([\s\S]*?)<\/\1>/g, (_match, componentName, props, content) => {
-      const dataProps = convertPropsToDataAttrs(props)
-      const htmlTagName = componentName.toLowerCase().replace(/\./g, '-')
-      return `<${htmlTagName}${dataProps}>${content}</${htmlTagName}>`
-    })
-    .replace(/<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)(\s+[^>]*?)\s*\/>/g, (_match, componentName, props) => {
-      const dataProps = convertPropsToDataAttrs(props)
-      const htmlTagName = componentName.toLowerCase().replace(/\./g, '-')
-      return `<${htmlTagName}${dataProps}></${htmlTagName}>`
-    })
+  let output = source
+  let previous = ''
+
+  while (output !== previous) {
+    previous = output
+    output = output
+      .replace(/<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)(\s+[^>]*)>([\s\S]*?)<\/\1>/g, (_match, componentName, props, content) => {
+        const dataProps = convertPropsToDataAttrs(props)
+        const htmlTagName = componentName.toLowerCase().replace(/\./g, '-')
+        return `<${htmlTagName}${dataProps}>${content}</${htmlTagName}>`
+      })
+      .replace(/<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)(\s+[^>]*?)\s*\/>/g, (_match, componentName, props) => {
+        const dataProps = convertPropsToDataAttrs(props)
+        const htmlTagName = componentName.toLowerCase().replace(/\./g, '-')
+        return `<${htmlTagName}${dataProps}></${htmlTagName}>`
+      })
+  }
+
+  return output
 }
 
 function convertPropsToDataAttrs(props: string): string {
@@ -549,6 +558,8 @@ export function MdxContent({
             if (codeElement) {
               const codeProps = (codeElement as any).props
               const className = codeProps?.className || ''
+              const codeLangMatch = /language-(\w+)/.exec(className)
+              const codeLang = codeLangMatch ? codeLangMatch[1].toLowerCase() : 'text'
               
               const node = codeProps?.node
               let codeChildren = codeProps?.children
@@ -562,6 +573,11 @@ export function MdxContent({
               
               // 获取 meta 信息
               const meta = node?.data?.meta || ''
+
+              if (codeLang === 'mermaid') {
+                const chart = typeof codeChildren === 'string' ? codeChildren : String(codeChildren || '')
+                return <Mermaid chart={chart} />
+              }
               
               return (
                 <ShikiCodeBlock

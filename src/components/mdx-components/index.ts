@@ -1,3 +1,5 @@
 export { Tip } from './Tip'
 export { Warning } from './Warning'
 export { Card } from './Card'
+export { Tabs, Tab } from './Tabs'
+export { Mermaid } from './Mermaid'

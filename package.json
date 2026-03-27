@@ -35,9 +35,9 @@
         "./style.css": "./dist/react-docs-ui.css"
     },
     "scripts": {
-        "predev": "node scripts/generate-doc-git-meta.mjs",
+        "predev": "node scripts/generate-doc-git-meta.mjs && node scripts/generate-llms-files.mjs",
         "dev": "vite",
-        "prebuild": "node scripts/generate-doc-git-meta.mjs",
+        "prebuild": "node scripts/generate-doc-git-meta.mjs && node scripts/generate-llms-files.mjs",
         "build": "tsc -b && vite build",
         "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.config.lib.ts",
         "build:search": "node scripts/generate-search-index.mjs",
@@ -73,6 +73,7 @@
         "katex": "^0.16.42",
         "katex-physics": "^1.0.2",
         "lucide-react": "^1.6.0",
+        "mermaid": "^11.13.0",
         "next-themes": "^0.4.6",
         "react-markdown": "^10.1.0",
         "rehype-autolink-headings": "^7.1.0",

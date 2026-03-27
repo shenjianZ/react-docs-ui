@@ -40,6 +40,12 @@ navbar:
           link: "https://example.com/api"
           enabled: false
 
+announcement:
+    enabled: true
+    text: "React Docs UI 已支持 Tabs、Mermaid 与 llms.txt"
+    link: "https://github.com/shenjianZ/react-docs-ui"
+    dismissible: true
+
 # 侧边栏导航配置
 sidebar:
     enabled: true
