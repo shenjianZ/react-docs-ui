@@ -125,6 +125,7 @@ export interface SiteConfig {
     >
   }
   theme?: {
+    defaultMode?: "light" | "dark" | "auto" | "system"
     allowToggle?: boolean
   }
   footer?: {
@@ -142,12 +143,14 @@ export interface SiteConfig {
         title: string
         link: string
         external?: boolean
+        action?: "scrollTop"
       }[]
     }[]
     links?: {
       title: string
       link: string
       external?: boolean
+      action?: "scrollTop"
     }[]
     social?: {
       name: string

@@ -20,7 +20,11 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | `fonts` | Site fonts and build-time font downloads |
 | `codeHighlight` | Syntax highlighting languages and themes |
 | `search` | Full-text search |
+| `seo` | Page SEO tag configuration |
 | `export` | Markdown / PDF / Word / bulk export |
+| `pageMeta` | Page-level metadata display configuration |
+| `editLink` | Edit-this-page link configuration |
+| `feedback` | Page feedback configuration |
 | `ai` | Global AI feature switch |
 | `pwa` | PWA-related settings |
 
@@ -30,6 +34,7 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | :-- | :-- | :-- | :-- |
 | `title` | string | Site title | `"React Docs UI Example"` |
 | `description` | string | Site description, usually used on the homepage and for SEO | `"Documentation site built with React Docs UI"` |
+| `url` | string | Base site URL used to build canonical, `hreflang`, and `og:url` | `"https://your-docs-site.example.com"` |
 | `logo` | string or object | Site logo. Can be an emoji, image path, absolute URL, or a light/dark object | `"📚"` / `"/images/logo.png"` / `{ light: "...", dark: "..." }` |
 | `author` | string | Sample metadata field. Not directly consumed by the current runtime | `"React Docs UI Team"` |
 

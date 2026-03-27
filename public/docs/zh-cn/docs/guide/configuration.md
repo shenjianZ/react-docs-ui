@@ -20,7 +20,11 @@
 | `fonts` | 页面字体与构建期下载字体 |
 | `codeHighlight` | 代码高亮语言与主题 |
 | `search` | 全文搜索 |
+| `seo` | 页面 SEO 标签配置 |
 | `export` | Markdown / PDF / Word / 批量导出 |
+| `pageMeta` | 页面元信息展示配置 |
+| `editLink` | “编辑此页”链接配置 |
+| `feedback` | 页面反馈配置 |
 | `ai` | AI 功能总开关 |
 | `pwa` | PWA 相关配置 |
 
@@ -30,6 +34,7 @@
 | :-- | :-- | :-- | :-- |
 | `title` | string | 网站标题 | `"React Docs UI 示例项目"` |
 | `description` | string | 网站描述，通常用于首页说明和 SEO | `"基于 React Docs UI 构建的文档网站示例"` |
+| `url` | string | 站点基准地址，用于生成 canonical、`hreflang`、`og:url` | `"https://your-docs-site.example.com"` |
 | `logo` | string 或 object | 网站 Logo，可用 emoji、图片路径、绝对 URL，或按明暗主题分别配置 | `"📚"` / `"/images/logo.png"` / `{ light: "...", dark: "..." }` |
 | `author` | string | 示例元信息字段，当前运行时未直接消费，可保留给站点维护者使用 | `"React Docs UI Team"` |
 

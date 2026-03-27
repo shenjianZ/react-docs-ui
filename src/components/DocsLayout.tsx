@@ -76,6 +76,7 @@ export function DocsLayout({
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
   const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
+  const showTopAuthors = config.pageMeta?.showAuthors !== false && topAuthors.length > 0
   const createdAtValue = frontmatter?.createdAt
   const formattedCreatedAt = createdAtValue
     ? new Date(createdAtValue).toString() !== "Invalid Date"
@@ -213,7 +214,7 @@ export function DocsLayout({
         <div className="relative flex md:col-start-2 min-w-0 overflow-hidden">
           <main className="relative py-6 lg:py-8 flex-auto w-full">
             {/* Frontmatter 元信息展示 */}
-            {frontmatter && (frontmatter.title || frontmatter.description || topAuthors.length || formattedCreatedAt || lastUpdated || editUrl) && (
+            {frontmatter && (frontmatter.title || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
               <header className="mb-8 pb-6 border-b border-border">
                 {frontmatter.title ? (
                   <div className="flex items-start justify-between gap-4 mb-3">
@@ -240,9 +241,9 @@ export function DocsLayout({
                 {frontmatter.description && (
                   <p className="text-lg text-muted-foreground mb-4">{frontmatter.description}</p>
                 )}
-                {(topAuthors.length > 0 || formattedCreatedAt) && (
+                {(showTopAuthors || formattedCreatedAt) && (
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                    {topAuthors.length > 0 && (
+                    {showTopAuthors && (
                       <span className="flex items-center gap-1.5">
                         <User className="h-4 w-4" />
                         {topAuthors.join("、")}
@@ -258,7 +259,7 @@ export function DocsLayout({
                 )}
               </header>
             )}
-            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !topAuthors.length && !formattedCreatedAt && !lastUpdated && !editUrl)) && (
+            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !showTopAuthors && !formattedCreatedAt && !lastUpdated && !editUrl)) && (
               <div className="mb-4">
                 <div className="flex justify-end">
                   <ExportToolbar

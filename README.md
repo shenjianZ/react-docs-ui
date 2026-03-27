@@ -7,7 +7,7 @@ React documentation site UI components. Build modern docs sites with a ready-to-
 ### Install
 
 ```bash
-npx create-react-docs-ui@latest my-docs
+pnpm create react-docs-ui my-docs
 ```
 
 ### Quick Start
@@ -16,8 +16,8 @@ Use the official scaffolding tool. Manual integration is no longer recommended b
 
 ```bash
 cd my-docs
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ### Features
