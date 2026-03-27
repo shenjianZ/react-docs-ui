@@ -168,6 +168,16 @@ Notes:
 | `maxLevel` | number | Maximum heading depth to show, usually `1-6` | `3` |
 | `title` | string | TOC title | `"On This Page"` |
 
+## Changelog `changelog`
+
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Enable the changelog module | `true` |
+| `title` | string | List page title | `"Changelog"` |
+| `showInNavbar` | boolean | Whether to show the entry in the navbar | `true` |
+| `showInSidebar` | boolean | Whether to show the entry in the sidebar | `false` |
+| `pageSize` | number | Number of items per page; if omitted, the list page shows all items | `10` |
+
 ## Image Viewer `imageViewer`
 
 | Field | Type | Description |
@@ -199,6 +209,39 @@ Notes:
 | `imageLoadError` | string | Image load failure message |
 
 You only need to define the labels you want to override.
+
+### Extended image syntax in documents
+
+Besides the global `imageViewer.enabled` switch, page authors can override behavior per image in Markdown or HTML, including size, preview on/off, inline rendering, and horizontal/vertical offsets.
+
+You can append options in the Markdown image title string:
+
+```md
+![Cover image](/images/og-default.png "width=320 preview=true")
+![Status icon](/images/success.svg "width=18 inline=true preview=false x=4 y=-2")
+```
+
+Supported options:
+
+- `width=24` / `height=24`: set width or height
+- `size=24`: set both width and height
+- `preview=true|false`: enable or disable preview for this image only
+- `inline=true`: render as an inline element instead of a full block
+- `x=4` / `y=-2`: apply horizontal or vertical offset, useful for small icons and text baseline alignment
+
+If you prefer raw HTML, you can also use a native `<img>` tag:
+
+```html
+<img src="/images/success.svg" alt="Status icon" width="18" data-inline="true" data-preview="false" data-offset-x="4" data-offset-y="-2" />
+```
+
+Common HTML `img` attributes:
+
+- `width` / `height`
+- `data-preview="true|false"`
+- `data-inline="true"`
+- `data-offset-x="4"`
+- `data-offset-y="-2"`
 
 ## Footer `footer`
 

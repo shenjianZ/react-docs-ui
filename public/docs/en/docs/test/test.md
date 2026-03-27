@@ -149,8 +149,56 @@ pnpm dev
 
 ## Images
 
+Default block images:
+
 ![Sample Image](https://picsum.photos/800/400)
-![01-image](/images/yrzx.png)
+![01-image](/images/og-default.png)
+![success-icon](/images/success.svg)
+
+Control size and disable preview:
+
+![Small success-icon, preview off](/images/success.svg "width=24 preview=false")
+
+Control size and keep preview:
+
+![Small success-icon, preview on](/images/success.svg "size=24 preview=true")
+
+Inline icon example:
+
+Status normal ![Inline success-icon](/images/success.svg "width=18 inline=true preview=false") completed
+
+Inline icon with preview:
+
+Click to view ![Inline preview icon](/images/success.svg "width=18 inline=true preview=true") large image
+
+Inline icon offset examples:
+
+Default position: status normal ![Default icon](/images/success.svg "width=18 inline=true preview=false")
+
+Move down by 3px: status normal ![Shift down icon](/images/success.svg "width=18 inline=true preview=false y=3")
+
+Move right 4px and up 2px: status normal ![Offset icon](/images/success.svg "width=18 inline=true preview=false x=4 y=-2")
+
+Use HTML `img` to control size and preview:
+
+<img src="/images/success.svg" alt="HTML icon" width="24" data-preview="false" />
+<img src="/images/og-default.png" alt="HTML custom sized image" width="320" data-preview="true" />
+
+Use HTML `img` for inline rendering:
+
+HTML inline icon: <img src="/images/success.svg" alt="HTML inline icon" width="18" data-inline="true" data-preview="false" /> current status normal
+
+HTML inline offset icon: <img src="/images/success.svg" alt="HTML offset icon" width="18" data-inline="true" data-preview="false" data-offset-x="4" data-offset-y="-2" /> current status normal
+
+Image syntax notes:
+
+- `width=24` or `height=24`: set image size
+- `size=24`: set both width and height
+- `preview=false`: disable image preview
+- `preview=true`: enable image preview
+- `inline=true`: render as inline element instead of a full block
+- `x=4`, `y=-2`: adjust horizontal and vertical offset
+- HTML `<img>` supports `width`, `height`, `data-preview`, `data-inline`, `data-offset-x`, `data-offset-y`
 
 ---
 

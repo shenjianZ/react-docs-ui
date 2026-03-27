@@ -77,6 +77,75 @@ function isCustomComponent(node: Element): boolean {
   return tagName.charAt(0) === tagName.charAt(0).toUpperCase() && tagName.charAt(0) !== tagName.charAt(0).toLowerCase()
 }
 
+type ImageBehavior = {
+  height?: string
+  inline?: boolean
+  offsetX?: string
+  offsetY?: string
+  preview?: boolean
+  title?: string
+  width?: string
+}
+
+function normalizeImageSize(value: unknown): string | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `${value}px`
+  }
+  if (typeof value !== "string") return undefined
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+  return /^\d+(\.\d+)?$/.test(trimmed) ? `${trimmed}px` : trimmed
+}
+
+function parseImageBoolean(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value
+  if (typeof value !== "string") return undefined
+  const normalized = value.trim().toLowerCase()
+  if (["true", "1", "yes", "on"].includes(normalized)) return true
+  if (["false", "0", "no", "off"].includes(normalized)) return false
+  return undefined
+}
+
+function parseImageBehavior(title?: string, props?: Record<string, unknown>): ImageBehavior {
+  const behavior: ImageBehavior = {
+    title,
+    width: normalizeImageSize(props?.width),
+    height: normalizeImageSize(props?.height),
+    inline: parseImageBoolean(props?.["data-inline"] ?? props?.inline),
+    offsetX: normalizeImageSize(props?.["data-offset-x"] ?? props?.offsetX ?? props?.offsetx ?? props?.x),
+    offsetY: normalizeImageSize(props?.["data-offset-y"] ?? props?.offsetY ?? props?.offsety ?? props?.y),
+    preview: parseImageBoolean(props?.["data-preview"] ?? props?.preview),
+  }
+  if (!title || !/(^|\s)(width|height|w|h|size|preview|inline|x|y|offsetx|offsety)=/i.test(title)) return behavior
+  let cleanedTitle = title
+  const optionPattern = /(^|\s)(width|height|w|h|size|preview|inline|x|y|offsetx|offsety)=(?:"([^"]+)"|'([^']+)'|([^\s]+))/gi
+  cleanedTitle = cleanedTitle.replace(optionPattern, (_match, leading, rawKey, dq, sq, bare) => {
+    const key = String(rawKey).toLowerCase()
+    const rawValue = dq ?? sq ?? bare ?? ""
+    if (key === "preview") {
+      behavior.preview = parseImageBoolean(rawValue) ?? behavior.preview
+    } else if (key === "inline") {
+      behavior.inline = parseImageBoolean(rawValue) ?? behavior.inline
+    } else if (key === "size") {
+      const [width, height] = rawValue.split("x")
+      behavior.width = normalizeImageSize(width) ?? behavior.width
+      behavior.height = normalizeImageSize(height ?? width) ?? behavior.height
+    } else if (key === "width" || key === "w") {
+      behavior.width = normalizeImageSize(rawValue) ?? behavior.width
+    } else if (key === "height" || key === "h") {
+      behavior.height = normalizeImageSize(rawValue) ?? behavior.height
+    } else if (key === "x" || key === "offsetx") {
+      behavior.offsetX = normalizeImageSize(rawValue) ?? behavior.offsetX
+    } else if (key === "y" || key === "offsety") {
+      behavior.offsetY = normalizeImageSize(rawValue) ?? behavior.offsetY
+    }
+    return leading
+  })
+  const normalizedTitle = cleanedTitle.replace(/\s{2,}/g, " ").trim()
+  behavior.title = normalizedTitle || undefined
+  return behavior
+}
+
 function convertJSXToHTML(source: string): string {
   let output = source
   let previous = ''
@@ -383,20 +452,77 @@ function MarkdownImage({
     () => getImageViewerLabels(lang, viewerConfig?.labels),
     [lang, viewerConfig?.labels]
   )
+  const behavior = React.useMemo(
+    () => parseImageBehavior(title, props),
+    [props, title]
+  )
+  const shouldPreview = behavior.preview ?? viewerConfig?.enabled !== false
+  const shouldInline = behavior.inline === true
+  const hasExplicitSize = Boolean(behavior.width || behavior.height)
+  const imageStyle = React.useMemo(
+    () => ({
+      ...(props.style as React.CSSProperties | undefined),
+      width: behavior.width ?? props.style?.width,
+      height: behavior.height ?? props.style?.height,
+      transform: [
+        props.style?.transform,
+        behavior.offsetX || behavior.offsetY
+          ? `translate(${behavior.offsetX ?? "0px"}, ${behavior.offsetY ?? "0px"})`
+          : undefined,
+      ].filter(Boolean).join(" ") || undefined,
+    }),
+    [behavior.height, behavior.offsetX, behavior.offsetY, behavior.width, props.style]
+  )
 
   if (!src) {
     return null
   }
 
-  if (viewerConfig?.enabled === false) {
+  if (!shouldPreview) {
     return (
       <img
+        {...props}
         src={src}
         alt={alt || labels.imageAltFallback}
-        title={title}
-        className={className}
-        {...props}
+        title={behavior.title}
+        className={className ?? (shouldInline ? "inline-block align-middle" : undefined)}
+        style={imageStyle}
       />
+    )
+  }
+
+  if (hasExplicitSize || shouldInline) {
+    return (
+      <>
+        <button
+          type="button"
+          className={shouldInline
+            ? "not-prose inline-flex max-w-full cursor-zoom-in align-middle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            : "not-prose inline-flex max-w-full cursor-zoom-in align-middle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"}
+          onClick={() => setOpen(true)}
+          aria-label={labels.preview}
+          title={labels.preview}
+        >
+          <img
+            {...props}
+            src={src}
+            alt={alt || labels.imageAltFallback}
+            title={behavior.title}
+            className={className ?? (shouldInline ? "inline-block align-middle" : undefined)}
+            style={imageStyle}
+          />
+        </button>
+
+        <ImageViewer
+          open={open}
+          onOpenChange={setOpen}
+          src={src}
+          alt={alt}
+          title={behavior.title}
+          lang={lang}
+          labels={viewerConfig?.labels}
+        />
+      </>
     )
   }
 
@@ -411,11 +537,12 @@ function MarkdownImage({
           title={labels.preview}
         >
           <img
+            {...props}
             src={src}
             alt={alt || labels.imageAltFallback}
-            title={title}
+            title={behavior.title}
             className={className ?? "h-auto w-full rounded-2xl object-contain"}
-            {...props}
+            style={imageStyle}
           />
         </button>
 
@@ -448,7 +575,7 @@ function MarkdownImage({
         onOpenChange={setOpen}
         src={src}
         alt={alt}
-        title={title}
+        title={behavior.title}
         lang={lang}
         labels={viewerConfig?.labels}
       />

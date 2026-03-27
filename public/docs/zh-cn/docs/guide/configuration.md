@@ -168,6 +168,16 @@
 | `maxLevel` | number | 最多显示到几级标题，范围通常为 `1-6` | `3` |
 | `title` | string | 目录标题 | `"本页目录"` |
 
+## 更新日志 `changelog`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用 changelog 模块 | `true` |
+| `title` | string | 列表页标题 | `"更新日志"` |
+| `showInNavbar` | boolean | 是否在导航中显示入口 | `true` |
+| `showInSidebar` | boolean | 是否在侧边栏显示入口 | `false` |
+| `pageSize` | number | 每页显示条数；未配置时列表页默认全量显示 | `10` |
+
 ## 图片查看器 `imageViewer`
 
 | 字段 | 类型 | 说明 |
@@ -199,6 +209,39 @@
 | `imageLoadError` | string | 图片加载失败提示 |
 
 如果你只想改部分文案，只配置需要覆盖的键即可。
+
+### 文档中的图片扩展语法
+
+除了通过 `imageViewer.enabled` 全局控制图片预览外，页面作者还可以在 Markdown / HTML 里单独控制某一张图片的尺寸、是否开启预览、是否按行内元素渲染，以及水平/垂直偏移。
+
+Markdown 图片可在标题字符串里追加参数：
+
+```md
+![封面图](/images/og-default.png "width=320 preview=true")
+![状态图标](/images/success.svg "width=18 inline=true preview=false x=4 y=-2")
+```
+
+支持的参数：
+
+- `width=24` / `height=24`：设置宽高
+- `size=24`：同时设置宽高
+- `preview=true|false`：单独开启或关闭该图片的预览
+- `inline=true`：按行内元素渲染，不独占一行
+- `x=4` / `y=-2`：设置水平或垂直偏移，适合微调小图标和文字基线
+
+如果你希望直接用 HTML，也可以使用原生 `<img>`：
+
+```html
+<img src="/images/success.svg" alt="状态图标" width="18" data-inline="true" data-preview="false" data-offset-x="4" data-offset-y="-2" />
+```
+
+HTML `img` 常用属性：
+
+- `width` / `height`
+- `data-preview="true|false"`
+- `data-inline="true"`
+- `data-offset-x="4"`
+- `data-offset-y="-2"`
 
 ## 页脚 `footer`
 

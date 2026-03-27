@@ -23,7 +23,11 @@ createdAt: 2026-03-27
 changelog:
   enabled: true
   title: "更新日志"
+  pageSize: 10
 ```
+
+- `pageSize` 可选；配置后列表页会启用分页。
+- 访问第 2 页可使用：`/zh-cn/changelog?page=2`
 
 ## frontmatter 字段
 
@@ -81,3 +85,5 @@ draft: false
 ```
 
 列表页数据来自 `public/changelog-index-<lang>.json`。因此，在新增、重命名或删除发布文件后，需要在你的项目流程里重新生成这个索引。
+
+分页由前端列表页根据 `changelog.pageSize` 控制，不影响 changelog 文件结构或索引生成逻辑。

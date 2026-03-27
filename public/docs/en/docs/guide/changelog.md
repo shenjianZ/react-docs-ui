@@ -23,7 +23,11 @@ In `public/config/site.yaml` and `public/config/site.en.yaml`:
 changelog:
   enabled: true
   title: "Changelog"
+  pageSize: 10
 ```
+
+- `pageSize` is optional; when set, the list page enables pagination.
+- You can open page 2 with: `/en/changelog?page=2`
 
 ## Recommended frontmatter
 
@@ -81,3 +85,5 @@ draft: false
 ```
 
 The list page is driven by `public/changelog-index-<lang>.json`, so whenever you add, rename, or delete release files, regenerate that index in your project workflow.
+
+Pagination is handled by the frontend list page through `changelog.pageSize` and does not change the changelog file structure or index generation flow.

@@ -150,8 +150,56 @@ pnpm dev
 
 ## 图片
 
+默认块级图片：
+
 ![示例图片](https://picsum.photos/800/400)
-![01-image](/images/yrzx.png)
+![01-image](/images/og-default.png)
+![success-icon](/images/success.svg)
+
+控制尺寸并关闭预览：
+
+![success-icon 小图标，关闭预览](/images/success.svg "width=24 preview=false")
+
+控制尺寸并保留预览：
+
+![success-icon 小图标，保留预览](/images/success.svg "size=24 preview=true")
+
+行内图标示例：
+
+状态正常 ![success-icon 行内图标](/images/success.svg "width=18 inline=true preview=false") 已完成
+
+行内图标并保留预览：
+
+点击查看 ![success-icon 行内预览图标](/images/success.svg "width=18 inline=true preview=true") 大图
+
+行内图标偏移示例：
+
+默认位置：状态正常 ![默认图标](/images/success.svg "width=18 inline=true preview=false")
+
+下移 3px：状态正常 ![下移图标](/images/success.svg "width=18 inline=true preview=false y=3")
+
+右移 4px、上移 2px：状态正常 ![偏移图标](/images/success.svg "width=18 inline=true preview=false x=4 y=-2")
+
+使用 HTML `img` 控制尺寸和预览：
+
+<img src="/images/success.svg" alt="HTML 图标" width="24" data-preview="false" />
+<img src="/images/og-default.png" alt="HTML 自定义尺寸图片" width="320" data-preview="true" />
+
+使用 HTML `img` 控制行内显示：
+
+HTML 行内图标：<img src="/images/success.svg" alt="HTML 行内图标" width="18" data-inline="true" data-preview="false" /> 当前状态正常
+
+HTML 行内偏移图标：<img src="/images/success.svg" alt="HTML 偏移图标" width="18" data-inline="true" data-preview="false" data-offset-x="4" data-offset-y="-2" /> 当前状态正常
+
+图片语法说明：
+
+- `width=24` 或 `height=24`：控制图片尺寸
+- `size=24`：同时设置宽高
+- `preview=false`：关闭 image preview
+- `preview=true`：开启 image preview
+- `inline=true`：按行内元素渲染，不独占一行
+- `x=4`、`y=-2`：控制图片水平/垂直偏移
+- HTML `<img>` 可使用 `width`、`height`、`data-preview`、`data-inline`、`data-offset-x`、`data-offset-y`
 
 ---
 
