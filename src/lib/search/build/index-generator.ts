@@ -14,6 +14,11 @@ interface ScanResult {
   lang: string
 }
 
+interface ResolvedDocPath {
+  docPath: string
+  version?: string
+}
+
 function scanDocsDirectory(
   docsDir: string,
   baseDir: string,
@@ -56,13 +61,31 @@ function generateId(docPath: string, sectionTitle: string): string {
   return anchor ? `${base}--${anchor}` : base
 }
 
-function buildUrl(lang: string, docPath: string, sectionTitle: string): string {
+function resolveDocPath(relativePath: string, lang: string): ResolvedDocPath {
+  const normalizedPath = relativePath.replace(/\\/g, '/')
+  const withoutLang = normalizedPath
+    .replace(new RegExp(`^${lang}/`), '')
+    .replace(/\.(md|mdx)$/, '')
+    .replace(/\/index$/, '')
+  const [firstSegment, ...restSegments] = withoutLang.split('/')
+
+  if (/^v[^/]+$/i.test(firstSegment) && restSegments.length > 0) {
+    return {
+      version: firstSegment,
+      docPath: restSegments.join('/'),
+    }
+  }
+
+  return { docPath: withoutLang }
+}
+
+function buildUrl(lang: string, docPath: string, sectionTitle: string, version?: string): string {
   const anchor = sectionTitle
     .toLowerCase()
     .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
     .replace(/^-+|-+$/g, '')
   
-  let url = `/${lang}/${docPath}`
+  let url = version ? `/${lang}/v/${version}/${docPath}` : `/${lang}/${docPath}`
   if (anchor) {
     url += `#${anchor}`
   }
@@ -80,17 +103,15 @@ async function processDocument(
   lang: string
 ): Promise<SearchSection[]> {
   const content = fs.readFileSync(filePath, 'utf-8')
-  const docPath = relativePath
-    .replace(new RegExp(`^${lang}[/\\\\]`), '')
-    .replace(/\.(md|mdx)$/, '')
-    .replace(/[/\\]index$/, '')
+  const { docPath, version } = resolveDocPath(relativePath, lang)
   
   const parsed = await parseMarkdown(content, docPath)
   const sections: SearchSection[] = []
 
   for (const section of parsed.sections) {
-    const id = generateId(docPath, section.title)
-    const url = buildUrl(lang, docPath, section.title)
+    const sectionPath = version ? `${version}/${docPath}` : docPath
+    const id = generateId(sectionPath, section.title)
+    const url = buildUrl(lang, docPath, section.title, version)
     
     const fullText = section.title + ' ' + section.content
     const tokens = await tokenize(fullText)
@@ -102,6 +123,7 @@ async function processDocument(
       content: truncateContent(section.content, MAX_CONTENT_LENGTH),
       url,
       lang,
+      version,
       tokens,
     })
   }

@@ -162,634 +162,6 @@ This guide will help you fully understand and master all the features of React D
 - **[Quick Start](/docs/guide/quick-start)**: Create and run your first documentation website in 5 minutes.
 - **[Configuration (`site.yaml`)](/docs/guide/configuration)**: Dive deep into each configuration option to take full control of your site.
 
-# /zh-cn/docs/guide/quick-start
-
-# 快速上手
-
-本指南将引导你在 5 分钟内，从零开始创建、配置并运行一个属于你自己的 React 文档网站。
-
-## 1. 创建项目
-
-使用官方脚手架是最高效的方式。打开你的终端，运行以下命令：
-
-``` shell
-# 这会创建一个名为 "my-awesome-docs" 的项目
-cd $HOME 
-npx create-react-docs-ui@latest my-awesome-docs
-```
-
-然后，进入项目目录并安装依赖：
-
-```bash
-cd my-awesome-docs
-npm install
-```
-
-## 2. 组织你的文档
-
-所有的文档内容都以 Markdown 文件的形式存放在 `public/docs/` 目录下。
-
-- 打开 `public/docs/zh-cn/` 目录。
-- 你可以修改现有的 `index.md` 和 `guide` 目录下的文件，或者创建新的 `.md` 文件。
-
-例如，我们来创建一个新页面。在`public/docs/zh-cn/`新建`about`目录以及`about.md`文件 ,
-`about.md`的内容如下
-
-```markdown
-
-# 关于我们
-
-我们热爱开源和创造！
-
-```
-
-
-## 3. 配置网站
-
-现在，让我们通过修改配置文件来展示新创建的页面。
-
-打开核心配置文件 `public/config/site.yaml`。
-
-### a. 修改网站信息
-
-更新 `site` 部分，给你的网站一个新标题和 Logo。
-
-```yaml
-site:
-  title: "我的超赞文档"
-  description: "一个使用 React Docs UI 构建的网站"
-  logo: "🚀" # 你可以使用 emoji 或图片路径
-```
-
-### b. 添加到导航栏
-
-在 `navbar.items` 数组中，为“关于”页面添加一个链接。
-
-```yaml
-navbar:
-  items:
-    - title: "首页"
-        link: "/"
-        active: true
-    - title: "文档"
-        link: "/docs"
-    - title: "关于"  # 新增
-        link: "/about" # 新增
-```
-
-### c. 添加到侧边栏
-
-为了让“关于”页面在侧边栏也可见，我们在 新建一个 `sidebar.collections.about.sections` ，并且添加一个新条目。
-
-```yaml
-sidebar:
-  collections:
-    about:
-      sections:
-        # 你可以为 "关于" 页面创建一个新的 section
-        - title: "关于我们"
-          path: "/about/about"
-```
-
-这里侧边栏的about项还需要再创建一个文件`public/docs/zh-cn/about` 下`创建about.md`
-## 4. 启动网站
-
-保存你的所有修改，然后在终端运行：
-
-```bash
-npm run dev
-```
-
-你的网站现在应该运行在 `http://localhost:5173` 上了。访问它，你会看到更新后的标题、Logo，以及导航栏和侧边栏中新增的“关于”链接。恭喜你，你已经成功掌握了 React Docs UI 的基本工作流程！
-
-# /zh-cn/docs/guide/pdf-server
-
-# PDF Server 部署
-
-React Docs UI 提供了 PDF 生成服务，可以独立部署为 Docker 容器。
-
-## 拉取镜像
-
-```bash
-docker pull registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
-```
-
-## 运行容器
-
-### 使用 Docker 命令
-
-```bash
-docker run -d \
-  --name pdf-server \
-  --memory=512m \
-  -p 6965:6965 \
-  registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
-```
-
-### 使用 Docker Compose
-
-创建 `docker-compose.yml` 文件：
-
-```yaml
-services:
-  pdf-server:
-    image: registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
-    container_name: pdf-server
-    mem_limit: 512m
-    ports:
-      - "6965:6965"
-    restart: unless-stopped
-```
-
-启动服务：
-
-```bash
-docker-compose up -d
-```
-
-## 验证服务
-
-```bash
-# 健康检查
-curl http://localhost:6965/health
-
-# 响应示例
-# {"status":"ok","timestamp":"2024-01-01T00:00:00.000Z"}
-```
-
-## API 接口
-
-| 端点 | 方法 | 说明 |
-|------|------|------|
-| `/health` | GET | 健康检查 |
-| `/generate-pdf` | POST | 生成 PDF（返回文件） |
-| `/generate-pdf-sync` | POST | 生成 PDF（返回 Base64） |
-
-### 生成 PDF 示例
-
-```bash
-curl -X POST http://localhost:6965/generate-pdf \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com", "filename": "document.pdf"}' \
-  --output document.pdf
-```
-
-## 资源配置
-
-PDF Server 基于 Puppeteer/Chromium 运行，建议配置：
-
-| 场景 | 推荐内存 |
-|------|---------|
-| 低并发（1-2 请求） | 512MB |
-| 中等并发 | 1GB |
-| 高并发 | 2GB+ |
-
-## 环境变量
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `PDF_SERVER_PORT` | 3001 | 服务端口（Docker 镜像默认 6965） |
-
-# /zh-cn/docs/guide/introduction
-
-# 介绍
-
-React Docs UI 是一个专为构建现代化文档网站而设计的 React 组件库与工具集。它的核心哲学是**配置优于编码**，让你能将精力完全集中在内容创作上。
-
-## 核心优势
-
-- **配置驱动**: 这是 React Docs UI 最核心的特性。你不需要编写复杂的 React 组件或路由逻辑，只需维护一个清晰的 `site.yaml` 文件，就能定义网站的导航、侧边栏、主题、页脚等所有内容。
-
-- **功能完备**: 开箱即用，提供了现代文档网站所需的一切：
-  - 响应式布局
-  - 明暗主题切换
-  - 基于 Markdown 的内容渲染 (支持 GFM 和 Frontmatter)
-  - 内置代码语法高亮
-  - 快捷命令菜单 (Cmd+K)
-  - 国际化支持
-
-- **极简上手**: 通过官方的 `create-react-docs-ui` 脚手架，你可以在一分钟内启动一个功能齐全的文档网站，无需任何复杂的环境配置。
-
-- **高度可定制**: 虽然开箱即用，但每个部分（如 Logo、配色、导航链接、社交媒体图标等）都可以通过配置文件进行深度定制。
-
-## 适用场景
-
-无论你是个人开发者还是团队，React Docs UI 都非常适合以下场景：
-
-- **开源项目文档**: 为你的 React 项目提供一个专业、易于维护的文档网站。
-- **产品手册**: 清晰地展示你的产品功能和使用指南。
-- **团队知识库**: 在团队内部沉淀和分享基于 React 技术的知识。
-- **个人博客或作品集**: 以优雅的方式组织和展示你的技术文章或项目。
-
-# /zh-cn/docs/guide/installation
-
-# 安装
-
-## 环境要求
-
-在开始之前，请确保你的开发环境满足以下要求：
-
-- **Node.js**: 版本 `>= 18.0.0`
-- **包管理器**: `npm`, `yarn` 或 `pnpm`
-
-## 推荐方式：使用脚手架
-
-我们强烈推荐使用官方的 `create-react-docs-ui` 脚手架来创建你的新文档项目。这是当前唯一推荐的安装方式，可以确保配置文件、运行时行为和目录结构保持一致。
-
-1.  **运行创建命令**:
-    ```bash
-    npx create-react-docs-ui@latest my-docs
-    ```
-    这会在当前目录下创建一个名为 `my-docs` 的新文件夹。
-
-2.  **进入项目并安装依赖**:
-    ```bash
-    cd my-docs
-    npm install
-    ```
-
-3.  **启动开发服务器**:
-    ```bash
-    npm run dev
-    ```
-    现在，你的文档网站已经运行在 `http://localhost:5173` (或另一个可用端口) 上了。
-
-## 为什么不再建议手动安装
-
-当前文档站的配置解析、搜索索引、代码高亮以及部分运行时行为都依赖脚手架生成的项目结构与构建流程。手动集成容易出现配置丢失、行为不一致或构建产物不完整的问题，因此文档不再提供手动安装步骤。
-
-# /zh-cn/docs/guide/configuration
-
-# 配置文件（`site.yaml`）字段说明
-
-项目遵循“配置驱动”。站点的大部分行为都由 `public/config/site.yaml`（中文）和 `public/config/site.en.yaml`（英文）控制。本文档按当前运行时实际支持的字段说明，并补充少量保留/兼容字段的用途。
-
-## 顶级键
-
-| 键 | 作用 |
-| :-- | :-- |
-| `site` | 网站基础信息，如标题、描述、Logo |
-| `navbar` | 顶部导航栏 |
-| `sidebar` | 侧边栏导航树 |
-| `theme` | 主题模式与切换行为 |
-| `toc` | 文章右侧目录 |
-| `imageViewer` | 图片预览器 |
-| `footer` | 页脚信息 |
-| `contextMenu` | 右键菜单 |
-| `mdx` | MDX 组件扫描与映射 |
-| `fonts` | 页面字体与构建期下载字体 |
-| `codeHighlight` | 代码高亮语言与主题 |
-| `search` | 全文搜索 |
-| `export` | Markdown / PDF / Word / 批量导出 |
-| `ai` | AI 功能总开关 |
-| `pwa` | PWA 相关配置 |
-
-## 站点信息 `site`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `title` | string | 网站标题 | `"React Docs UI 示例项目"` |
-| `description` | string | 网站描述，通常用于首页说明和 SEO | `"基于 React Docs UI 构建的文档网站示例"` |
-| `logo` | string 或 object | 网站 Logo，可用 emoji、图片路径、绝对 URL，或按明暗主题分别配置 | `"📚"` / `"/images/logo.png"` / `{ light: "...", dark: "..." }` |
-| `author` | string | 示例元信息字段，当前运行时未直接消费，可保留给站点维护者使用 | `"React Docs UI Team"` |
-
-`logo` 支持的常见写法：
-
-- emoji：`"🤖"`
-- 公共资源路径：`"/images/logo.png"`
-- 完整 URL：`"https://example.com/logo.png"`
-- 明暗主题对象：`{ light: "/images/logo.svg", dark: "/images/logo-dark.svg" }`
-
-## 顶部导航 `navbar`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `showLogo` | boolean | 是否显示左上角 Logo |
-| `showTitle` | boolean | 是否显示站点标题 |
-| `showLanguageSwitcher` | boolean | 是否显示语言切换器 |
-| `items` | `NavbarItem[]` | 主导航项 |
-| `actions` | `NavbarAction[]` | 右侧操作按钮 |
-
-`NavbarItem`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `title` | string | 导航文案 | `"文档"` |
-| `link` | string | 目标路径或外链 | `"/docs"` |
-| `external` | boolean | 外链时是否新开标签页 | `true` |
-| `visible` | boolean | 是否显示，设为 `false` 时隐藏 | `true` |
-| `active` | boolean | 示例字段，当前运行时未使用，不建议依赖 | `true` |
-
-`NavbarAction`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `type` | string | 预设动作类型，影响图标选择 | `"github"` |
-| `title` | string | 自定义动作名称 | `"API"` |
-| `link` | string | 目标地址 | `"https://example.com/api"` |
-| `icon` | string | 自定义图标名，通常与 `type` 二选一 | `"link"` |
-| `enabled` | boolean | 是否启用该按钮 | `true` |
-
-常见 `type` / `icon` 值：
-
-- `github`
-- `gitee`
-- `gitea`
-- `gitlab`
-- `link`
-- `external`
-- `globe`
-
-## 侧边栏 `sidebar`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 全局开关；未设置时按是否存在数据自动判断 |
-| `collections` | `Record<string, SidebarCollection>` | 推荐写法。按一级路由段拆分侧边栏 |
-| `sections` | `SidebarSection[]` | 兼容旧结构的单棵树写法 |
-
-`SidebarCollection`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `sections` | `SidebarSection[]` | 当前集合下的分组列表 |
-
-`SidebarSection`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `title` | string | 分组标题 | `"快速开始"` |
-| `path` | string | 分组基础路径，用于展开和高亮判断 | `"/docs/guide"` |
-| `children` | `SidebarItem[]` | 子页面列表 | |
-
-`SidebarItem`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `title` | string | 子项标题 | `"安装"` |
-| `path` | string | 完整文档路径 | `"/docs/guide/installation"` |
-
-## 主题 `theme`
-
-| 字段 | 类型 | 说明 | 可选值 | 默认值 |
-| :-- | :-- | :-- | :-- | :-- |
-| `defaultMode` | string | 默认主题模式 | `light` / `dark` / `auto` | `auto` |
-| `allowToggle` | boolean | 是否允许用户切换主题 | `true` / `false` | `true` |
-
-说明：
-
-- `defaultMode: "auto"` 表示跟随系统主题。
-- 若 `allowToggle: false`，页面不会显示主题切换入口。
-
-## 目录导航 `toc`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用右侧目录 | `true` |
-| `maxLevel` | number | 最多显示到几级标题，范围通常为 `1-6` | `3` |
-| `title` | string | 目录标题 | `"本页目录"` |
-
-## 图片查看器 `imageViewer`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用图片预览器 |
-| `labels` | object | 图片预览器界面文案 |
-
-`imageViewer.labels`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `preview` | string | 鼠标悬停/按钮上的“预览图片”文案 |
-| `zoomIn` | string | 放大 |
-| `zoomOut` | string | 缩小 |
-| `fit` | string | 适配窗口 |
-| `actualSize` | string | 原始比例 |
-| `reset` | string | 重置缩放和旋转 |
-| `rotateLeft` | string | 左旋 |
-| `rotateRight` | string | 右旋 |
-| `fullscreen` | string | 全屏 |
-| `download` | string | 下载 |
-| `openInNewTab` | string | 新标签打开 |
-| `close` | string | 关闭预览器 |
-| `imageAltFallback` | string | 图片缺少 alt 时的兜底文案 |
-| `downloadSuccess` | string | 下载成功提示 |
-| `downloadError` | string | 下载失败提示 |
-| `fullscreenError` | string | 全屏失败提示 |
-| `openInNewTabError` | string | 新标签打开失败提示 |
-| `imageLoadError` | string | 图片加载失败提示 |
-
-如果你只想改部分文案，只配置需要覆盖的键即可。
-
-## 页脚 `footer`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 是否显示页脚 |
-| `copyright` | string | 版权文案 |
-| `repository` | object | 仓库信息，用于“编辑此页”等能力 |
-| `lastUpdated` | string | 页脚显示的最近更新时间 |
-| `version` | string | 页脚显示的版本号 |
-| `groups` | `FooterGroup[]` | 页脚分组链接区 |
-| `links` | `FooterLink[]` | 简单链接列表 |
-| `social` | `FooterSocial[]` | 社交链接图标 |
-
-`footer.repository`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `url` | string | 仓库地址 | `"https://github.com/your/repo"` |
-| `branch` | string | 分支名 | `"main"` |
-
-`FooterGroup`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `title` | string | 分组标题 |
-| `items` | `FooterLink[]` | 分组内链接 |
-
-`FooterLink`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `title` | string | 链接名称 |
-| `link` | string | 链接地址 |
-| `external` | boolean | 是否新开标签页 |
-| `action` | string | 兼容动作字段；当前内置支持 `scrollTop` |
-
-`FooterSocial`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `name` | string | 平台名称，仅用于语义和调试 |
-| `url` | string | 社交链接地址 |
-| `link` | string | 兼容旧写法，和 `url` 二选一 |
-| `icon` | string | 图标名 |
-
-## 右键菜单 `contextMenu`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用右键菜单 |
-| `page` | object | 页面级菜单项开关 |
-| `site` | object | 站点级菜单项开关 |
-| `appearance` | object | 外观级菜单项开关 |
-
-`contextMenu.page`
-
-| 字段 | 类型 | 说明 | 默认值 |
-| :-- | :-- | :-- | :-- |
-| `copySelectedText` | boolean | 复制选中文本 | `true` |
-| `copyUrl` | boolean | 复制当前链接 | `true` |
-| `copyTitle` | boolean | 复制页面标题 | `false` |
-| `copyMarkdownLink` | boolean | 复制 Markdown 链接 | `false` |
-| `openInNewTab` | boolean | 新标签打开 | `false` |
-| `reload` | boolean | 刷新页面 | `true` |
-| `printPage` | boolean | 打印页面 | `true` |
-| `scrollToTop` | boolean | 回到顶部 | `true` |
-| `scrollToBottom` | boolean | 滚动到底部 | `true` |
-
-`contextMenu.site`
-
-| 字段 | 类型 | 说明 | 默认值 |
-| :-- | :-- | :-- | :-- |
-| `goHome` | boolean | 返回首页 | `true` |
-| `quickNav` | boolean | 快速导航 | `false` |
-| `language` | boolean | 语言切换 | `false` |
-
-`contextMenu.appearance`
-
-| 字段 | 类型 | 说明 | 默认值 |
-| :-- | :-- | :-- | :-- |
-| `theme` | boolean | 主题切换 | `false` |
-| `resetThemePref` | boolean | 重置主题偏好 | `false` |
-
-## MDX 配置 `mdx`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `componentsPath` | string | 自动扫描自定义 MDX 组件的路径 | `"/src/components"` |
-| `enabled` | boolean | 是否启用 MDX 支持 | `true` |
-| `components` | `Record<string, string>` | 手动声明组件名到文件路径的映射 | `{ Demo: "/src/components/Demo.tsx" }` |
-
-说明：
-
-- `componentsPath` 用于自动扫描。
-- `components` 用于手动补充映射。
-- 两者可以同时使用。
-
-## 字体 `fonts`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `fontFamilyZhCn` | string | 中文字体栈 | `"MiSans, PingFang SC, sans-serif"` |
-| `fontFamilyEn` | string | 英文或等宽字体栈 | `"Fragment Mono, system-ui, sans-serif"` |
-| `downloadFonts` | string[] | 构建或开发时自动准备到 `public/fonts` 的字体文件名 | `["FragmentMono-Regular.woff2"]` |
-
-说明：
-
-- 页面会先用系统字体渲染，再异步切换到你配置的站点字体。
-- `downloadFonts` 属于构建辅助配置，不是运行时网络请求白名单。
-
-## 代码高亮 `codeHighlight`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `langs` | string[] | 站点预加载的高亮语言列表 | `["bash", "yaml", "typescript", "tsx"]` |
-| `lightTheme` | string | 亮色主题名 | `"github-light"` |
-| `darkTheme` | string | 暗色主题名 | `"github-dark"` |
-
-说明：
-
-- 这里只建议写站点实际会出现的语言。
-- 未列出的代码块会回退为普通 `code` 显示。
-- 语言名需要与 Shiki 支持的语言名或常见别名一致。
-
-## 搜索 `search`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用全文搜索 | `true` |
-| `placeholder` | string | 搜索框占位符 | `"搜索文档..."` |
-| `maxResults` | number | 最多返回多少条结果 | `20` |
-| `snippetLength` | number | 示例/保留字段，当前运行时未直接使用 | `120` |
-
-## 导出 `export`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用导出能力 |
-| `markdown` | boolean | 是否允许导出 Markdown |
-| `pdf` | boolean | 是否允许导出 PDF |
-| `word` | boolean | 是否允许导出 Word |
-| `allDocs` | boolean | 是否允许批量导出全部文档 |
-| `pdfServer` | object | 服务端 PDF 配置 |
-
-`export.pdfServer`
-
-| 字段 | 类型 | 说明 | 示例 |
-| :-- | :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用服务端 PDF 生成 | `true` |
-| `url` | string | PDF 服务地址 | `"http://localhost:3001"` |
-
-说明：
-
-- 若 `pdfServer.enabled` 为 `false`，PDF 导出会退回到浏览器打印方案。
-
-## 页面元信息 `pageMeta`
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `showLastUpdated` | boolean | 是否显示页面最后更新时间 |
-| `showEditLink` | boolean | 是否显示“编辑此页”入口 |
-| `showAuthors` | boolean | 是否显示作者 |
-| `preferGitMeta` | boolean | 是否优先使用构建时生成的 git 元数据 |
-
-页面级展示会优先读取 `public/doc-git-meta.json` 中的最后更新时间和作者；若缺失，则回退到 frontmatter 中的 `lastUpdated` / `authors` / `author`。创建时间请使用 `createdAt`。
-
-## 编辑入口 `editLink`
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `enabled` | boolean | 是否启用编辑入口 |
-| `label` | string | 链接文案 |
-| `urlTemplate` | string | 编辑地址模板 |
-
-支持的模板变量：`{lang}`、`{slug}`、`{docPath}`、`{ext}`、`{filePath}`。
-
-## 页面反馈 `feedback`
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `enabled` | boolean | 是否显示反馈区 |
-| `endpoint` | string | 反馈上报地址，留空则仅本地记录提交状态 |
-| `method` | string | 请求方法，当前固定为 `POST` |
-| `includePageMeta` | boolean | 是否在请求中附带页面信息 |
-| `labels` | object | 按钮与文案配置 |
-
-## AI 功能 `ai`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | AI 功能总开关 |
-
-## PWA `pwa`
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `enabled` | boolean | 是否启用 PWA |
-| `name` | string | 应用名称 |
-| `shortName` | string | 应用简称 |
-| `description` | string | 应用描述 |
-| `themeColor` | string | 主题色 |
-| `backgroundColor` | string | 背景色 |
-
-## 建议
-
-- 优先以模板里的最新 `site.yaml` 作为参考，不要只看旧博客或旧 README 示例。
-- 对于标注为“保留字段”“兼容字段”“示例字段”的项，不要把它们当成核心运行时能力。
-- 若你准备新增配置字段，先同步更新 `src/lib/config.ts`、模板示例和本页文档，避免再次出现“配置可写但文档缺失”的问题。
-
 # /zh-cn/docs/test/test
 
 # 📄 文档渲染测试页
@@ -1410,6 +782,669 @@ console.log(greeting)
 
 测试完成 ✅
 
+# /zh-cn/docs/guide/quick-start
+
+# 快速上手
+
+本指南将引导你在 5 分钟内，从零开始创建、配置并运行一个属于你自己的 React 文档网站。
+
+## 1. 创建项目
+
+使用官方脚手架是最高效的方式。打开你的终端，运行以下命令：
+
+``` shell
+# 这会创建一个名为 "my-awesome-docs" 的项目
+cd $HOME 
+npx create-react-docs-ui@latest my-awesome-docs
+```
+
+然后，进入项目目录并安装依赖：
+
+```bash
+cd my-awesome-docs
+npm install
+```
+
+## 2. 组织你的文档
+
+所有的文档内容都以 Markdown 文件的形式存放在 `public/docs/` 目录下。
+
+- 打开 `public/docs/zh-cn/` 目录。
+- 你可以修改现有的 `index.md` 和 `guide` 目录下的文件，或者创建新的 `.md` 文件。
+
+例如，我们来创建一个新页面。在`public/docs/zh-cn/`新建`about`目录以及`about.md`文件 ,
+`about.md`的内容如下
+
+```markdown
+
+# 关于我们
+
+我们热爱开源和创造！
+
+```
+
+
+## 3. 配置网站
+
+现在，让我们通过修改配置文件来展示新创建的页面。
+
+打开核心配置文件 `public/config/site.yaml`。
+
+### a. 修改网站信息
+
+更新 `site` 部分，给你的网站一个新标题和 Logo。
+
+```yaml
+site:
+  title: "我的超赞文档"
+  description: "一个使用 React Docs UI 构建的网站"
+  logo: "🚀" # 你可以使用 emoji 或图片路径
+```
+
+### b. 添加到导航栏
+
+在 `navbar.items` 数组中，为“关于”页面添加一个链接。
+
+```yaml
+navbar:
+  items:
+    - title: "首页"
+        link: "/"
+        active: true
+    - title: "文档"
+        link: "/docs"
+    - title: "关于"  # 新增
+        link: "/about" # 新增
+```
+
+### c. 添加到侧边栏
+
+为了让“关于”页面在侧边栏也可见，我们在 新建一个 `sidebar.collections.about.sections` ，并且添加一个新条目。
+
+```yaml
+sidebar:
+  collections:
+    about:
+      sections:
+        # 你可以为 "关于" 页面创建一个新的 section
+        - title: "关于我们"
+          path: "/about/about"
+```
+
+这里侧边栏的about项还需要再创建一个文件`public/docs/zh-cn/about` 下`创建about.md`
+## 4. 启动网站
+
+保存你的所有修改，然后在终端运行：
+
+```bash
+npm run dev
+```
+
+你的网站现在应该运行在 `http://localhost:5173` 上了。访问它，你会看到更新后的标题、Logo，以及导航栏和侧边栏中新增的“关于”链接。恭喜你，你已经成功掌握了 React Docs UI 的基本工作流程！
+
+# /zh-cn/docs/guide/pdf-server
+
+# PDF Server 部署
+
+React Docs UI 提供了 PDF 生成服务，可以独立部署为 Docker 容器。
+
+## 拉取镜像
+
+```bash
+docker pull registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
+```
+
+## 运行容器
+
+### 使用 Docker 命令
+
+```bash
+docker run -d \
+  --name pdf-server \
+  --memory=512m \
+  -p 6965:6965 \
+  registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
+```
+
+### 使用 Docker Compose
+
+创建 `docker-compose.yml` 文件：
+
+```yaml
+services:
+  pdf-server:
+    image: registry.cn-hangzhou.aliyuncs.com/pull-image/react-docs-pdf-server:latest
+    container_name: pdf-server
+    mem_limit: 512m
+    ports:
+      - "6965:6965"
+    restart: unless-stopped
+```
+
+启动服务：
+
+```bash
+docker-compose up -d
+```
+
+## 验证服务
+
+```bash
+# 健康检查
+curl http://localhost:6965/health
+
+# 响应示例
+# {"status":"ok","timestamp":"2024-01-01T00:00:00.000Z"}
+```
+
+## API 接口
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/health` | GET | 健康检查 |
+| `/generate-pdf` | POST | 生成 PDF（返回文件） |
+| `/generate-pdf-sync` | POST | 生成 PDF（返回 Base64） |
+
+### 生成 PDF 示例
+
+```bash
+curl -X POST http://localhost:6965/generate-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "filename": "document.pdf"}' \
+  --output document.pdf
+```
+
+## 资源配置
+
+PDF Server 基于 Puppeteer/Chromium 运行，建议配置：
+
+| 场景 | 推荐内存 |
+|------|---------|
+| 低并发（1-2 请求） | 512MB |
+| 中等并发 | 1GB |
+| 高并发 | 2GB+ |
+
+## 环境变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `PDF_SERVER_PORT` | 3001 | 服务端口（Docker 镜像默认 6965） |
+
+# /zh-cn/docs/guide/introduction
+
+# 介绍
+
+React Docs UI 是一个专为构建现代化文档网站而设计的 React 组件库与工具集。它的核心哲学是**配置优于编码**，让你能将精力完全集中在内容创作上。
+
+## 核心优势
+
+- **配置驱动**: 这是 React Docs UI 最核心的特性。你不需要编写复杂的 React 组件或路由逻辑，只需维护一个清晰的 `site.yaml` 文件，就能定义网站的导航、侧边栏、主题、页脚等所有内容。
+
+- **功能完备**: 开箱即用，提供了现代文档网站所需的一切：
+  - 响应式布局
+  - 明暗主题切换
+  - 基于 Markdown 的内容渲染 (支持 GFM 和 Frontmatter)
+  - 内置代码语法高亮
+  - 快捷命令菜单 (Cmd+K)
+  - 国际化支持
+
+- **极简上手**: 通过官方的 `create-react-docs-ui` 脚手架，你可以在一分钟内启动一个功能齐全的文档网站，无需任何复杂的环境配置。
+
+- **高度可定制**: 虽然开箱即用，但每个部分（如 Logo、配色、导航链接、社交媒体图标等）都可以通过配置文件进行深度定制。
+
+## 适用场景
+
+无论你是个人开发者还是团队，React Docs UI 都非常适合以下场景：
+
+- **开源项目文档**: 为你的 React 项目提供一个专业、易于维护的文档网站。
+- **产品手册**: 清晰地展示你的产品功能和使用指南。
+- **团队知识库**: 在团队内部沉淀和分享基于 React 技术的知识。
+- **个人博客或作品集**: 以优雅的方式组织和展示你的技术文章或项目。
+
+# /zh-cn/docs/guide/installation
+
+# 安装
+
+## 环境要求
+
+在开始之前，请确保你的开发环境满足以下要求：
+
+- **Node.js**: 版本 `>= 18.0.0`
+- **包管理器**: `npm`, `yarn` 或 `pnpm`
+
+## 推荐方式：使用脚手架
+
+我们强烈推荐使用官方的 `create-react-docs-ui` 脚手架来创建你的新文档项目。这是当前唯一推荐的安装方式，可以确保配置文件、运行时行为和目录结构保持一致。
+
+1.  **运行创建命令**:
+    ```bash
+    npx create-react-docs-ui@latest my-docs
+    ```
+    这会在当前目录下创建一个名为 `my-docs` 的新文件夹。
+
+2.  **进入项目并安装依赖**:
+    ```bash
+    cd my-docs
+    npm install
+    ```
+
+3.  **启动开发服务器**:
+    ```bash
+    npm run dev
+    ```
+    现在，你的文档网站已经运行在 `http://localhost:5173` (或另一个可用端口) 上了。
+
+## 为什么不再建议手动安装
+
+当前文档站的配置解析、搜索索引、代码高亮以及部分运行时行为都依赖脚手架生成的项目结构与构建流程。手动集成容易出现配置丢失、行为不一致或构建产物不完整的问题，因此文档不再提供手动安装步骤。
+
+# /zh-cn/docs/guide/configuration
+
+# 配置文件（`site.yaml`）字段说明
+
+项目遵循“配置驱动”。站点的大部分行为都由 `public/config/site.yaml`（中文）和 `public/config/site.en.yaml`（英文）控制。本文档按当前运行时实际支持的字段说明，并补充少量保留/兼容字段的用途。
+
+## 顶级键
+
+| 键 | 作用 |
+| :-- | :-- |
+| `site` | 网站基础信息，如标题、描述、Logo |
+| `navbar` | 顶部导航栏 |
+| `announcement` | 顶部公告栏 |
+| `versions` | 文档版本配置 |
+| `sidebar` | 侧边栏导航树 |
+| `theme` | 主题模式与切换行为 |
+| `toc` | 文章右侧目录 |
+| `imageViewer` | 图片预览器 |
+| `footer` | 页脚信息 |
+| `contextMenu` | 右键菜单 |
+| `mdx` | MDX 组件扫描与映射 |
+| `fonts` | 页面字体与构建期下载字体 |
+| `codeHighlight` | 代码高亮语言与主题 |
+| `search` | 全文搜索 |
+| `export` | Markdown / PDF / Word / 批量导出 |
+| `ai` | AI 功能总开关 |
+| `pwa` | PWA 相关配置 |
+
+## 站点信息 `site`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `title` | string | 网站标题 | `"React Docs UI 示例项目"` |
+| `description` | string | 网站描述，通常用于首页说明和 SEO | `"基于 React Docs UI 构建的文档网站示例"` |
+| `logo` | string 或 object | 网站 Logo，可用 emoji、图片路径、绝对 URL，或按明暗主题分别配置 | `"📚"` / `"/images/logo.png"` / `{ light: "...", dark: "..." }` |
+| `author` | string | 示例元信息字段，当前运行时未直接消费，可保留给站点维护者使用 | `"React Docs UI Team"` |
+
+`logo` 支持的常见写法：
+
+- emoji：`"🤖"`
+- 公共资源路径：`"/images/logo.png"`
+- 完整 URL：`"https://example.com/logo.png"`
+- 明暗主题对象：`{ light: "/images/logo.svg", dark: "/images/logo-dark.svg" }`
+
+## 顶部导航 `navbar`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `showLogo` | boolean | 是否显示左上角 Logo |
+| `showTitle` | boolean | 是否显示站点标题 |
+| `showLanguageSwitcher` | boolean | 是否显示语言切换器 |
+| `items` | `NavbarItem[]` | 主导航项 |
+| `actions` | `NavbarAction[]` | 右侧操作按钮 |
+
+`NavbarItem`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `title` | string | 导航文案 | `"文档"` |
+| `link` | string | 目标路径或外链 | `"/docs"` |
+| `external` | boolean | 外链时是否新开标签页 | `true` |
+| `visible` | boolean | 是否显示，设为 `false` 时隐藏 | `true` |
+| `active` | boolean | 示例字段，当前运行时未使用，不建议依赖 | `true` |
+
+`NavbarAction`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `type` | string | 预设动作类型，影响图标选择 | `"github"` |
+| `title` | string | 自定义动作名称 | `"API"` |
+| `link` | string | 目标地址 | `"https://example.com/api"` |
+| `icon` | string | 自定义图标名，通常与 `type` 二选一 | `"link"` |
+| `enabled` | boolean | 是否启用该按钮 | `true` |
+
+常见 `type` / `icon` 值：
+
+- `github`
+- `gitee`
+- `gitea`
+- `gitlab`
+- `link`
+- `external`
+- `globe`
+
+## 公告栏 `announcement`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否显示公告栏 | `true` |
+| `text` | string | 公告文案 | `"React Docs UI 已支持 Tabs"` |
+| `link` | string | 点击后的目标地址 | `"https://github.com/..."` |
+| `dismissible` | boolean | 是否允许用户关闭公告 | `true` |
+
+## 版本配置 `versions`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用版本切换 |
+| `current` | string | 当前默认版本值 |
+| `items` | `VersionItem[]` | 可选版本列表 |
+
+`VersionItem`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `value` | string | 版本值，用于路由段 | `"v1"` |
+| `label` | string | 版本显示文案 | `"v1"` |
+
+启用后，版本化路由格式为 `/:lang/v/:version/*`，例如：`/zh-cn/v/v1/docs/guide/introduction`。
+
+版本化文档目录建议使用：
+
+- `public/docs/zh-cn/v1/docs/...`
+- `public/docs/en/v1/docs/...`
+
+如果某个版本目录下缺少对应页面，当前运行时会回退到未版本化文档。
+
+## 侧边栏 `sidebar`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 全局开关；未设置时按是否存在数据自动判断 |
+| `collections` | `Record<string, SidebarCollection>` | 推荐写法。按一级路由段拆分侧边栏 |
+| `sections` | `SidebarSection[]` | 兼容旧结构的单棵树写法 |
+
+`SidebarCollection`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `sections` | `SidebarSection[]` | 当前集合下的分组列表 |
+
+`SidebarSection`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `title` | string | 分组标题 | `"快速开始"` |
+| `path` | string | 分组基础路径，用于展开和高亮判断 | `"/docs/guide"` |
+| `children` | `SidebarItem[]` | 子页面列表 | |
+
+`SidebarItem`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `title` | string | 子项标题 | `"安装"` |
+| `path` | string | 完整文档路径 | `"/docs/guide/installation"` |
+
+## 主题 `theme`
+
+| 字段 | 类型 | 说明 | 可选值 | 默认值 |
+| :-- | :-- | :-- | :-- | :-- |
+| `defaultMode` | string | 默认主题模式 | `light` / `dark` / `auto` | `auto` |
+| `allowToggle` | boolean | 是否允许用户切换主题 | `true` / `false` | `true` |
+
+说明：
+
+- `defaultMode: "auto"` 表示跟随系统主题。
+- 若 `allowToggle: false`，页面不会显示主题切换入口。
+
+## 目录导航 `toc`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用右侧目录 | `true` |
+| `maxLevel` | number | 最多显示到几级标题，范围通常为 `1-6` | `3` |
+| `title` | string | 目录标题 | `"本页目录"` |
+
+## 图片查看器 `imageViewer`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用图片预览器 |
+| `labels` | object | 图片预览器界面文案 |
+
+`imageViewer.labels`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `preview` | string | 鼠标悬停/按钮上的“预览图片”文案 |
+| `zoomIn` | string | 放大 |
+| `zoomOut` | string | 缩小 |
+| `fit` | string | 适配窗口 |
+| `actualSize` | string | 原始比例 |
+| `reset` | string | 重置缩放和旋转 |
+| `rotateLeft` | string | 左旋 |
+| `rotateRight` | string | 右旋 |
+| `fullscreen` | string | 全屏 |
+| `download` | string | 下载 |
+| `openInNewTab` | string | 新标签打开 |
+| `close` | string | 关闭预览器 |
+| `imageAltFallback` | string | 图片缺少 alt 时的兜底文案 |
+| `downloadSuccess` | string | 下载成功提示 |
+| `downloadError` | string | 下载失败提示 |
+| `fullscreenError` | string | 全屏失败提示 |
+| `openInNewTabError` | string | 新标签打开失败提示 |
+| `imageLoadError` | string | 图片加载失败提示 |
+
+如果你只想改部分文案，只配置需要覆盖的键即可。
+
+## 页脚 `footer`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否显示页脚 |
+| `copyright` | string | 版权文案 |
+| `repository` | object | 仓库信息，用于“编辑此页”等能力 |
+| `lastUpdated` | string | 页脚显示的最近更新时间 |
+| `version` | string | 页脚显示的版本号 |
+| `groups` | `FooterGroup[]` | 页脚分组链接区 |
+| `links` | `FooterLink[]` | 简单链接列表 |
+| `social` | `FooterSocial[]` | 社交链接图标 |
+
+`footer.repository`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `url` | string | 仓库地址 | `"https://github.com/your/repo"` |
+| `branch` | string | 分支名 | `"main"` |
+
+`FooterGroup`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `title` | string | 分组标题 |
+| `items` | `FooterLink[]` | 分组内链接 |
+
+`FooterLink`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `title` | string | 链接名称 |
+| `link` | string | 链接地址 |
+| `external` | boolean | 是否新开标签页 |
+| `action` | string | 兼容动作字段；当前内置支持 `scrollTop` |
+
+`FooterSocial`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `name` | string | 平台名称，仅用于语义和调试 |
+| `url` | string | 社交链接地址 |
+| `link` | string | 兼容旧写法，和 `url` 二选一 |
+| `icon` | string | 图标名 |
+
+## 右键菜单 `contextMenu`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用右键菜单 |
+| `page` | object | 页面级菜单项开关 |
+| `site` | object | 站点级菜单项开关 |
+| `appearance` | object | 外观级菜单项开关 |
+
+`contextMenu.page`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `copySelectedText` | boolean | 复制选中文本 | `true` |
+| `copyUrl` | boolean | 复制当前链接 | `true` |
+| `copyTitle` | boolean | 复制页面标题 | `false` |
+| `copyMarkdownLink` | boolean | 复制 Markdown 链接 | `false` |
+| `openInNewTab` | boolean | 新标签打开 | `false` |
+| `reload` | boolean | 刷新页面 | `true` |
+| `printPage` | boolean | 打印页面 | `true` |
+| `scrollToTop` | boolean | 回到顶部 | `true` |
+| `scrollToBottom` | boolean | 滚动到底部 | `true` |
+
+`contextMenu.site`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `goHome` | boolean | 返回首页 | `true` |
+| `quickNav` | boolean | 快速导航 | `false` |
+| `language` | boolean | 语言切换 | `false` |
+
+`contextMenu.appearance`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `theme` | boolean | 主题切换 | `false` |
+| `resetThemePref` | boolean | 重置主题偏好 | `false` |
+
+## MDX 配置 `mdx`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `componentsPath` | string | 自动扫描自定义 MDX 组件的路径 | `"/src/components"` |
+| `enabled` | boolean | 是否启用 MDX 支持 | `true` |
+| `components` | `Record<string, string>` | 手动声明组件名到文件路径的映射 | `{ Demo: "/src/components/Demo.tsx" }` |
+
+说明：
+
+- `componentsPath` 用于自动扫描。
+- `components` 用于手动补充映射。
+- 两者可以同时使用。
+
+## 字体 `fonts`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `fontFamilyZhCn` | string | 中文字体栈 | `"MiSans, PingFang SC, sans-serif"` |
+| `fontFamilyEn` | string | 英文或等宽字体栈 | `"Fragment Mono, system-ui, sans-serif"` |
+| `downloadFonts` | string[] | 构建或开发时自动准备到 `public/fonts` 的字体文件名 | `["FragmentMono-Regular.woff2"]` |
+
+说明：
+
+- 页面会先用系统字体渲染，再异步切换到你配置的站点字体。
+- `downloadFonts` 属于构建辅助配置，不是运行时网络请求白名单。
+
+## 代码高亮 `codeHighlight`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `langs` | string[] | 站点预加载的高亮语言列表 | `["bash", "yaml", "typescript", "tsx"]` |
+| `lightTheme` | string | 亮色主题名 | `"github-light"` |
+| `darkTheme` | string | 暗色主题名 | `"github-dark"` |
+
+说明：
+
+- 这里只建议写站点实际会出现的语言。
+- 未列出的代码块会回退为普通 `code` 显示。
+- 语言名需要与 Shiki 支持的语言名或常见别名一致。
+
+## 搜索 `search`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用全文搜索 | `true` |
+| `placeholder` | string | 搜索框占位符 | `"搜索文档..."` |
+| `maxResults` | number | 最多返回多少条结果 | `20` |
+| `snippetLength` | number | 示例/保留字段，当前运行时未直接使用 | `120` |
+
+## 导出 `export`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用导出能力 |
+| `markdown` | boolean | 是否允许导出 Markdown |
+| `pdf` | boolean | 是否允许导出 PDF |
+| `word` | boolean | 是否允许导出 Word |
+| `allDocs` | boolean | 是否允许批量导出全部文档 |
+| `pdfServer` | object | 服务端 PDF 配置 |
+
+`export.pdfServer`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用服务端 PDF 生成 | `true` |
+| `url` | string | PDF 服务地址 | `"http://localhost:3001"` |
+
+说明：
+
+- 若 `pdfServer.enabled` 为 `false`，PDF 导出会退回到浏览器打印方案。
+
+## 页面元信息 `pageMeta`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `showLastUpdated` | boolean | 是否显示页面最后更新时间 |
+| `showEditLink` | boolean | 是否显示“编辑此页”入口 |
+| `showAuthors` | boolean | 是否显示作者 |
+| `preferGitMeta` | boolean | 是否优先使用构建时生成的 git 元数据 |
+
+页面级展示会优先读取 `public/doc-git-meta.json` 中的最后更新时间和作者；若缺失，则回退到 frontmatter 中的 `lastUpdated` / `authors` / `author`。创建时间请使用 `createdAt`。
+
+## 编辑入口 `editLink`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `enabled` | boolean | 是否启用编辑入口 |
+| `label` | string | 链接文案 |
+| `urlTemplate` | string | 编辑地址模板 |
+
+支持的模板变量：`{lang}`、`{slug}`、`{docPath}`、`{ext}`、`{filePath}`。
+
+## 页面反馈 `feedback`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `enabled` | boolean | 是否显示反馈区 |
+| `endpoint` | string | 反馈上报地址，留空则仅本地记录提交状态 |
+| `method` | string | 请求方法，当前固定为 `POST` |
+| `includePageMeta` | boolean | 是否在请求中附带页面信息 |
+| `labels` | object | 按钮与文案配置 |
+
+## AI 功能 `ai`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | AI 功能总开关 |
+
+## PWA `pwa`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用 PWA |
+| `name` | string | 应用名称 |
+| `shortName` | string | 应用简称 |
+| `description` | string | 应用描述 |
+| `themeColor` | string | 主题色 |
+| `backgroundColor` | string | 背景色 |
+
+## 建议
+
+- 优先以模板里的最新 `site.yaml` 作为参考，不要只看旧博客或旧 README 示例。
+- 对于标注为“保留字段”“兼容字段”“示例字段”的项，不要把它们当成核心运行时能力。
+- 若你准备新增配置字段，先同步更新 `src/lib/config.ts`、模板示例和本页文档，避免再次出现“配置可写但文档缺失”的问题。
+
 # /en/docs/test/test
 
 # 📄 Document Rendering Test Page
@@ -2025,6 +2060,26 @@ console.log(greeting)
 
 Test completed ✅
 
+# /zh-cn/v1/docs/guide/introduction
+
+# 介绍（v1）
+
+这是一个用于演示版本化文档的 `v1` 页面。
+
+## 你现在看到的内容
+
+- 顶部版本切换器会显示当前版本
+- 当前页面路径包含 `/v/v1/`
+- 侧边栏、页内链接、上一节/下一节会尽量保留版本前缀
+
+## 与当前版本的区别
+
+这个示例页用于表示旧版本文档。你可以继续补充：
+
+- v1 的安装方式
+- v1 的配置字段差异
+- v1 已废弃能力说明
+
 # /en/docs/guide/quick-start
 
 # Quick Start
@@ -2292,6 +2347,8 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | :-- | :-- |
 | `site` | Basic site metadata such as title, description, and logo |
 | `navbar` | Top navigation bar |
+| `announcement` | Top announcement bar |
+| `versions` | Documentation version configuration |
 | `sidebar` | Sidebar navigation tree |
 | `theme` | Theme mode and theme-switch behavior |
 | `toc` | Right-side table of contents |
@@ -2361,6 +2418,39 @@ Common `type` / `icon` values:
 - `link`
 - `external`
 - `globe`
+
+## Announcement `announcement`
+
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Whether to show the announcement bar | `true` |
+| `text` | string | Announcement text | `"React Docs UI now supports Tabs"` |
+| `link` | string | Target URL when clicked | `"https://github.com/..."` |
+| `dismissible` | boolean | Whether users can dismiss the bar | `true` |
+
+## Versions `versions`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Whether version switching is enabled |
+| `current` | string | Default current version value |
+| `items` | `VersionItem[]` | Available versions |
+
+`VersionItem`
+
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `value` | string | Version value used in the route | `"v1"` |
+| `label` | string | Label shown in the UI | `"v1"` |
+
+When enabled, the versioned route format is `/:lang/v/:version/*`, for example: `/en/v/v1/docs/guide/introduction`.
+
+Recommended versioned document directories:
+
+- `public/docs/zh-cn/v1/docs/...`
+- `public/docs/en/v1/docs/...`
+
+If a page is missing under a version directory, the current runtime falls back to the unversioned document.
 
 ## Sidebar `sidebar`
 
@@ -2651,3 +2741,23 @@ Supported variables: `{lang}`, `{slug}`, `{docPath}`, `{ext}`, `{filePath}`.
 - Treat the latest template `site.yaml` as the primary reference instead of relying on older blog posts or README snippets.
 - Do not depend on fields marked as reserved, legacy, or sample-only as core runtime features.
 - If you add a new config field, update `src/lib/config.ts`, the template example, and this page together so docs and runtime stay aligned.
+
+# /en/v1/docs/guide/introduction
+
+# Introduction (v1)
+
+This is a sample `v1` page used to demonstrate versioned documentation.
+
+## What you are seeing
+
+- The header version switcher shows the active version
+- The current route includes `/v/v1/`
+- Sidebar links, in-page links, and prev/next navigation try to preserve the version prefix
+
+## Difference from the current version
+
+This page represents an older documentation version. You can expand it with:
+
+- v1 installation instructions
+- v1 configuration differences
+- deprecation notes for v1-only behavior

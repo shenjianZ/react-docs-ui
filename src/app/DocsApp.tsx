@@ -26,6 +26,8 @@ import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents, getBuiltinComponents, prefetchGeneratedComponents } from "../lib/component-scanner"
 import { parseFrontmatter } from "../lib/frontmatter"
+import { buildEditUrl, resolvePageMeta, type DocGitMeta } from "../lib/page-meta"
+import { buildVersionedDocAssetPath, isKnownVersion, resolveVersionedDocFilePath } from "../lib/versioning"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
@@ -71,8 +73,10 @@ interface Frontmatter {
   title?: string
   description?: string
   author?: string
+  authors?: string[]
   createdAt?: string
   lastUpdated?: string
+  editUrl?: string
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
@@ -98,8 +102,9 @@ export function useSiteConfig() {
 }
 
 function SearchLauncherWrapper({ children }: { children: React.ReactNode }) {
-  const params = useParams<{ lang: string }>()
+  const params = useParams<{ lang: string; version?: string }>()
   const lang = useMemo(() => params.lang || "zh-cn", [params.lang])
+  const version = useMemo(() => params.version, [params.version])
   const [config, setConfig] = useState<SiteConfig | null>(null)
   
   useEffect(() => {
@@ -109,6 +114,7 @@ function SearchLauncherWrapper({ children }: { children: React.ReactNode }) {
   return (
     <SearchLauncherProvider
       lang={lang}
+      version={version}
       enabled={config?.search?.enabled !== false}
       maxResults={config?.search?.maxResults}
       placeholder={config?.search?.placeholder}
@@ -194,17 +200,28 @@ function RootShell(): React.JSX.Element {
 }
 
 function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
-  const params = useParams<{ lang: string; "*": string }>()
+  const params = useParams<{ lang: string; version?: string; "*": string }>()
   const langParam = params.lang
+  const versionParam = params.version
   const slug = params["*"]
+  const invalidLang = Boolean(langParam && langParam !== "en" && langParam !== "zh-cn")
 
-  const currentLang = useMemo(() => langParam || "zh-cn", [langParam])
+  const currentLang = useMemo(() => {
+    return langParam === "en" || langParam === "zh-cn" ? langParam : "zh-cn"
+  }, [langParam])
 
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [content, setContent] = useState<string | null>(null)
   const [frontmatter, setFrontmatter] = useState<Frontmatter | null>(null)
+  const [docGitMeta, setDocGitMeta] = useState<DocGitMeta | null>(null)
+  const [docFilePath, setDocFilePath] = useState<string>()
+  const [docExt, setDocExt] = useState<"md" | "mdx">()
   const [contentLoading, setContentLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+
+  const currentVersion = useMemo(() => {
+    return isKnownVersion(config, versionParam) ? versionParam : undefined
+  }, [config, versionParam])
 
   // 计算当前路径的第一段（用于匹配 collections）
   const firstSegment = useMemo(() => {
@@ -214,9 +231,9 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
 
   // 计算上一节和下一节
   const { prev, next } = useMemo(() => {
-    const currentPath = `/${currentLang}/${slug || ""}`
-    return getPrevNextPage(config?.sidebar, currentPath, firstSegment)
-  }, [config?.sidebar, currentLang, slug, firstSegment])
+    const currentPath = currentVersion ? `/${currentLang}/v/${currentVersion}/${slug || ""}` : `/${currentLang}/${slug || ""}`
+    return getPrevNextPage(config?.sidebar, currentPath, firstSegment, currentVersion)
+  }, [config?.sidebar, currentLang, currentVersion, slug, firstSegment])
 
   useEffect(() => {
     let cancelled = false
@@ -243,27 +260,43 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
   useEffect(() => {
     let cancelled = false
     setContentLoading(true)
+    setDocGitMeta(null)
+    setDocFilePath(undefined)
+    setDocExt(undefined)
 
     prefetchMdxRuntime()
 
+    if (invalidLang) {
+      setContent("# 404 - Not Found\n\nThe page you're looking for could not be found.")
+      setFrontmatter({ title: "Not Found", toc: [] })
+      setError(null)
+      setContentLoading(false)
+      return () => {
+        cancelled = true
+      }
+    }
+
     const pageSlug = slug || "index"
-    
-    const mdPath = `/docs/${currentLang}/${pageSlug}.md`
-    const mdxPath = `/docs/${currentLang}/${pageSlug}.mdx`
+    const mdPath = buildVersionedDocAssetPath(currentLang, pageSlug, "md", currentVersion)
+    const mdxPath = buildVersionedDocAssetPath(currentLang, pageSlug, "mdx", currentVersion)
+    const fallbackMdPath = buildVersionedDocAssetPath(currentLang, pageSlug, "md")
+    const fallbackMdxPath = buildVersionedDocAssetPath(currentLang, pageSlug, "mdx")
     
     const loadContent = async () => {
       try {
-        const [mdResponse, mdxResponse] = await Promise.all([
-          fetch(mdPath),
-          fetch(mdxPath)
-        ])
+        const [mdResponse, mdxResponse] = await Promise.all([fetch(mdPath), fetch(mdxPath)])
+        const [fallbackMdResponse, fallbackMdxResponse] = currentVersion ? await Promise.all([fetch(fallbackMdPath), fetch(fallbackMdxPath)]) : [null, null]
         
         let contentToUse: string | null = null
+        let resolvedExt: "md" | "mdx" | undefined
+        let usedVersionedSource = false
         
         if (mdxResponse.ok) {
           const mdxText = await mdxResponse.text()
           if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
             contentToUse = mdxText
+            resolvedExt = "mdx"
+            usedVersionedSource = true
           }
         }
         
@@ -271,6 +304,24 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
           const mdText = await mdResponse.text()
           if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
             contentToUse = mdText
+            resolvedExt = "md"
+            usedVersionedSource = true
+          }
+        }
+
+        if (!contentToUse && fallbackMdxResponse?.ok) {
+          const mdxText = await fallbackMdxResponse.text()
+          if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
+            contentToUse = mdxText
+            resolvedExt = "mdx"
+          }
+        }
+
+        if (!contentToUse && fallbackMdResponse?.ok) {
+          const mdText = await fallbackMdResponse.text()
+          if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
+            contentToUse = mdText
+            resolvedExt = "md"
           }
         }
         
@@ -302,6 +353,10 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
 
         setFrontmatter(enrichedFrontmatter)
         setContent(markdownContent)
+        if (resolvedExt) {
+          setDocExt(resolvedExt)
+          setDocFilePath(resolveVersionedDocFilePath(currentLang, pageSlug, resolvedExt, currentVersion && usedVersionedSource ? currentVersion : undefined))
+        }
         prefetchShikiAssets(markdownContent, config?.codeHighlight, shikiBundle)
         
       } catch (error) {
@@ -335,7 +390,25 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
     return () => {
       cancelled = true
     }
-  }, [currentLang, slug])
+  }, [currentLang, currentVersion, invalidLang, slug])
+
+  useEffect(() => {
+    let cancelled = false
+    if (!docFilePath || frontmatter?.title === "Not Found") return
+    ;(async () => {
+      try {
+        const response = await fetch("/doc-git-meta.json")
+        if (!response.ok) throw new Error(`Failed to fetch doc git meta: ${response.status}`)
+        const payload = await response.json() as { files?: Record<string, DocGitMeta> }
+        if (!cancelled) setDocGitMeta(payload.files?.[docFilePath] ?? null)
+      } catch {
+        if (!cancelled) setDocGitMeta(null)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [docFilePath, frontmatter?.title])
 
   useEffect(() => {
     if (!content || contentLoading) {
@@ -349,6 +422,9 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
   if (!config) {
     return <div>Loading...</div>
   }
+
+  const pageMeta = resolvePageMeta({ gitMeta: docGitMeta ?? undefined, frontmatter, preferGitMeta: config.pageMeta?.preferGitMeta !== false })
+  const editUrl = typeof frontmatter?.editUrl === "string" ? frontmatter.editUrl : config.editLink?.enabled === false ? undefined : buildEditUrl(config.editLink?.urlTemplate, { lang: currentLang, version: currentVersion, slug: slug || "index", docPath: docFilePath, ext: docExt, filePath: docFilePath })
 
   if (error) {
     return (
@@ -374,6 +450,11 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
       lang={currentLang}
       config={config}
       frontmatter={frontmatter}
+      slug={slug}
+      version={currentVersion}
+      lastUpdated={pageMeta.lastUpdated}
+      editUrl={frontmatter?.title === "Not Found" ? undefined : editUrl}
+      docFilePath={docFilePath}
       prev={prev}
       next={next}
       content={content || ""}
@@ -410,6 +491,8 @@ export function DocsApp({ shikiBundle }: DocsAppProps = {}): React.JSX.Element {
           children: [
             { index: true, element: <DocsPage shikiBundle={shikiBundle} /> },
             { path: ":lang", element: <DocsPage shikiBundle={shikiBundle} /> },
+            { path: ":lang/v/:version", element: <DocsPage shikiBundle={shikiBundle} /> },
+            { path: ":lang/v/:version/*", element: <DocsPage shikiBundle={shikiBundle} /> },
             { path: ":lang/*", element: <DocsPage shikiBundle={shikiBundle} /> },
           ],
         },

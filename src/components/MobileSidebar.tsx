@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 interface MobileSidebarProps {
   lang: string
+  version?: string
   sidebar: {
     enabled?: boolean
     sections?: any
@@ -16,6 +17,7 @@ interface MobileSidebarProps {
 
 export function MobileSidebar({
   lang,
+  version,
   sidebar,
   open,
   onOpenChange,
@@ -51,7 +53,7 @@ export function MobileSidebar({
         )}
       >
         <ScrollArea className="h-full w-full px-4 py-4">
-          <SidebarNav lang={lang} sidebar={sidebar} />
+          <SidebarNav lang={lang} version={version} sidebar={sidebar} />
         </ScrollArea>
       </div>
     </div>

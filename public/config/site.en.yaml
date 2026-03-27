@@ -46,6 +46,15 @@ announcement:
     link: "https://github.com/shenjianZ/react-docs-ui"
     dismissible: true
 
+versions:
+    enabled: true
+    current: "v2"
+    items:
+        - value: "v2"
+          label: "v2 (Current)"
+        - value: "v1"
+          label: "v1"
+
 # Sidebar Navigation Configuration
 sidebar:
     enabled: true

@@ -17,6 +17,7 @@ import { getImageViewerLabels } from "../lib/image-viewer"
 import { ImageViewer } from "./ImageViewer"
 import { Mermaid } from "./mdx-components"
 import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
+import { buildVersionedPath } from "../lib/versioning"
 import macros_physics from "katex-physics"
 
 interface MdxContentProps {
@@ -462,8 +463,9 @@ export function MdxContent({
   codeHighlight,
   shikiBundle,
 }: MdxContentProps) {
-  const params = useParams<{ lang: string }>()
+  const params = useParams<{ lang: string; version?: string }>()
   const lang = params.lang || "zh-cn"
+  const version = params.version
   const registeredComponents = useComponents()
   
   // 预加载 Shiki
@@ -614,7 +616,7 @@ export function MdxContent({
             }
 
             const normalized = href.startsWith("/") ? href : `/${href}`
-            const to = `/${lang}${normalized}`
+            const to = buildVersionedPath(lang, normalized, version)
             return (
               <Link to={to} {...props}>
                 {children}

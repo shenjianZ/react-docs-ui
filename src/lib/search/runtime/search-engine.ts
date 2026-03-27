@@ -43,18 +43,24 @@ export class SearchEngine {
       return []
     }
 
-    const { query, limit = DEFAULT_LIMIT } = options
+    const { query, version, limit = DEFAULT_LIMIT } = options
     const normalizedQuery = query.toLowerCase().trim()
     
     if (!normalizedQuery) {
       return []
     }
 
-    const results = this.index.search(normalizedQuery, { limit }) as string[]
+    const searchLimit = Math.max(limit * 5, limit)
+    const results = this.index.search(normalizedQuery, { limit: searchLimit }) as string[]
 
     return results.map(id => {
       const section = this.sections.get(id)
       if (!section) return null
+      if (version) {
+        if (section.version && section.version !== version) return null
+      } else if (section.version) {
+        return null
+      }
       
       return {
         id: section.id,
@@ -64,7 +70,7 @@ export class SearchEngine {
         url: section.url,
         score: 1,
       }
-    }).filter((r): r is SearchResult => r !== null)
+    }).filter((r): r is SearchResult => r !== null).slice(0, limit)
   }
 
   private generateSnippet(content: string, query: string): string {

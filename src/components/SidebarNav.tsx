@@ -8,6 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
+import { buildVersionedPath } from "@/lib/versioning"
 
 // Define SiteConfig types locally
 interface SiteConfig {
@@ -39,18 +40,18 @@ interface SiteConfig {
 
 interface SidebarNavProps {
   lang: string
+  version?: string
   sidebar: SiteConfig["sidebar"]
 }
 
-export function SidebarNav({ lang, sidebar }: SidebarNavProps) {
+export function SidebarNav({ lang, version, sidebar }: SidebarNavProps) {
   const location = useLocation()
   const pathname = location.pathname
 
   // 解析当前一级分类（如 /en/guide/xxx => guide）
   const firstSegment = React.useMemo(() => {
     const parts = pathname.split("/").filter(Boolean)
-    // parts[0] 语言，parts[1] 可能是一级分类
-    return parts.length >= 2 ? parts[1] : ""
+    return parts[1] === "v" ? parts[3] || "" : parts[1] || ""
   }, [pathname])
 
   // 根据 collections 匹配对应侧边栏；否则回退到全局 sections
@@ -81,7 +82,7 @@ export function SidebarNav({ lang, sidebar }: SidebarNavProps) {
           {section.path ? (
             <CollapsibleTrigger asChild>
               <Link
-                to={`/${lang}${section.path}`}
+                to={buildVersionedPath(lang, section.path, version)}
                 className="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium text-sm hover:bg-muted"
               >
                 <span>{section.title}</span>
@@ -97,7 +98,7 @@ export function SidebarNav({ lang, sidebar }: SidebarNavProps) {
           <CollapsibleContent className="py-1 pl-4">
             <div className="grid grid-flow-row auto-rows-max text-sm">
               {(section.children || []).map(item => {
-                const to = `/${lang}${item.path}`
+                const to = buildVersionedPath(lang, item.path, version)
                 return (
                   <Link
                     key={item.path}

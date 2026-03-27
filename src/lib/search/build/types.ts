@@ -5,6 +5,7 @@ export interface SearchSection {
   content: string
   url: string
   lang: string
+  version?: string
   tokens: string[]
 }
 

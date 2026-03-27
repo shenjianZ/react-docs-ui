@@ -1,5 +1,6 @@
 import type { SiteConfig } from "./config"
 import type { NavigationItem } from "../components/PageNavigation"
+import { buildVersionedPath } from "./versioning"
 
 export interface NavigationResult {
   prev: NavigationItem | null
@@ -9,7 +10,8 @@ export interface NavigationResult {
 export function getPrevNextPage(
   sidebar: SiteConfig["sidebar"] | undefined,
   currentPath: string,
-  firstSegment: string
+  firstSegment: string,
+  version?: string
 ): NavigationResult {
   if (!sidebar) {
     return { prev: null, next: null }
@@ -29,7 +31,7 @@ export function getPrevNextPage(
       if (section.path) {
         allPages.push({
           title: section.title,
-          path: section.path,
+          path: buildVersionedPath(currentPath.replace(/^\/([^/]+).*/, "$1"), section.path, version),
         })
       }
 
@@ -38,7 +40,7 @@ export function getPrevNextPage(
         section.children.forEach((child) => {
           allPages.push({
             title: child.title,
-            path: child.path,
+            path: buildVersionedPath(currentPath.replace(/^\/([^/]+).*/, "$1"), child.path, version),
           })
         })
       }
@@ -47,8 +49,7 @@ export function getPrevNextPage(
 
   // 找到当前页面的索引
   // 移除语言前缀（如 /zh-cn 或 /en）来匹配配置中的路径
-  const normalizedPath = currentPath.replace(/^\/[a-z-]+/, "")
-  const currentIndex = allPages.findIndex((page) => normalizedPath === page.path)
+  const currentIndex = allPages.findIndex((page) => currentPath === page.path)
 
   if (currentIndex === -1) {
     return { prev: null, next: null }

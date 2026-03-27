@@ -1,4 +1,4 @@
-import { ExternalLink, Globe, Monitor, Moon, MoreVertical, Search, Sun } from "lucide-react"
+import { Check, ChevronDown, ExternalLink, Globe, Monitor, Moon, MoreVertical, Search, Sun } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
@@ -26,6 +26,7 @@ import {
   languageMenuItemClassName,
 } from "@/lib/language-menu"
 import { cn } from "@/lib/utils"
+import { buildVersionedPath } from "@/lib/versioning"
 
 // Define SiteConfig types locally as they are not available in the Vite project
 interface SiteConfig {
@@ -64,9 +65,15 @@ interface SiteConfig {
 
 interface HeaderNavProps {
   lang: string
+  version?: string
   site: SiteConfig["site"]
   navbar: SiteConfig["navbar"]
   announcement?: SiteConfig["announcement"]
+  versions?: {
+    enabled?: boolean
+    current?: string
+    items?: { value: string; label: string }[]
+  }
   themeConfig?: { allowToggle?: boolean }
   searchConfig?: {
     enabled?: boolean
@@ -162,7 +169,28 @@ function getActionIcon(action: { type?: string; icon?: string; title?: string; l
   return <ExternalLink className={iconClassName} />
 }
 
-export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searchConfig }: HeaderNavProps) {
+async function canResolveVersionedDoc(lang: string, version: string, pathname: string) {
+  const slugPath = pathname.replace(/^\/[a-z-]+(?:\/v\/[^/]+)?/, "").replace(/^\//, "")
+  if (!slugPath) return false
+
+  const candidates = [
+    `/docs/${lang}/${version}/${slugPath}.mdx`,
+    `/docs/${lang}/${version}/${slugPath}.md`,
+  ]
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, { method: "GET" })
+      if (response.ok) return true
+    } catch {
+      // ignore and continue probing
+    }
+  }
+
+  return false
+}
+
+export function HeaderNav({ lang, version, site, navbar, announcement, versions, themeConfig, searchConfig }: HeaderNavProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const pathname = location.pathname
@@ -200,6 +228,7 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
 
   const currentLang = location.pathname.startsWith("/en") ? "en" : "zh-cn"
   const t = translations[currentLang]
+  const versionItems = versions?.enabled === false ? [] : versions?.items || []
   const locales = [
     { code: "en", name: "English" },
     { code: "zh-cn", name: "简体中文" },
@@ -213,6 +242,25 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
       pathParts.unshift(newLocale)
     }
     navigate(`/${pathParts.join("/")}`)
+  }
+
+  const handleVersionChange = async (nextVersion: string) => {
+    const pathParts = location.pathname.split("/").filter(Boolean)
+    const hasCurrentSlug = await canResolveVersionedDoc(lang, nextVersion, pathname)
+    if (pathParts[1] === "v") {
+      pathParts[2] = nextVersion
+      if (!hasCurrentSlug) {
+        navigate(`/${lang}/v/${nextVersion}`)
+        return
+      }
+      navigate(`/${pathParts.join("/")}`)
+      return
+    }
+    if (!hasCurrentSlug) {
+      navigate(`/${lang}/v/${nextVersion}`)
+      return
+    }
+    navigate(`/${lang}/v/${nextVersion}${pathname.replace(/^\/[a-z-]+/, "")}`)
   }
 
   useEffect(() => {
@@ -269,12 +317,12 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
               !item.external && (
                 <Link
                   key={item.link}
-                  to={`/${lang}${item.link}`}
+                  to={buildVersionedPath(lang, item.link, version)}
                   className={cn(
                     "transition-colors hover:text-foreground/80",
                     (item.link === "/" 
                       ? pathname === `/${lang}` || pathname === `/${lang}/`
-                      : pathname.startsWith(`/${lang}${item.link}`))
+                      : pathname.startsWith(buildVersionedPath(lang, item.link, version)))
                       ? "text-foreground"
                       : "text-foreground/60"
                   )}
@@ -284,7 +332,7 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
               )
           )}
         </nav>
-        <div className="flex flex-1 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end gap-2">
           {/* 搜索按钮 - 仅桌面端显示 */}
           {searchEnabled && (
             <div className="hidden md:block">
@@ -306,6 +354,34 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
                 </kbd>
               </button>
             </div>
+          )}
+          {versionItems.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="hidden h-9 items-center gap-1 rounded-lg border border-input bg-background px-3 text-sm md:inline-flex"
+                  aria-label={currentLang === "en" ? "Version" : "版本"}
+                >
+                  <span>{versionItems.find(item => item.value === (version || versions?.current))?.label || version || versions?.current || versionItems[0]?.label}</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[8rem]">
+                {versionItems.map((item) => (
+                  <DropdownMenuItem
+                    key={item.value}
+                    onClick={() => handleVersionChange(item.value)}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <span>{item.label}</span>
+                    {(version || versions?.current || versionItems[0]?.value) === item.value && (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           {/* 桌面端：显示独立图标 */}
           <nav className="flex items-center space-x-2 hidden md:flex">
@@ -396,6 +472,29 @@ export function HeaderNav({ lang, site, navbar, announcement, themeConfig, searc
                       </DropdownMenuItem>
                     )
                   })}
+                {versionItems.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2">
+                        <span>{currentLang === "en" ? "Version" : "版本"}</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent alignOffset={-4}>
+                        <DropdownMenuRadioGroup value={version || versions?.current || versionItems[0]?.value}>
+                          {versionItems.map((item) => (
+                            <DropdownMenuRadioItem
+                              key={item.value}
+                              value={item.value}
+                              onClick={() => handleVersionChange(item.value)}
+                            >
+                              <span>{item.label}</span>
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </>
+                )}
                 {navbar.showLanguageSwitcher !== false && (
                   <>
                     <DropdownMenuSeparator />

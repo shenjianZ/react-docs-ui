@@ -5,6 +5,7 @@ import { SearchProvider, useSearch } from "./SearchProvider"
 
 interface SearchRuntimeProps {
   lang: string
+  version?: string
   maxResults?: number
   placeholder?: string
   openSignal: number
@@ -30,6 +31,7 @@ function SearchRuntimeBridge({
 
 export default function SearchRuntime({
   lang,
+  version,
   maxResults,
   placeholder,
   openSignal,
@@ -37,6 +39,7 @@ export default function SearchRuntime({
   return (
     <SearchProvider
       lang={lang}
+      version={version}
       maxResults={maxResults}
       enableHotkeys={false}
     >

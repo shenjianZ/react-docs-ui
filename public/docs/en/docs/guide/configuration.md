@@ -8,6 +8,8 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | :-- | :-- |
 | `site` | Basic site metadata such as title, description, and logo |
 | `navbar` | Top navigation bar |
+| `announcement` | Top announcement bar |
+| `versions` | Documentation version configuration |
 | `sidebar` | Sidebar navigation tree |
 | `theme` | Theme mode and theme-switch behavior |
 | `toc` | Right-side table of contents |
@@ -77,6 +79,39 @@ Common `type` / `icon` values:
 - `link`
 - `external`
 - `globe`
+
+## Announcement `announcement`
+
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Whether to show the announcement bar | `true` |
+| `text` | string | Announcement text | `"React Docs UI now supports Tabs"` |
+| `link` | string | Target URL when clicked | `"https://github.com/..."` |
+| `dismissible` | boolean | Whether users can dismiss the bar | `true` |
+
+## Versions `versions`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Whether version switching is enabled |
+| `current` | string | Default current version value |
+| `items` | `VersionItem[]` | Available versions |
+
+`VersionItem`
+
+| Field | Type | Description | Example |
+| :-- | :-- | :-- | :-- |
+| `value` | string | Version value used in the route | `"v1"` |
+| `label` | string | Label shown in the UI | `"v1"` |
+
+When enabled, the versioned route format is `/:lang/v/:version/*`, for example: `/en/v/v1/docs/guide/introduction`.
+
+Recommended versioned document directories:
+
+- `public/docs/zh-cn/v1/docs/...`
+- `public/docs/en/v1/docs/...`
+
+If a page is missing under a version directory, the current runtime falls back to the unversioned document.
 
 ## Sidebar `sidebar`
 

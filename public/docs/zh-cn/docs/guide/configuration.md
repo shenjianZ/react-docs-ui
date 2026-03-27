@@ -8,6 +8,8 @@
 | :-- | :-- |
 | `site` | 网站基础信息，如标题、描述、Logo |
 | `navbar` | 顶部导航栏 |
+| `announcement` | 顶部公告栏 |
+| `versions` | 文档版本配置 |
 | `sidebar` | 侧边栏导航树 |
 | `theme` | 主题模式与切换行为 |
 | `toc` | 文章右侧目录 |
@@ -77,6 +79,39 @@
 - `link`
 - `external`
 - `globe`
+
+## 公告栏 `announcement`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否显示公告栏 | `true` |
+| `text` | string | 公告文案 | `"React Docs UI 已支持 Tabs"` |
+| `link` | string | 点击后的目标地址 | `"https://github.com/..."` |
+| `dismissible` | boolean | 是否允许用户关闭公告 | `true` |
+
+## 版本配置 `versions`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用版本切换 |
+| `current` | string | 当前默认版本值 |
+| `items` | `VersionItem[]` | 可选版本列表 |
+
+`VersionItem`
+
+| 字段 | 类型 | 说明 | 示例 |
+| :-- | :-- | :-- | :-- |
+| `value` | string | 版本值，用于路由段 | `"v1"` |
+| `label` | string | 版本显示文案 | `"v1"` |
+
+启用后，版本化路由格式为 `/:lang/v/:version/*`，例如：`/zh-cn/v/v1/docs/guide/introduction`。
+
+版本化文档目录建议使用：
+
+- `public/docs/zh-cn/v1/docs/...`
+- `public/docs/en/v1/docs/...`
+
+如果某个版本目录下缺少对应页面，当前运行时会回退到未版本化文档。
 
 ## 侧边栏 `sidebar`
 

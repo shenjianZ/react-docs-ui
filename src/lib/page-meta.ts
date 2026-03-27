@@ -8,6 +8,14 @@ export interface ResolvedPageMeta {
   authors: string[]
 }
 
+function normalizeMetaDate(value: unknown) {
+  if (typeof value === "string") return value
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString()
+  }
+  return undefined
+}
+
 export function resolveDocFilePath(lang: string, pageSlug: string, ext: "md" | "mdx") {
   return `public/docs/${lang}/${pageSlug}.${ext}`
 }
@@ -35,10 +43,7 @@ export function resolvePageMeta(options: {
   const gitAuthors = gitMeta?.author ? [gitMeta.author] : []
   const authors = preferGitMeta && gitAuthors.length > 0 ? gitAuthors : frontmatterAuthor
 
-  const frontmatterLastUpdated =
-    typeof frontmatter?.lastUpdated === "string"
-      ? frontmatter.lastUpdated
-      : undefined
+  const frontmatterLastUpdated = normalizeMetaDate(frontmatter?.lastUpdated)
 
   const lastUpdated =
     preferGitMeta && gitMeta?.lastUpdated ? gitMeta.lastUpdated : frontmatterLastUpdated

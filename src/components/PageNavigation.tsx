@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { buildVersionedPath } from "@/lib/versioning"
 
 export interface NavigationItem {
   title: string
@@ -10,6 +11,7 @@ export interface PageNavigationProps {
   prev?: NavigationItem | null
   next?: NavigationItem | null
   lang: string
+  version?: string
 }
 
 const i18n = {
@@ -52,19 +54,20 @@ function handleNavigationClick(e: React.MouseEvent<HTMLAnchorElement>, targetPat
   }
 }
 
-export function PageNavigation({ prev, next, lang }: PageNavigationProps) {
+export function PageNavigation({ prev, next, lang, version }: PageNavigationProps) {
   if (!prev && !next) {
     return null
   }
 
   const texts = i18n[lang as keyof typeof i18n] || i18n["zh-cn"]
+  const resolveTo = (path: string) => path.startsWith(`/${lang}`) ? path : buildVersionedPath(lang, path, version)
 
   return (
     <div className="flex flex-row gap-4 mt-8 pt-8 border-t" data-print-hidden>
       {prev && (
         <Link
-          to={`/${lang}${prev.path}`}
-          onClick={(e) => handleNavigationClick(e, `/${lang}${prev.path}`)}
+          to={resolveTo(prev.path)}
+          onClick={(e) => handleNavigationClick(e, resolveTo(prev.path))}
           className="flex items-center flex-1 min-w-0 group hover:text-foreground transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4 flex-shrink-0 text-muted-foreground group-hover:text-foreground" />
@@ -76,8 +79,8 @@ export function PageNavigation({ prev, next, lang }: PageNavigationProps) {
       )}
       {next && (
         <Link
-          to={`/${lang}${next.path}`}
-          onClick={(e) => handleNavigationClick(e, `/${lang}${next.path}`)}
+          to={resolveTo(next.path)}
+          onClick={(e) => handleNavigationClick(e, resolveTo(next.path))}
           className="flex items-center justify-end flex-1 min-w-0 text-right group hover:text-foreground transition-colors"
         >
           <div className="flex flex-col min-w-0">

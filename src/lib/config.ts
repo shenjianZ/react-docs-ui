@@ -61,6 +61,11 @@ export interface AnnouncementConfig {
   dismissible?: boolean
 }
 
+export interface VersionItemConfig {
+  value: string
+  label: string
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -86,6 +91,11 @@ export interface SiteConfig {
     }[]
   }
   announcement?: AnnouncementConfig
+  versions?: {
+    enabled?: boolean
+    current?: string
+    items?: VersionItemConfig[]
+  }
   sidebar: {
     // 全局开关，未设置时按数据存在与否自动判断
     enabled?: boolean

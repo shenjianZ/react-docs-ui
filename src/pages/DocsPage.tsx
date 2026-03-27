@@ -8,8 +8,9 @@ import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { parseFrontmatter } from "../lib/frontmatter"
 import { getPrevNextPage } from "../lib/navigation"
-import { buildEditUrl, resolveDocFilePath, resolvePageMeta, type DocGitMeta } from "../lib/page-meta"
+import { buildEditUrl, resolvePageMeta, type DocGitMeta } from "../lib/page-meta"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
+import { buildVersionedDocAssetPath, isKnownVersion, resolveVersionedDocFilePath } from "../lib/versioning"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
 import { siteShikiBundle } from "../generated/shiki-bundle"
 
@@ -41,8 +42,9 @@ interface DocsPageProps {
 }
 
 export function DocsPage({ aiEnabled = false }: DocsPageProps) {
-  const params = useParams<{ lang: string; "*": string }>()
+  const params = useParams<{ lang: string; version?: string; "*": string }>()
   const langParam = params.lang
+  const versionParam = params.version
   const slug = params["*"]
 
   const currentLang = useMemo(() => langParam || "zh-cn", [langParam])
@@ -62,11 +64,17 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     return parts.length > 0 ? parts[0] : ""
   }, [slug])
 
+  const currentVersion = useMemo(() => {
+    return isKnownVersion(config, versionParam) ? versionParam : undefined
+  }, [config, versionParam])
+
   // 计算上一节和下一节
   const { prev, next } = useMemo(() => {
-    const currentPath = `/${currentLang}/${slug || ""}`
-    return getPrevNextPage(config?.sidebar, currentPath, firstSegment)
-  }, [config?.sidebar, currentLang, slug, firstSegment])
+    const currentPath = currentVersion
+      ? `/${currentLang}/v/${currentVersion}/${slug || ""}`
+      : `/${currentLang}/${slug || ""}`
+    return getPrevNextPage(config?.sidebar, currentPath, firstSegment, currentVersion)
+  }, [config?.sidebar, currentLang, currentVersion, slug, firstSegment])
 
   // 加载站点配置：仅在语言变化时触发
   useEffect(() => {
@@ -103,29 +111,50 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     setDocExt(undefined)
 
     const pageSlug = slug || "index"
-    const mdPath = `/docs/${currentLang}/${pageSlug}.md`
-    const mdxPath = `/docs/${currentLang}/${pageSlug}.mdx`
+    const mdPath = buildVersionedDocAssetPath(currentLang, pageSlug, "md", currentVersion)
+    const mdxPath = buildVersionedDocAssetPath(currentLang, pageSlug, "mdx", currentVersion)
+    const fallbackMdPath = buildVersionedDocAssetPath(currentLang, pageSlug, "md")
+    const fallbackMdxPath = buildVersionedDocAssetPath(currentLang, pageSlug, "mdx")
 
     const loadContent = async () => {
       try {
-        const [mdResponse, mdxResponse] = await Promise.all([
-          fetch(mdPath),
-          fetch(mdxPath)
-        ])
+        const [mdResponse, mdxResponse] = await Promise.all([fetch(mdPath), fetch(mdxPath)])
+        const [fallbackMdResponse, fallbackMdxResponse] = currentVersion
+          ? await Promise.all([fetch(fallbackMdPath), fetch(fallbackMdxPath)])
+          : [null, null]
 
         let contentToUse: string | null = null
         let resolvedExt: "md" | "mdx" | undefined
+        let usedVersionedSource = false
 
         if (mdxResponse.ok) {
           const mdxText = await mdxResponse.text()
           if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
             contentToUse = mdxText
             resolvedExt = "mdx"
+            usedVersionedSource = true
           }
         }
 
         if (!contentToUse && mdResponse.ok) {
           const mdText = await mdResponse.text()
+          if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
+            contentToUse = mdText
+            resolvedExt = "md"
+            usedVersionedSource = true
+          }
+        }
+
+        if (!contentToUse && fallbackMdxResponse?.ok) {
+          const mdxText = await fallbackMdxResponse.text()
+          if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
+            contentToUse = mdxText
+            resolvedExt = "mdx"
+          }
+        }
+
+        if (!contentToUse && fallbackMdResponse?.ok) {
+          const mdText = await fallbackMdResponse.text()
           if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
             contentToUse = mdText
             resolvedExt = "md"
@@ -161,7 +190,8 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
         setContent(content)
         if (resolvedExt) {
           setDocExt(resolvedExt)
-          setDocFilePath(resolveDocFilePath(currentLang, pageSlug, resolvedExt))
+          const resolvedVersion = currentVersion && usedVersionedSource ? currentVersion : undefined
+          setDocFilePath(resolveVersionedDocFilePath(currentLang, pageSlug, resolvedExt, resolvedVersion))
         }
       } catch (error) {
         console.error('[DocsPage] Error:', error);
@@ -193,7 +223,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     return () => {
       cancelled = true
     }
-  }, [currentLang, slug, config?.toc?.maxLevel])
+  }, [currentLang, currentVersion, slug, config?.toc?.maxLevel])
 
   useEffect(() => {
     let cancelled = false
@@ -239,12 +269,13 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     if (config?.editLink?.enabled === false) return undefined
     return buildEditUrl(config?.editLink?.urlTemplate, {
       lang: currentLang,
+      version: currentVersion,
       slug: slug || "index",
       docPath: docFilePath,
       ext: docExt,
       filePath: docFilePath,
     })
-  }, [config?.editLink?.enabled, config?.editLink?.urlTemplate, currentLang, docExt, docFilePath, frontmatter?.editUrl, slug])
+  }, [config?.editLink?.enabled, config?.editLink?.urlTemplate, currentLang, currentVersion, docExt, docFilePath, frontmatter?.editUrl, slug])
 
   if (configLoading && !config) {
     return <div>Loading...</div>
@@ -256,6 +287,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       config={config!}
       frontmatter={frontmatter}
       slug={slug}
+      version={currentVersion}
       lastUpdated={pageMeta.lastUpdated}
       editUrl={frontmatter?.title === "Not Found" ? undefined : editUrl}
       docFilePath={docFilePath}

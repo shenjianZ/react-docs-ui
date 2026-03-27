@@ -14,5 +14,6 @@ export interface SearchResult {
 export interface SearchOptions {
   query: string
   lang: string
+  version?: string
   limit?: number
 }

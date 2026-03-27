@@ -35,6 +35,7 @@ export function useSearch(): SearchContextValue {
 interface SearchProviderProps {
   children: React.ReactNode
   lang?: string
+  version?: string
   enabled?: boolean
   maxResults?: number
   enableHotkeys?: boolean
@@ -43,6 +44,7 @@ interface SearchProviderProps {
 export function SearchProvider({
   children,
   lang = 'zh-cn',
+  version,
   enabled = true,
   maxResults = 20,
   enableHotkeys = true,
@@ -81,6 +83,10 @@ export function SearchProvider({
       }
     }
   }, [lang])
+
+  useEffect(() => {
+    setResults([])
+  }, [version])
 
   const loadIndex = useCallback(async () => {
     if ((isLoaded && loadedLangRef.current === lang) || loadingRef.current || !enabled) return
@@ -124,6 +130,7 @@ export function SearchProvider({
     const options: SearchOptions = {
       query: searchQuery,
       lang,
+      version,
       limit: maxResults,
     }
 
@@ -134,7 +141,7 @@ export function SearchProvider({
     }
 
     return []
-  }, [lang, loadIndex, maxResults])
+  }, [lang, version, loadIndex, maxResults])
 
   useEffect(() => {
     if (!query.trim()) {

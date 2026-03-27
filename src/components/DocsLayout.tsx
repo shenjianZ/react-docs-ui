@@ -22,7 +22,7 @@ interface Frontmatter {
   description?: string
   author?: string
   authors?: string[]
-  createdAt?: string
+  createdAt?: string | Date
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
@@ -33,6 +33,7 @@ interface DocsLayoutProps {
   config: SiteConfig
   frontmatter: Frontmatter | null
   slug?: string
+  version?: string
   lastUpdated?: string
   editUrl?: string
   docFilePath?: string
@@ -48,6 +49,7 @@ export function DocsLayout({
   config,
   frontmatter,
   slug,
+  version,
   lastUpdated,
   editUrl,
   docFilePath,
@@ -59,10 +61,11 @@ export function DocsLayout({
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
   const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
-  const formattedCreatedAt = frontmatter?.createdAt
-    ? new Date(frontmatter.createdAt).toString() !== "Invalid Date"
-      ? new Date(frontmatter.createdAt).toLocaleDateString(lang === "en" ? "en-US" : "zh-CN")
-      : frontmatter.createdAt
+  const createdAtValue = frontmatter?.createdAt
+  const formattedCreatedAt = createdAtValue
+    ? new Date(createdAtValue).toString() !== "Invalid Date"
+      ? new Date(createdAtValue).toLocaleDateString(lang === "en" ? "en-US" : "zh-CN")
+      : String(createdAtValue)
     : undefined
   
   const pageTitle = frontmatter?.title || frontmatter?.firstH1 || site?.title || "Docs"
@@ -85,11 +88,12 @@ export function DocsLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <HeaderNav lang={lang} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} />
+      <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
       {/* 移动端侧边栏 */}
       {sidebar && (
         <MobileSidebar
           lang={lang}
+          version={version}
           sidebar={sidebar}
           open={mobileSidebarOpen}
           onOpenChange={setMobileSidebarOpen}
@@ -111,7 +115,7 @@ export function DocsLayout({
         {sidebar && (
           <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block">
             <ScrollArea className="h-full py-6 pr-6 lg:py-8">
-              <SidebarNav lang={lang} sidebar={sidebar} />
+              <SidebarNav lang={lang} version={version} sidebar={sidebar} />
             </ScrollArea>
           </aside>
         )}
@@ -191,7 +195,7 @@ export function DocsLayout({
                 editLinkLabel={config.editLink?.label}
               />
             </div>
-            <PageNavigation prev={prev} next={next} lang={lang} />
+            <PageNavigation prev={prev} next={next} lang={lang} version={version} />
           </main>
         </div>
         <div className="md:col-start-2">

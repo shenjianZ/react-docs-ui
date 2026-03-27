@@ -24,6 +24,7 @@ const SearchLauncherContext = createContext<SearchLauncherContextValue>(noopSear
 interface SearchLauncherProviderProps {
   children: React.ReactNode
   lang: string
+  version?: string
   enabled?: boolean
   maxResults?: number
   placeholder?: string
@@ -32,6 +33,7 @@ interface SearchLauncherProviderProps {
 export function SearchLauncherProvider({
   children,
   lang,
+  version,
   enabled = true,
   maxResults,
   placeholder,
@@ -71,6 +73,7 @@ export function SearchLauncherProvider({
         <Suspense fallback={null}>
           <LazySearchRuntime
             lang={lang}
+            version={version}
             maxResults={maxResults}
             placeholder={placeholder}
             openSignal={openSignal}

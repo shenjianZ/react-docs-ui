@@ -5,7 +5,8 @@ import yaml from "js-yaml"
 
 import { ThemeProvider } from "@/components/theme-provider"
 import { FontProvider } from "@/components/FontProvider"
-import { SearchProvider, SearchDialog } from "@/components/search"
+import { SearchProvider } from "@/components/search"
+import { SearchLauncherProvider } from "@/components/SearchLauncher"
 import { GlobalContextMenu } from "@/components/GlobalContextMenu"
 import { ComponentProvider } from "@/components/ComponentProvider"
 import { DocsPage } from "@/pages/DocsPage"
@@ -23,6 +24,11 @@ function App() {
   const lang = useMemo(() => {
     const parts = location.pathname.split("/").filter(Boolean)
     return parts[0] === "en" || parts[0] === "zh-cn" ? parts[0] : "zh-cn"
+  }, [location.pathname])
+
+  const version = useMemo(() => {
+    const parts = location.pathname.split("/").filter(Boolean)
+    return parts[1] === "v" ? parts[2] : undefined
   }, [location.pathname])
 
   useEffect(() => {
@@ -78,16 +84,30 @@ function App() {
       <FontProvider config={config} lang={lang}>
         <AIProvider>
           <ComponentProvider components={components}>
-            <SearchProvider lang={lang} enabled={searchEnabled} maxResults={searchConfig?.maxResults}>
-              <GlobalContextMenu config={config?.contextMenu}>
-                <SearchDialog placeholder={searchConfig?.placeholder} />
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/:lang" element={<DocsPage aiEnabled={aiEnabled} />} />
-                  <Route path="/:lang/*" element={<DocsPage aiEnabled={aiEnabled} />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </GlobalContextMenu>
+            <SearchProvider
+              lang={lang}
+              version={version}
+              enabled={searchEnabled}
+              maxResults={searchConfig?.maxResults}
+            >
+              <SearchLauncherProvider
+                lang={lang}
+                version={version}
+                enabled={searchEnabled}
+                maxResults={searchConfig?.maxResults}
+                placeholder={searchConfig?.placeholder}
+              >
+                <GlobalContextMenu config={config?.contextMenu}>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/:lang" element={<DocsPage aiEnabled={aiEnabled} />} />
+                    <Route path="/:lang/v/:version" element={<DocsPage aiEnabled={aiEnabled} />} />
+                    <Route path="/:lang/v/:version/*" element={<DocsPage aiEnabled={aiEnabled} />} />
+                    <Route path="/:lang/*" element={<DocsPage aiEnabled={aiEnabled} />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                  </Routes>
+                </GlobalContextMenu>
+              </SearchLauncherProvider>
             </SearchProvider>
             <Toaster />
           </ComponentProvider>
