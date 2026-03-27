@@ -9,6 +9,7 @@ import { SearchProvider } from "@/components/search"
 import { SearchLauncherProvider } from "@/components/SearchLauncher"
 import { GlobalContextMenu } from "@/components/GlobalContextMenu"
 import { ComponentProvider } from "@/components/ComponentProvider"
+import { ChangelogPage } from "@/pages/ChangelogPage"
 import { DocsPage } from "@/pages/DocsPage"
 import { HomePage } from "@/pages/HomePage"
 import { AIProvider } from "@/components/ai"
@@ -100,6 +101,7 @@ function App() {
                 <GlobalContextMenu config={config?.contextMenu}>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/:lang/changelog" element={<ChangelogPage />} />
                     <Route path="/:lang" element={<DocsPage aiEnabled={aiEnabled} />} />
                     <Route path="/:lang/v/:version" element={<DocsPage aiEnabled={aiEnabled} />} />
                     <Route path="/:lang/v/:version/*" element={<DocsPage aiEnabled={aiEnabled} />} />

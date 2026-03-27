@@ -10,6 +10,7 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | `navbar` | Top navigation bar |
 | `announcement` | Top announcement bar |
 | `versions` | Documentation version configuration |
+| `changelog` | Changelog list-page and title configuration |
 | `sidebar` | Sidebar navigation tree |
 | `theme` | Theme mode and theme-switch behavior |
 | `toc` | Right-side table of contents |

@@ -6,6 +6,7 @@ import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
 import { FloatingActionBall } from "@/components/FloatingActionBall"
 import { PageMetaActions } from "@/components/PageMetaActions"
+import { ReleaseMetaBar } from "@/components/ReleaseMetaBar"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
@@ -23,6 +24,10 @@ interface Frontmatter {
   author?: string
   authors?: string[]
   createdAt?: string | Date
+  date?: string | Date
+  version?: string
+  type?: string
+  breaking?: boolean
   canonical?: string
   noindex?: boolean
   toc?: TocItem[]
@@ -77,6 +82,7 @@ export function DocsLayout({
   const { site, navbar, sidebar, theme } = config
   const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
   const showTopAuthors = config.pageMeta?.showAuthors !== false && topAuthors.length > 0
+  const isChangelogDetail = Boolean(slug?.startsWith("changelog/"))
   const createdAtValue = frontmatter?.createdAt
   const formattedCreatedAt = createdAtValue
     ? new Date(createdAtValue).toString() !== "Invalid Date"
@@ -271,6 +277,15 @@ export function DocsLayout({
                   />
                 </div>
               </div>
+            )}
+            {isChangelogDetail && (
+              <ReleaseMetaBar
+                lang={lang}
+                version={typeof frontmatter?.version === "string" ? frontmatter.version : undefined}
+                date={typeof frontmatter?.date === "string" ? frontmatter.date : undefined}
+                type={typeof frontmatter?.type === "string" ? frontmatter.type : undefined}
+                breaking={frontmatter?.breaking === true}
+              />
             )}
             {children}
             <div className="mt-8 border-t border-border pt-6">

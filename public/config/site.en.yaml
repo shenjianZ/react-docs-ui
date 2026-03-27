@@ -24,6 +24,8 @@ navbar:
           active: true
         - title: "Document"
           link: "/docs"
+        - title: "Changelog"
+          link: "/changelog"
     actions:
         - type: "github"
           link: "https://github.com/shenjianZ/React-docs-ui"
@@ -56,6 +58,10 @@ versions:
         - value: "v1"
           label: "v1"
 
+changelog:
+    enabled: true
+    title: "Changelog"
+
 # Sidebar Navigation Configuration
 sidebar:
     enabled: true
@@ -73,6 +79,8 @@ sidebar:
                         path: "/docs/guide/quick-start"
                       - title: "Configuration"
                         path: "/docs/guide/configuration"
+                      - title: "Changelog"
+                        path: "/docs/guide/changelog"
                       - title: "PDF Server Deployment"
                         path: "/docs/guide/pdf-server"
                 - title: "Documentation Tests"

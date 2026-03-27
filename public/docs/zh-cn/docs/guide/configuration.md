@@ -10,6 +10,7 @@
 | `navbar` | 顶部导航栏 |
 | `announcement` | 顶部公告栏 |
 | `versions` | 文档版本配置 |
+| `changelog` | 更新日志列表页与标题配置 |
 | `sidebar` | 侧边栏导航树 |
 | `theme` | 主题模式与切换行为 |
 | `toc` | 文章右侧目录 |

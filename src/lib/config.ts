@@ -66,6 +66,14 @@ export interface VersionItemConfig {
   label: string
 }
 
+export interface ChangelogConfig {
+  enabled?: boolean
+  title?: string
+  showInNavbar?: boolean
+  showInSidebar?: boolean
+  pageSize?: number
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -97,6 +105,7 @@ export interface SiteConfig {
     current?: string
     items?: VersionItemConfig[]
   }
+  changelog?: ChangelogConfig
   sidebar: {
     // 全局开关，未设置时按数据存在与否自动判断
     enabled?: boolean

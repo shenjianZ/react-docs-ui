@@ -22,6 +22,7 @@ import { SearchLauncherProvider } from "../components/SearchLauncher"
 import { ComponentProvider } from "../components/ComponentProvider"
 import { AIProvider } from "../components/ai/AIProvider"
 import { Toaster } from "../components/ui/toaster"
+import { ChangelogPage } from "../pages/ChangelogPage"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
 import { scanComponents, loadComponents, getBuiltinComponents, prefetchGeneratedComponents } from "../lib/component-scanner"
@@ -490,6 +491,7 @@ export function DocsApp({ shikiBundle }: DocsAppProps = {}): React.JSX.Element {
           element: <RootShell />,
           children: [
             { index: true, element: <DocsPage shikiBundle={shikiBundle} /> },
+            { path: ":lang/changelog", element: <ChangelogPage /> },
             { path: ":lang", element: <DocsPage shikiBundle={shikiBundle} /> },
             { path: ":lang/v/:version", element: <DocsPage shikiBundle={shikiBundle} /> },
             { path: ":lang/v/:version/*", element: <DocsPage shikiBundle={shikiBundle} /> },

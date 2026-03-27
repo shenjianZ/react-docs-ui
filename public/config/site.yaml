@@ -24,6 +24,8 @@ navbar:
           active: true
         - title: "文档"
           link: "/docs"
+        - title: "更新日志"
+          link: "/changelog"
     actions:
         - type: "github"
           link: "https://github.com/shenjianZ/React-docs-ui"
@@ -56,6 +58,10 @@ versions:
         - value: "v1"
           label: "v1"
 
+changelog:
+    enabled: true
+    title: "更新日志"
+
 # 侧边栏导航配置
 sidebar:
     enabled: true
@@ -73,6 +79,8 @@ sidebar:
                         path: "/docs/guide/quick-start"
                       - title: "配置说明"
                         path: "/docs/guide/configuration"
+                      - title: "更新日志模块"
+                        path: "/docs/guide/changelog"
                       - title: "PDF Server 部署"
                         path: "/docs/guide/pdf-server"
                 - title: "文档测试"
