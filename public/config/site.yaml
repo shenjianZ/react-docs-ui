@@ -297,5 +297,28 @@ export:
         enabled: true
         url: "http://localhost:3001"
 
+pageMeta:
+    showLastUpdated: true
+    showEditLink: true
+    showAuthors: true
+    preferGitMeta: true
+
+editLink:
+    enabled: true
+    label: "编辑此页"
+    urlTemplate: "https://github.com/shenjianZ/react-docs-ui/edit/main/{filePath}"
+
+feedback:
+    enabled: true
+    endpoint: ""
+    method: "POST"
+    includePageMeta: true
+    labels:
+        helpful: "有帮助"
+        unhelpful: "没帮助"
+        inputPlaceholder: "可以补充哪里不清楚或不准确"
+        submit: "提交反馈"
+        thanks: "感谢反馈"
+
 ai:
     enabled: true

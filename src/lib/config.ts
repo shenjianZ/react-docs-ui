@@ -34,6 +34,26 @@ export interface SyntaxHighlightConfig {
   darkTheme?: string
 }
 
+export interface FeedbackConfig {
+  enabled?: boolean
+  endpoint?: string
+  method?: "POST"
+  includePageMeta?: boolean
+  labels?: {
+    helpful?: string
+    unhelpful?: string
+    inputPlaceholder?: string
+    submit?: string
+    thanks?: string
+  }
+}
+
+export interface EditLinkConfig {
+  enabled?: boolean
+  urlTemplate?: string
+  label?: string
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -193,6 +213,14 @@ export interface SiteConfig {
       enabled?: boolean      // 是否启用服务器端 PDF 生成
       url?: string           // PDF 服务器地址
     }
+  }
+  feedback?: FeedbackConfig
+  editLink?: EditLinkConfig
+  pageMeta?: {
+    showLastUpdated?: boolean
+    showEditLink?: boolean
+    showAuthors?: boolean
+    preferGitMeta?: boolean
   }
   imageViewer?: ImageViewerConfig
 }

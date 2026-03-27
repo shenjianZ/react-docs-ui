@@ -314,6 +314,37 @@ Notes:
 
 - If `pdfServer.enabled` is `false`, PDF export falls back to browser print/export.
 
+## Page Meta `pageMeta`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `showLastUpdated` | boolean | Show the page last-updated value |
+| `showEditLink` | boolean | Show the "Edit this page" link |
+| `showAuthors` | boolean | Show the author |
+| `preferGitMeta` | boolean | Prefer build-time git metadata over frontmatter |
+
+Page-level meta first reads `public/doc-git-meta.json`; if no git data is available, it falls back to frontmatter `lastUpdated` / `authors` / `author`. Use `createdAt` for created time.
+
+## Edit Link `editLink`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Enable the edit link |
+| `label` | string | Link label |
+| `urlTemplate` | string | Edit URL template |
+
+Supported variables: `{lang}`, `{slug}`, `{docPath}`, `{ext}`, `{filePath}`.
+
+## Feedback `feedback`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Show the page feedback section |
+| `endpoint` | string | Feedback endpoint; when empty, submission is stored locally only |
+| `method` | string | Request method, currently `POST` |
+| `includePageMeta` | boolean | Include page metadata in the payload |
+| `labels` | object | UI labels for the feedback block |
+
 ## AI `ai`
 
 | Field | Type | Description |

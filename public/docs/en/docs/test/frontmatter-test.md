@@ -2,7 +2,8 @@
 title: Frontmatter Test Page
 description: This is a test page for demonstrating the Frontmatter field display functionality
 author: Development Team
-date: 2026-03-09
+createdAt: 2026-03-09
+lastUpdated: 2026-03-27
 ---
 
 # Frontmatter Feature Test
@@ -11,7 +12,7 @@ This page is used to test the display of Frontmatter fields.
 
 ## Test Description
 
-If you can see the title, description, author, and date information at the top of the page, the Frontmatter display feature is working correctly.
+If you can see the title, description, author, and created time at the top of the page, plus the last updated time, edit link, and feedback component at the bottom, the Frontmatter display feature is working correctly.
 
 ## Supported Fields
 
@@ -19,8 +20,9 @@ If you can see the title, description, author, and date information at the top o
 |-------|-------------|
 | `title` | Page title, displayed at the top of the content area and set as the browser tab title |
 | `description` | Page description, displayed below the title |
-| `author` | Author information, displayed below the description |
-| `date` | Publication date, displayed next to the author |
+| `author` | Author information, displayed at the top of the page |
+| `createdAt` | Created time, displayed at the top of the page |
+| `lastUpdated` | Last updated time, displayed at the bottom of the page |
 
 ## Regular Content
 

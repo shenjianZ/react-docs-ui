@@ -314,6 +314,37 @@
 
 - 若 `pdfServer.enabled` 为 `false`，PDF 导出会退回到浏览器打印方案。
 
+## 页面元信息 `pageMeta`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `showLastUpdated` | boolean | 是否显示页面最后更新时间 |
+| `showEditLink` | boolean | 是否显示“编辑此页”入口 |
+| `showAuthors` | boolean | 是否显示作者 |
+| `preferGitMeta` | boolean | 是否优先使用构建时生成的 git 元数据 |
+
+页面级展示会优先读取 `public/doc-git-meta.json` 中的最后更新时间和作者；若缺失，则回退到 frontmatter 中的 `lastUpdated` / `authors` / `author`。创建时间请使用 `createdAt`。
+
+## 编辑入口 `editLink`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `enabled` | boolean | 是否启用编辑入口 |
+| `label` | string | 链接文案 |
+| `urlTemplate` | string | 编辑地址模板 |
+
+支持的模板变量：`{lang}`、`{slug}`、`{docPath}`、`{ext}`、`{filePath}`。
+
+## 页面反馈 `feedback`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `enabled` | boolean | 是否显示反馈区 |
+| `endpoint` | string | 反馈上报地址，留空则仅本地记录提交状态 |
+| `method` | string | 请求方法，当前固定为 `POST` |
+| `includePageMeta` | boolean | 是否在请求中附带页面信息 |
+| `labels` | object | 按钮与文案配置 |
+
 ## AI 功能 `ai`
 
 | 字段 | 类型 | 说明 |

@@ -297,3 +297,26 @@ export:
     pdfServer:
         enabled: false
         url: "http://localhost:3001"
+
+pageMeta:
+    showLastUpdated: true
+    showEditLink: true
+    showAuthors: true
+    preferGitMeta: true
+
+editLink:
+    enabled: true
+    label: "Edit this page"
+    urlTemplate: "https://github.com/shenjianZ/react-docs-ui/edit/main/{filePath}"
+
+feedback:
+    enabled: true
+    endpoint: ""
+    method: "POST"
+    includePageMeta: true
+    labels:
+        helpful: "Helpful"
+        unhelpful: "Not helpful"
+        inputPlaceholder: "Tell us what is unclear or missing"
+        submit: "Submit feedback"
+        thanks: "Thanks for your feedback"

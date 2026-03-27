@@ -5,6 +5,7 @@ import { Calendar, User } from "lucide-react"
 import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
 import { FloatingActionBall } from "@/components/FloatingActionBall"
+import { PageMetaActions } from "@/components/PageMetaActions"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
@@ -20,7 +21,8 @@ interface Frontmatter {
   title?: string
   description?: string
   author?: string
-  date?: string | Date
+  authors?: string[]
+  createdAt?: string
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
@@ -30,6 +32,10 @@ interface DocsLayoutProps {
   lang: string
   config: SiteConfig
   frontmatter: Frontmatter | null
+  slug?: string
+  lastUpdated?: string
+  editUrl?: string
+  docFilePath?: string
   children: React.ReactNode
   prev?: { title: string; path: string } | null
   next?: { title: string; path: string } | null
@@ -41,6 +47,10 @@ export function DocsLayout({
   lang,
   config,
   frontmatter,
+  slug,
+  lastUpdated,
+  editUrl,
+  docFilePath,
   children,
   prev,
   next,
@@ -48,6 +58,12 @@ export function DocsLayout({
   availableLangs,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
+  const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
+  const formattedCreatedAt = frontmatter?.createdAt
+    ? new Date(frontmatter.createdAt).toString() !== "Invalid Date"
+      ? new Date(frontmatter.createdAt).toLocaleDateString(lang === "en" ? "en-US" : "zh-CN")
+      : frontmatter.createdAt
+    : undefined
   
   const pageTitle = frontmatter?.title || frontmatter?.firstH1 || site?.title || "Docs"
   
@@ -103,7 +119,7 @@ export function DocsLayout({
         <div className="relative flex md:col-start-2 min-w-0 overflow-hidden">
           <main className="relative py-6 lg:py-8 flex-auto w-full">
             {/* Frontmatter 元信息展示 */}
-            {frontmatter && (frontmatter.title || frontmatter.description || frontmatter.author || frontmatter.date) && (
+            {frontmatter && (frontmatter.title || frontmatter.description || topAuthors.length || formattedCreatedAt || lastUpdated || editUrl) && (
               <header className="mb-8 pb-6 border-b border-border">
                 {frontmatter.title ? (
                   <div className="flex items-start justify-between gap-4 mb-3">
@@ -130,38 +146,51 @@ export function DocsLayout({
                 {frontmatter.description && (
                   <p className="text-lg text-muted-foreground mb-4">{frontmatter.description}</p>
                 )}
-                {(frontmatter.author || frontmatter.date) && (
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {frontmatter.author && (
+                {(topAuthors.length > 0 || formattedCreatedAt) && (
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                    {topAuthors.length > 0 && (
                       <span className="flex items-center gap-1.5">
                         <User className="h-4 w-4" />
-                        {frontmatter.author}
+                        {topAuthors.join("、")}
                       </span>
                     )}
-                    {frontmatter.date && (
+                    {formattedCreatedAt && (
                       <span className="flex items-center gap-1.5">
                         <Calendar className="h-4 w-4" />
-                        {frontmatter.date instanceof Date 
-                          ? frontmatter.date.toLocaleDateString('zh-CN') 
-                          : String(frontmatter.date)}
+                        {lang === "en" ? "Created" : "创建时间"} {formattedCreatedAt}
                       </span>
                     )}
                   </div>
                 )}
               </header>
             )}
-            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !frontmatter.author && !frontmatter.date)) && (
-              <div className="flex justify-end mb-4">
-                <ExportToolbar
-                  content={content}
-                  title={frontmatter?.firstH1}
-                  lang={lang}
-                  availableLangs={availableLangs}
-                  pdfServerConfig={config.export?.pdfServer}
-                />
+            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !topAuthors.length && !formattedCreatedAt && !lastUpdated && !editUrl)) && (
+              <div className="mb-4">
+                <div className="flex justify-end">
+                  <ExportToolbar
+                    content={content}
+                    title={frontmatter?.firstH1}
+                    lang={lang}
+                    availableLangs={availableLangs}
+                    pdfServerConfig={config.export?.pdfServer}
+                  />
+                </div>
               </div>
             )}
             {children}
+            <div className="mt-10 border-t border-border pt-6">
+              <PageMetaActions
+                lang={lang}
+                slug={slug}
+                title={frontmatter?.title || frontmatter?.firstH1}
+                filePath={docFilePath}
+                lastUpdated={lastUpdated}
+                editUrl={editUrl}
+                feedback={frontmatter?.title === "Not Found" ? { ...config.feedback, enabled: false } : config.feedback}
+                pageMeta={config.pageMeta}
+                editLinkLabel={config.editLink?.label}
+              />
+            </div>
           </main>
         </div>
         <div className="md:col-start-2">

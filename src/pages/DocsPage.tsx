@@ -8,6 +8,7 @@ import { MdxContent } from "../components/MdxContent"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { parseFrontmatter } from "../lib/frontmatter"
 import { getPrevNextPage } from "../lib/navigation"
+import { buildEditUrl, resolveDocFilePath, resolvePageMeta, type DocGitMeta } from "../lib/page-meta"
 import { rehypeToc, type TocItem } from "../lib/rehype-toc"
 import { AISelectionTrigger, AIChatDialog, AISettingsPanel } from "../components/ai"
 import { siteShikiBundle } from "../generated/shiki-bundle"
@@ -16,7 +17,10 @@ interface Frontmatter {
   title?: string
   description?: string
   author?: string
-  date?: string | Date
+  authors?: string[]
+  createdAt?: string
+  lastUpdated?: string
+  editUrl?: string
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
@@ -46,6 +50,9 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [content, setContent] = useState("")
   const [frontmatter, setFrontmatter] = useState<Frontmatter | null>(null)
+  const [docGitMeta, setDocGitMeta] = useState<DocGitMeta | null>(null)
+  const [docFilePath, setDocFilePath] = useState<string>()
+  const [docExt, setDocExt] = useState<"md" | "mdx">()
   const [configLoading, setConfigLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(true)
 
@@ -91,6 +98,9 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
   useEffect(() => {
     let cancelled = false
     setContentLoading(true)
+    setDocGitMeta(null)
+    setDocFilePath(undefined)
+    setDocExt(undefined)
 
     const pageSlug = slug || "index"
     const mdPath = `/docs/${currentLang}/${pageSlug}.md`
@@ -104,11 +114,13 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
         ])
 
         let contentToUse: string | null = null
+        let resolvedExt: "md" | "mdx" | undefined
 
         if (mdxResponse.ok) {
           const mdxText = await mdxResponse.text()
           if (!mdxText.trim().startsWith('<!DOCTYPE') && !mdxText.includes('<html')) {
             contentToUse = mdxText
+            resolvedExt = "mdx"
           }
         }
 
@@ -116,6 +128,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
           const mdText = await mdResponse.text()
           if (!mdText.trim().startsWith('<!DOCTYPE') && !mdText.includes('<html')) {
             contentToUse = mdText
+            resolvedExt = "md"
           }
         }
 
@@ -146,6 +159,10 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
 
         setFrontmatter(enrichedFrontmatter)
         setContent(content)
+        if (resolvedExt) {
+          setDocExt(resolvedExt)
+          setDocFilePath(resolveDocFilePath(currentLang, pageSlug, resolvedExt))
+        }
       } catch (error) {
         console.error('[DocsPage] Error:', error);
         if (cancelled) return
@@ -153,6 +170,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
           "# 404 - Not Found\n\nThe page you're looking for could not be found."
         setContent(errorMessage)
         setFrontmatter({ title: "Not Found" })
+        setDocGitMeta(null)
       } finally {
         if (!cancelled) setContentLoading(false)
       }
@@ -177,6 +195,57 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
     }
   }, [currentLang, slug, config?.toc?.maxLevel])
 
+  useEffect(() => {
+    let cancelled = false
+
+    if (!docFilePath || frontmatter?.title === "Not Found") {
+      setDocGitMeta(null)
+      return () => {
+        cancelled = true
+      }
+    }
+
+    ;(async () => {
+      try {
+        const response = await fetch("/doc-git-meta.json")
+        if (!response.ok) throw new Error(`Failed to fetch doc git meta: ${response.status}`)
+        const payload = await response.json() as { files?: Record<string, DocGitMeta> }
+        if (!cancelled) {
+          setDocGitMeta(payload.files?.[docFilePath] ?? null)
+        }
+      } catch (error) {
+        console.error("[DocsPage] Failed to load doc git meta:", error)
+        if (!cancelled) {
+          setDocGitMeta(null)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [docFilePath, frontmatter?.title])
+
+  const pageMeta = useMemo(() => {
+    return resolvePageMeta({
+      gitMeta: docGitMeta ?? undefined,
+      frontmatter,
+      preferGitMeta: config?.pageMeta?.preferGitMeta !== false,
+    })
+  }, [config?.pageMeta?.preferGitMeta, docGitMeta, frontmatter])
+
+  const editUrl = useMemo(() => {
+    if (typeof frontmatter?.editUrl === "string") return frontmatter.editUrl
+    if (config?.editLink?.enabled === false) return undefined
+    return buildEditUrl(config?.editLink?.urlTemplate, {
+      lang: currentLang,
+      slug: slug || "index",
+      docPath: docFilePath,
+      ext: docExt,
+      filePath: docFilePath,
+    })
+  }, [config?.editLink?.enabled, config?.editLink?.urlTemplate, currentLang, docExt, docFilePath, frontmatter?.editUrl, slug])
+
   if (configLoading && !config) {
     return <div>Loading...</div>
   }
@@ -186,6 +255,10 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       lang={currentLang}
       config={config!}
       frontmatter={frontmatter}
+      slug={slug}
+      lastUpdated={pageMeta.lastUpdated}
+      editUrl={frontmatter?.title === "Not Found" ? undefined : editUrl}
+      docFilePath={docFilePath}
       prev={prev}
       next={next}
       content={content}

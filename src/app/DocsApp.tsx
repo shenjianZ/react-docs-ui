@@ -71,7 +71,8 @@ interface Frontmatter {
   title?: string
   description?: string
   author?: string
-  date?: string | Date
+  createdAt?: string
+  lastUpdated?: string
   toc?: TocItem[]
   firstH1?: string
   [key: string]: unknown
