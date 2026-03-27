@@ -307,7 +307,7 @@ pageMeta:
 editLink:
     enabled: true
     label: "Edit this page"
-    urlTemplate: "https://github.com/shenjianZ/react-docs-ui/edit/main/{filePath}"
+    urlTemplate: "https://github.com/shenjianZ/react-docs-ui/edit/master/{filePath}"
 
 feedback:
     enabled: true

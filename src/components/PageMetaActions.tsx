@@ -32,12 +32,15 @@ export function PageMetaActions(props: PageMetaActionsProps) {
   return (
     <div className="space-y-4">
       {hasSummary && (
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-end gap-4 text-sm text-muted-foreground">
           {showLastUpdated && (
-            <span className="flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
               {updatedLabel} {formattedLastUpdated}
             </span>
+          )}
+          {showLastUpdated && showEditLink && (
+            <span className="h-4 w-px bg-border/80" aria-hidden="true" />
           )}
           {showEditLink && (
             <a className="inline-flex items-center gap-1.5 hover:text-foreground" href={props.editUrl} target="_blank" rel="noopener noreferrer">

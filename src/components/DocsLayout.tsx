@@ -178,7 +178,7 @@ export function DocsLayout({
               </div>
             )}
             {children}
-            <div className="mt-10 border-t border-border pt-6">
+            <div className="mt-8 border-t border-border pt-6">
               <PageMetaActions
                 lang={lang}
                 slug={slug}
@@ -191,10 +191,10 @@ export function DocsLayout({
                 editLinkLabel={config.editLink?.label}
               />
             </div>
+            <PageNavigation prev={prev} next={next} lang={lang} />
           </main>
         </div>
         <div className="md:col-start-2">
-          <PageNavigation prev={prev} next={next} lang={lang} />
           {config.footer?.enabled !== false && (
             <Footer footer={config.footer} lang={lang} />
           )}
