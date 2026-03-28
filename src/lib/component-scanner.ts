@@ -31,8 +31,22 @@ const BUILTIN_MDX_COMPONENTS: ComponentRegistry = {
 
 let generatedComponentsPromise: Promise<ComponentRegistry | null> | null = null
 
+function getRuntimeInjectedComponents(): ComponentRegistry | null {
+  const runtimeRegistry = (globalThis as any).__REACT_DOCS_UI_MDX_COMPONENTS__
+  if (runtimeRegistry && typeof runtimeRegistry === 'object') {
+    return runtimeRegistry as ComponentRegistry
+  }
+  return null
+}
+
 function getGeneratedComponentsPromise(): Promise<ComponentRegistry | null> {
   if (!generatedComponentsPromise) {
+    const runtimeInjectedComponents = getRuntimeInjectedComponents()
+    if (runtimeInjectedComponents) {
+      generatedComponentsPromise = Promise.resolve(runtimeInjectedComponents)
+      return generatedComponentsPromise
+    }
+
     generatedComponentsPromise = import('../generated/mdx-components')
       .then(module => {
         if (module && module.MDX_COMPONENTS) {

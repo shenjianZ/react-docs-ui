@@ -630,6 +630,7 @@ export function MdxContent({
         })
         
         map.set(name, WrappedComponent)
+        map.set(name.toLowerCase(), WrappedComponent)
         
         if (name.includes('.')) {
           const [parentName, subName] = name.split('.')
