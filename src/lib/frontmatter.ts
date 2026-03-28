@@ -6,17 +6,15 @@ export interface ParsedFrontmatter {
 }
 
 export function parseFrontmatter(source: string): ParsedFrontmatter {
-  if (!source.startsWith("---\n")) {
+  const normalized = source.replace(/^\uFEFF/, "")
+  const match = normalized.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/)
+
+  if (!match) {
     return { data: {}, content: source }
   }
 
-  const endIndex = source.indexOf("\n---\n", 4)
-  if (endIndex === -1) {
-    return { data: {}, content: source }
-  }
-
-  const rawFrontmatter = source.slice(4, endIndex)
-  const content = source.slice(endIndex + 5)
+  const rawFrontmatter = match[1]
+  const content = normalized.slice(match[0].length)
 
   try {
     const parsed = yaml.load(rawFrontmatter)
