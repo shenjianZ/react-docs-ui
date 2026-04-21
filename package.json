@@ -1,6 +1,6 @@
 {
     "name": "react-docs-ui",
-    "version": "0.7.5",
+    "version": "0.7.6",
     "type": "module",
     "description": "React documentation site UI components — navigation, sidebar, search, code highlight, MDX rendering and theming to help you build docs fast.",
     "homepage": "https://shenjianZ.github.io/react-docs-ui",
@@ -18,8 +18,17 @@
     ],
     "module": "dist/react-docs-ui.es.js",
     "types": "dist/types/index.d.ts",
+    "bin": {
+        "react-docs-ui": "./scripts/cli.mjs"
+    },
     "files": [
         "dist",
+        "scripts/cli.mjs",
+        "scripts/generate-changelog-index.mjs",
+        "scripts/generate-doc-git-meta.mjs",
+        "scripts/generate-llms-files.mjs",
+        "scripts/generate-search-index.mjs",
+        "scripts/generate-shiki-bundle.mjs",
         "README.md",
         "package.json"
     ],
@@ -35,12 +44,12 @@
         "./style.css": "./dist/react-docs-ui.css"
     },
     "scripts": {
-        "predev": "node scripts/generate-doc-git-meta.mjs && node scripts/generate-llms-files.mjs && node scripts/generate-changelog-index.mjs",
+        "predev": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index",
         "dev": "vite",
-        "prebuild": "node scripts/generate-doc-git-meta.mjs && node scripts/generate-llms-files.mjs && node scripts/generate-changelog-index.mjs",
+        "prebuild": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index",
         "build": "tsc -b && vite build",
         "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.config.lib.ts",
-        "build:search": "node scripts/generate-search-index.mjs",
+        "build:search": "node scripts/cli.mjs generate-search-index",
         "preview": "vite preview",
         "lint": "eslint .",
         "prepublishOnly": "npm run build:lib",
@@ -65,6 +74,7 @@
         "docx": "^9.6.1",
         "file-saver": "^2.0.5",
         "flexsearch": "^0.8.212",
+        "glob": "^13.0.6",
         "gray-matter": "^4.0.3",
         "html-to-image": "^1.11.13",
         "js-yaml": "^4.1.0",
@@ -108,7 +118,6 @@
         "eslint-plugin-react-hooks": "^7.0.1",
         "eslint-plugin-react-refresh": "^0.5.2",
         "express": "^5.2.1",
-        "glob": "^13.0.6",
         "globals": "^17.4.0",
         "puppeteer": "^24.40.0",
         "react": "^19.0.0",

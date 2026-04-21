@@ -7,6 +7,7 @@ interface SearchRuntimeProps {
   lang: string
   version?: string
   maxResults?: number
+  snippetLength?: number
   placeholder?: string
   openSignal: number
 }
@@ -33,6 +34,7 @@ export default function SearchRuntime({
   lang,
   version,
   maxResults,
+  snippetLength,
   placeholder,
   openSignal,
 }: SearchRuntimeProps) {
@@ -41,6 +43,7 @@ export default function SearchRuntime({
       lang={lang}
       version={version}
       maxResults={maxResults}
+      snippetLength={snippetLength}
       enableHotkeys={false}
     >
       <SearchRuntimeBridge openSignal={openSignal} placeholder={placeholder} />

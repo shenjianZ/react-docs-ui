@@ -24,6 +24,13 @@ interface ExportToolbarProps {
   title?: string
   lang: string
   availableLangs?: string[]
+  exportConfig?: {
+    enabled?: boolean
+    markdown?: boolean
+    pdf?: boolean
+    word?: boolean
+    allDocs?: boolean
+  }
   pdfServerConfig?: PdfServerConfig
 }
 
@@ -69,6 +76,7 @@ export function ExportToolbar({
   title,
   lang,
   availableLangs = [lang],
+  exportConfig,
   pdfServerConfig,
 }: ExportToolbarProps) {
   const t = translations[lang as keyof typeof translations] || translations.en
@@ -77,6 +85,11 @@ export function ExportToolbar({
   const [exportAllOpen, setExportAllOpen] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
   const copyTriggeredRef = useRef(false)
+  const showMarkdown = exportConfig?.markdown !== false
+  const showPdf = exportConfig?.pdf !== false
+  const showWord = exportConfig?.word !== false
+  const showAllDocs = exportConfig?.allDocs !== false
+  const hasActions = showMarkdown || showPdf || showWord || showAllDocs
 
   const handleCopyAsMarkdown = useCallback(async () => {
     try {
@@ -153,6 +166,10 @@ export function ExportToolbar({
     }
   }, [content, title, t.wordExportFailed, t.wordExported, toast])
 
+  if (exportConfig?.enabled === false || !hasActions) {
+    return null
+  }
+
   return (
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
@@ -168,47 +185,59 @@ export function ExportToolbar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem
-            onPointerDown={(event) => {
-              event.preventDefault()
-              if (copyTriggeredRef.current) return
-              copyTriggeredRef.current = true
-              void handleCopyAsMarkdown().finally(() => {
-                window.setTimeout(() => {
-                  copyTriggeredRef.current = false
-                }, 0)
-              })
-            }}
-            onClick={() => {
-              if (copyTriggeredRef.current) return
-              void handleCopyAsMarkdown()
-            }}
-            onSelect={(event) => {
-              event.preventDefault()
-              if (copyTriggeredRef.current) return
-              void handleCopyAsMarkdown()
-            }}
-          >
-            <Copy className="mr-2 h-4 w-4" />
-            {t.copyAsMarkdown}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleExportMarkdown}>
-            <FileText className="mr-2 h-4 w-4" />
-            {t.exportAsMarkdown}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleExportPDF}>
-            <FileType className="mr-2 h-4 w-4" />
-            {t.exportAsPDF}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleExportWord}>
-            <FileDown className="mr-2 h-4 w-4" />
-            {t.exportAsWord}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setExportAllOpen(true)}>
-            <Package className="mr-2 h-4 w-4" />
-            {t.exportAllDocs}
-          </DropdownMenuItem>
+          {showMarkdown && (
+            <>
+              <DropdownMenuItem
+                onPointerDown={(event) => {
+                  event.preventDefault()
+                  if (copyTriggeredRef.current) return
+                  copyTriggeredRef.current = true
+                  void handleCopyAsMarkdown().finally(() => {
+                    window.setTimeout(() => {
+                      copyTriggeredRef.current = false
+                    }, 0)
+                  })
+                }}
+                onClick={() => {
+                  if (copyTriggeredRef.current) return
+                  void handleCopyAsMarkdown()
+                }}
+                onSelect={(event) => {
+                  event.preventDefault()
+                  if (copyTriggeredRef.current) return
+                  void handleCopyAsMarkdown()
+                }}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                {t.copyAsMarkdown}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleExportMarkdown}>
+                <FileText className="mr-2 h-4 w-4" />
+                {t.exportAsMarkdown}
+              </DropdownMenuItem>
+            </>
+          )}
+          {showPdf && (
+            <DropdownMenuItem onSelect={handleExportPDF}>
+              <FileType className="mr-2 h-4 w-4" />
+              {t.exportAsPDF}
+            </DropdownMenuItem>
+          )}
+          {showWord && (
+            <DropdownMenuItem onSelect={handleExportWord}>
+              <FileDown className="mr-2 h-4 w-4" />
+              {t.exportAsWord}
+            </DropdownMenuItem>
+          )}
+          {showAllDocs && (
+            <>
+              {(showMarkdown || showPdf || showWord) && <DropdownMenuSeparator />}
+              <DropdownMenuItem onSelect={() => setExportAllOpen(true)}>
+                <Package className="mr-2 h-4 w-4" />
+                {t.exportAllDocs}
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

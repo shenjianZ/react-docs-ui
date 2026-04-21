@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore types provided via ambient declaration
 import yaml from "js-yaml"
 
 export interface ImageViewerLabels {
@@ -232,6 +230,7 @@ export interface SiteConfig {
     enabled?: boolean        // 是否启用全文搜索，默认 true
     placeholder?: string     // 搜索框占位符
     maxResults?: number      // 最大返回结果数，默认 20
+    snippetLength?: number   // 搜索摘要最大长度，默认 150
   }
   // 导出功能配置
   export?: {

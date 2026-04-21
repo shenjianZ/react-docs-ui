@@ -80,6 +80,15 @@ export function DocsLayout({
   availableLangs,
 }: DocsLayoutProps) {
   const { site, navbar, sidebar, theme } = config
+  const sidebarEnabled = React.useMemo(() => {
+    if (!sidebar || sidebar.enabled === false) return false
+    const hasSections = Boolean(sidebar.sections?.length)
+    const hasCollections = Boolean(
+      sidebar.collections &&
+        Object.values(sidebar.collections).some(collection => collection.sections?.length)
+    )
+    return hasSections || hasCollections
+  }, [sidebar])
   const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
   const showTopAuthors = config.pageMeta?.showAuthors !== false && topAuthors.length > 0
   const isChangelogDetail = Boolean(slug?.startsWith("changelog/"))
@@ -187,7 +196,7 @@ export function DocsLayout({
     <div className="relative flex min-h-screen flex-col">
       <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
       {/* 移动端侧边栏 */}
-      {sidebar && (
+      {sidebarEnabled && sidebar && (
         <MobileSidebar
           lang={lang}
           version={version}
@@ -201,15 +210,15 @@ export function DocsLayout({
         lang={lang}
         navItems={navbar.items || []}
         toc={toc}
-        showSidebar={!!sidebar}
+        showSidebar={sidebarEnabled}
         showSearch={config.search?.enabled !== false}
         onOpenSidebar={() => setMobileSidebarOpen(true)}
         onOpenSearch={openSearch}
       />
       <div 
-  className={`flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 px-4 md:px-8 ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
+  className={`flex-1 items-start px-4 md:px-8 ${sidebarEnabled ? 'md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10' : ''} ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
 >
-        {sidebar && (
+        {sidebarEnabled && sidebar && (
           <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block">
             <ScrollArea className="h-full py-6 pr-6 lg:py-8">
               <SidebarNav lang={lang} version={version} sidebar={sidebar} />
@@ -217,7 +226,7 @@ export function DocsLayout({
           </aside>
         )}
         {/* 内容区域 */}
-        <div className="relative flex md:col-start-2 min-w-0 overflow-hidden">
+        <div className={`relative flex min-w-0 overflow-hidden ${sidebarEnabled ? 'md:col-start-2' : ''}`}>
           <main className="relative py-6 lg:py-8 flex-auto w-full">
             {/* Frontmatter 元信息展示 */}
             {frontmatter && (frontmatter.title || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
@@ -230,6 +239,7 @@ export function DocsLayout({
                       title={frontmatter.title}
                       lang={lang}
                       availableLangs={availableLangs}
+                      exportConfig={config.export}
                       pdfServerConfig={config.export?.pdfServer}
                     />
                   </div>
@@ -240,6 +250,7 @@ export function DocsLayout({
                       title={frontmatter.firstH1}
                       lang={lang}
                       availableLangs={availableLangs}
+                      exportConfig={config.export}
                       pdfServerConfig={config.export?.pdfServer}
                     />
                   </div>
@@ -273,6 +284,7 @@ export function DocsLayout({
                     title={frontmatter?.firstH1}
                     lang={lang}
                     availableLangs={availableLangs}
+                    exportConfig={config.export}
                     pdfServerConfig={config.export?.pdfServer}
                   />
                 </div>
@@ -304,7 +316,7 @@ export function DocsLayout({
             <PageNavigation prev={prev} next={next} lang={lang} version={version} />
           </main>
         </div>
-        <div className="md:col-start-2">
+        <div className={sidebarEnabled ? "md:col-start-2" : undefined}>
           {config.footer?.enabled !== false && (
             <Footer footer={config.footer} lang={lang} />
           )}

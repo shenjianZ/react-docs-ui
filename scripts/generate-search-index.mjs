@@ -1,9 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const ROOT_DIR = path.resolve(__dirname, '..')
+const ROOT_DIR = process.cwd()
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public')
 const DOCS_DIR = path.join(PUBLIC_DIR, 'docs')
 
@@ -21,17 +19,22 @@ function tokenize(text) {
   for (const part of parts) {
     if (!part.trim()) continue
     if (isChinese(part)) {
-      tokens.push(part)
+      const chars = part.split('')
+      for (let i = 0; i < chars.length - 1; i++) {
+        tokens.push(chars[i] + chars[i + 1])
+      }
+      tokens.push(...chars.filter(c => c.trim()))
     } else {
-      const words = part.toLowerCase().split(/[^a-zA-Z0-9]+/).filter(w => w.length > 1)
+      const words = part.toLowerCase().split(/[^a-zA-Z0-9]+/).filter(w => w.length > 0)
       tokens.push(...words)
     }
   }
-  return [...new Set(tokens.filter(t => t.length > 1))]
+  return [...new Set(tokens)]
 }
 
 function parseFrontmatter(content) {
-  const lines = content.split('\n')
+  const normalized = content.replace(/^\uFEFF/, '')
+  const lines = normalized.split(/\r?\n/)
   const data = {}
   let contentStart = 0
   if (lines[0]?.startsWith('---')) {
@@ -65,7 +68,7 @@ function cleanContent(text) {
 function extractTextContent(node) {
   if (!node || typeof node !== 'object') return ''
   if (node.type === 'text') return node.value || ''
-  if (node.type === 'inlineCode') return node.value || ''
+  if (node.type === 'inlineCode') return `\`${node.value || ''}\``
   if (node.type === 'code') return node.value || ''
   if ('children' in node && Array.isArray(node.children)) {
     return node.children.map(extractTextContent).join(' ')

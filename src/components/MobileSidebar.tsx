@@ -2,15 +2,12 @@ import { useEffect } from "react"
 import { SidebarNav } from "./SidebarNav"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import type { SiteConfig } from "@/lib/config"
 
 interface MobileSidebarProps {
   lang: string
   version?: string
-  sidebar: {
-    enabled?: boolean
-    sections?: any
-    collections?: Record<string, { sections: any }>
-  }
+  sidebar: SiteConfig["sidebar"]
   open: boolean
   onOpenChange: (open: boolean) => void
 }

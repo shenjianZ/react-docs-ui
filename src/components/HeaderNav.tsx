@@ -271,15 +271,6 @@ export function HeaderNav({ lang, version, site, navbar, announcement, versions,
       setResolvedTheme(theme)
     }
   }, [theme])
-
-  useEffect(() => {
-    if (theme === "system") {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-      setResolvedTheme(isDark ? "dark" : "light")
-    } else {
-      setResolvedTheme(theme)
-    }
-  }, [theme])
   const normalizeLogoPath = (p: string) => (p.startsWith("http") ? p : `/${p.replace(/^\//, "")}`)
   const { light: logoLight, dark: logoDark } =
     typeof site.logo === "string"

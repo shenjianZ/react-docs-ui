@@ -27,6 +27,7 @@ interface SearchLauncherProviderProps {
   version?: string
   enabled?: boolean
   maxResults?: number
+  snippetLength?: number
   placeholder?: string
 }
 
@@ -36,6 +37,7 @@ export function SearchLauncherProvider({
   version,
   enabled = true,
   maxResults,
+  snippetLength,
   placeholder,
 }: SearchLauncherProviderProps) {
   const [shouldMountRuntime, setShouldMountRuntime] = useState(false)
@@ -75,6 +77,7 @@ export function SearchLauncherProvider({
             lang={lang}
             version={version}
             maxResults={maxResults}
+            snippetLength={snippetLength}
             placeholder={placeholder}
             openSignal={openSignal}
           />

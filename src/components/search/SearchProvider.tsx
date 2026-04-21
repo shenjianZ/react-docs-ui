@@ -38,6 +38,7 @@ interface SearchProviderProps {
   version?: string
   enabled?: boolean
   maxResults?: number
+  snippetLength?: number
   enableHotkeys?: boolean
 }
 
@@ -47,6 +48,7 @@ export function SearchProvider({
   version,
   enabled = true,
   maxResults = 20,
+  snippetLength,
   enableHotkeys = true,
 }: SearchProviderProps) {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -132,6 +134,7 @@ export function SearchProvider({
       lang,
       version,
       limit: maxResults,
+      snippetLength,
     }
 
     if (engineRef.current) {
@@ -141,7 +144,7 @@ export function SearchProvider({
     }
 
     return []
-  }, [lang, version, loadIndex, maxResults])
+  }, [lang, version, loadIndex, maxResults, snippetLength])
 
   useEffect(() => {
     if (!query.trim()) {

@@ -59,6 +59,9 @@ importers:
       flexsearch:
         specifier: ^0.8.212
         version: 0.8.212
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -183,9 +186,6 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
-      glob:
-        specifier: ^13.0.6
-        version: 13.0.6
       globals:
         specifier: ^17.4.0
         version: 17.4.0
@@ -1859,6 +1859,7 @@ packages:
   basic-ftp@5.2.0:
     resolution: {integrity: sha512-VoMINM2rqJwJgfdHq6RiUudKt2BV+FY5ZFezP/ypmwayk68+NzzAQy4XXLlqsGD4MCzq3DrmNFD/uUmBJuGoXw==}
     engines: {node: '>=10.0.0'}
+    deprecated: Security vulnerability fixed in 5.2.1, please upgrade
 
   bn.js@4.12.3:
     resolution: {integrity: sha512-fGTi3gxV/23FTYdAoUtLYp6qySe2KE3teyZitipKNRuVYcBkoP/bB3guXN/XVKUe9mxCHXnc9C4ocyz8OmgN0g==}

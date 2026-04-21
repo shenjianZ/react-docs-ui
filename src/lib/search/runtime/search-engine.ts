@@ -2,9 +2,9 @@ import FlexSearch from 'flexsearch'
 import type { SearchIndex, SearchSection, SearchResult, SearchOptions } from './types'
 
 const DEFAULT_LIMIT = 20
+const DEFAULT_SNIPPET_LENGTH = 150
 
 export class SearchEngine {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private index: any
   private sections: Map<string, SearchSection> = new Map()
   private initialized = false
@@ -43,7 +43,7 @@ export class SearchEngine {
       return []
     }
 
-    const { query, version, limit = DEFAULT_LIMIT } = options
+    const { query, version, limit = DEFAULT_LIMIT, snippetLength = DEFAULT_SNIPPET_LENGTH } = options
     const normalizedQuery = query.toLowerCase().trim()
     
     if (!normalizedQuery) {
@@ -66,17 +66,16 @@ export class SearchEngine {
         id: section.id,
         pageTitle: section.pageTitle,
         sectionTitle: section.sectionTitle,
-        snippet: this.generateSnippet(section.content, normalizedQuery),
+        snippet: this.generateSnippet(section.content, normalizedQuery, snippetLength),
         url: section.url,
         score: 1,
       }
     }).filter((r): r is SearchResult => r !== null).slice(0, limit)
   }
 
-  private generateSnippet(content: string, query: string): string {
+  private generateSnippet(content: string, query: string, maxLength: number): string {
     if (!content) return ''
     
-    const maxLength = 150
     const lowerContent = content.toLowerCase()
     const queryTerms = query.split(/\s+/).filter(Boolean)
     

@@ -118,6 +118,7 @@ function SearchLauncherWrapper({ children }: { children: React.ReactNode }) {
       version={version}
       enabled={config?.search?.enabled !== false}
       maxResults={config?.search?.maxResults}
+      snippetLength={config?.search?.snippetLength}
       placeholder={config?.search?.placeholder}
     >
       {children}
@@ -391,7 +392,15 @@ function DocsPage({ shikiBundle }: { shikiBundle?: ShikiBundle }) {
     return () => {
       cancelled = true
     }
-  }, [currentLang, currentVersion, invalidLang, slug])
+  }, [
+    config?.codeHighlight,
+    config?.toc?.maxLevel,
+    currentLang,
+    currentVersion,
+    invalidLang,
+    shikiBundle,
+    slug,
+  ])
 
   useEffect(() => {
     let cancelled = false

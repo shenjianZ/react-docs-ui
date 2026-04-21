@@ -16,4 +16,5 @@ export interface SearchOptions {
   lang: string
   version?: string
   limit?: number
+  snippetLength?: number
 }

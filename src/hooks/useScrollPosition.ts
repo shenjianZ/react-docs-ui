@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 
 export function useScrollPosition() {
@@ -8,7 +8,7 @@ export function useScrollPosition() {
   const restoredPathsRef = useRef<Set<string>>(new Set())
 
   // 获取当前页面的滚动位置（从存储中）
-  const getSavedScrollPosition = (key: string): number | undefined => {
+  const getSavedScrollPosition = useCallback((key: string): number | undefined => {
     // 先从 ref 中查找
     let scrollY = scrollPositionsRef.current.get(key)
     
@@ -30,10 +30,10 @@ export function useScrollPosition() {
     }
     
     return scrollY
-  }
+  }, [])
 
   // 保存当前页面的滚动位置
-  const saveScrollPosition = () => {
+  const saveScrollPosition = useCallback(() => {
     // 如果正在恢复滚动位置，不保存
     if (isRestoringRef.current) return
     
@@ -46,10 +46,10 @@ export function useScrollPosition() {
       restoredPathsRef.current.add(key) // 标记该页面已被访问过
       sessionStorage.setItem("scroll-positions", JSON.stringify(Object.fromEntries(scrollPositionsRef.current)))
     }
-  }
+  }, [location.pathname, location.search])
 
   // 恢复页面的滚动位置
-  const restoreScrollPosition = () => {
+  const restoreScrollPosition = useCallback(() => {
     const key = location.pathname + location.search
     
     // 检查该页面是否有保存的滚动位置
@@ -76,7 +76,7 @@ export function useScrollPosition() {
         }
       })
     }
-  }
+  }, [getSavedScrollPosition, location.pathname, location.search])
 
   useEffect(() => {
     // 初始化时加载 sessionStorage 中的数据
@@ -116,10 +116,10 @@ export function useScrollPosition() {
       window.removeEventListener("scroll", throttledScroll)
       saveScrollPosition()
     }
-  }, [location.pathname, location.search])
+  }, [location.pathname, location.search, restoreScrollPosition, saveScrollPosition])
 
   // 清除指定路径的滚动位置
-  const clearScrollPosition = (pathname: string) => {
+  const clearScrollPosition = useCallback((pathname: string) => {
     const key = pathname + window.location.search
     scrollPositionsRef.current.delete(key)
     restoredPathsRef.current.delete(key)
@@ -131,7 +131,7 @@ export function useScrollPosition() {
     } catch {
       // ignore
     }
-  }
+  }, [])
 
   return {
     saveScrollPosition,
