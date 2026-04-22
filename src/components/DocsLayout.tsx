@@ -1,10 +1,11 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Calendar, User } from "lucide-react"
+import { Calendar, User, Clock } from "lucide-react"
 
 import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
 import { FloatingActionBall } from "@/components/FloatingActionBall"
+import { ReadingProgressBar } from "@/components/ReadingProgressBar"
 import { PageMetaActions } from "@/components/PageMetaActions"
 import { ReleaseMetaBar } from "@/components/ReleaseMetaBar"
 import { SidebarNav } from "@/components/SidebarNav"
@@ -18,6 +19,7 @@ import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearchLauncher } from "@/components/SearchLauncher"
 import type { TocItem } from "@/lib/rehype-toc"
 import type { SiteConfig } from "@/lib/config"
+import { estimateReadingTime } from "@/lib/reading-time"
 
 interface Frontmatter {
   title?: string
@@ -105,6 +107,10 @@ export function DocsLayout({
     ? config.seo.titleTemplate.replace(/\{title\}/g, rawTitle).replace(/\{siteTitle\}/g, site?.title || "Docs")
     : rawTitle
   const pageDescription = frontmatter?.description || config.seo?.defaultDescription || site?.description
+  const readingTime = React.useMemo(
+    () => config.reading?.showTime !== false ? estimateReadingTime(content, lang) : null,
+    [content, lang, config.reading?.showTime]
+  )
   const siteUrl = site?.url?.replace(/\/+$/, "")
   const pagePath = version ? `/${lang}/v/${version}${slug ? `/${slug}` : ""}` : `/${lang}${slug ? `/${slug}` : ""}`
   
@@ -193,7 +199,7 @@ export function DocsLayout({
     } else if (feedNode) {
       feedNode.remove()
     }
-  }, [config.seo, frontmatter?.canonical, frontmatter?.noindex, lang, pageDescription, pagePath, pageTitle, siteUrl, slug, version])
+  }, [config.feed?.enabled, config.feed?.title, config.seo, frontmatter?.canonical, frontmatter?.noindex, lang, pageDescription, pagePath, pageTitle, site?.title, siteUrl, slug, version])
   
   const toc = config.toc?.enabled !== false
     ? (frontmatter?.toc || [])
@@ -210,6 +216,7 @@ export function DocsLayout({
   return (
     <div className="relative flex min-h-screen flex-col">
       <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
+      {config.reading?.showProgress === true && <ReadingProgressBar />}
       {/* 移动端侧边栏 */}
       {sidebarEnabled && sidebar && (
         <MobileSidebar
@@ -282,7 +289,7 @@ export function DocsLayout({
                 {frontmatter.description && (
                   <p className="text-lg text-muted-foreground mb-4">{frontmatter.description}</p>
                 )}
-                {(showTopAuthors || formattedCreatedAt) && (
+                {(showTopAuthors || formattedCreatedAt || readingTime) && (
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     {showTopAuthors && (
                       <span className="flex items-center gap-1.5">
@@ -294,6 +301,12 @@ export function DocsLayout({
                       <span className="flex items-center gap-1.5">
                         <Calendar className="h-4 w-4" />
                         {lang === "en" ? "Created" : "创建时间"} {formattedCreatedAt}
+                      </span>
+                    )}
+                    {readingTime && (
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4" />
+                        {readingTime.text}
                       </span>
                     )}
                   </div>

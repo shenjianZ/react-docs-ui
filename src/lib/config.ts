@@ -217,6 +217,11 @@ export interface SiteConfig {
     enabled?: boolean        // 是否启用面包屑，默认 true
     showHome?: boolean       // 是否显示首页链接，默认 true
   }
+  // 阅读体验配置
+  reading?: {
+    showTime?: boolean       // 是否显示阅读时间，默认 true
+    showProgress?: boolean   // 是否显示阅读进度条，默认 false
+  }
   // AI功能配置
   ai?: {
     enabled?: boolean        // 是否启用AI功能，默认 true
