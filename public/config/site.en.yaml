@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=./site.schema.json
 # Website Configuration
 site:
     title: "React Docs UI Example"
@@ -318,6 +319,37 @@ seo:
     defaultOgImage: "https://react-docs-ui.example.com/images/og-default.png"
     robots: "index, follow"
     twitterCard: "summary_large_image"
+
+# Breadcrumb Configuration
+breadcrumb:
+    enabled: true
+    # Whether to show the home entry, including icon and label
+    showHome: true
+
+# Reading Experience Configuration
+reading:
+    # Show estimated reading time (default: true)
+    showTime: true
+    # Show reading progress bar (default: false)
+    showProgress: true
+
+# Sitemap Configuration
+sitemap:
+    enabled: true
+    # Available values: always, hourly, daily, weekly, monthly, yearly, never
+    changefreq: "weekly"
+    # Value range: 0.0 - 1.0
+    priority: 0.7
+    # Exclude paths. Supports exact paths, suffix wildcards (*.pdf), and directory wildcards (/en/private/*)
+    exclude: []
+
+# RSS Feed Configuration
+feed:
+    enabled: true
+    title: "React Docs UI Example"
+    description: "React Docs UI changelog"
+    # Maximum RSS item count
+    limit: 20
 
 # Export Configuration
 export:

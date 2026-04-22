@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=./site.schema.json
 # 网站基本配置
 site:
     title: "React Docs UI 示例项目"
@@ -317,6 +318,37 @@ seo:
     defaultOgImage: "https://react-docs-ui.example.com/images/og-default.png"
     robots: "index, follow"
     twitterCard: "summary_large_image"
+
+# 面包屑导航配置
+breadcrumb:
+    enabled: true
+    # 是否显示首页入口（图标和文字）
+    showHome: true
+
+# 阅读体验配置
+reading:
+    # 是否显示阅读时间估算（默认 true）
+    showTime: true
+    # 是否显示阅读进度条（默认 false）
+    showProgress: true
+
+# Sitemap 配置
+sitemap:
+    enabled: true
+    # 可选值：always、hourly、daily、weekly、monthly、yearly、never
+    changefreq: "weekly"
+    # 取值范围：0.0 - 1.0
+    priority: 0.7
+    # 排除路径，支持精确路径、后缀通配（*.pdf）和目录通配（/zh-cn/private/*）
+    exclude: []
+
+# RSS Feed 配置
+feed:
+    enabled: true
+    title: "React Docs UI 示例项目"
+    description: "React Docs UI 更新日志"
+    # RSS 条目数量上限
+    limit: 20
 
 # 导出功能配置
 export:
