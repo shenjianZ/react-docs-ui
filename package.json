@@ -44,9 +44,9 @@
         "./style.css": "./dist/react-docs-ui.css"
     },
     "scripts": {
-        "predev": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index",
+        "predev": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index && node scripts/cli.mjs generate-sitemap && node scripts/cli.mjs generate-feed",
         "dev": "vite",
-        "prebuild": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index",
+        "prebuild": "node scripts/cli.mjs generate-doc-git-meta && node scripts/cli.mjs generate-llms-files && node scripts/cli.mjs generate-changelog-index && node scripts/cli.mjs generate-sitemap && node scripts/cli.mjs generate-feed",
         "build": "tsc -b && vite build",
         "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.config.lib.ts",
         "build:search": "node scripts/cli.mjs generate-search-index",

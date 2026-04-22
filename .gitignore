@@ -33,3 +33,5 @@ public/doc-git-meta.json
 public/llms-full.txt
 public/llms.txt
 public/changelog-index-*.json
+public/feed.xml
+public/sitemap.xml

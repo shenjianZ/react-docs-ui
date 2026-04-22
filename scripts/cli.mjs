@@ -8,6 +8,8 @@ const commands = {
   "generate-changelog-index": "./generate-changelog-index.mjs",
   "generate-search-index": "./generate-search-index.mjs",
   "generate-shiki-bundle": "./generate-shiki-bundle.mjs",
+  "generate-sitemap": "./generate-sitemap.mjs",
+  "generate-feed": "./generate-feed.mjs",
 }
 
 if (!command || !commands[command]) {

@@ -10,6 +10,7 @@ import { ReleaseMetaBar } from "@/components/ReleaseMetaBar"
 import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
+import { Breadcrumb } from "@/components/Breadcrumb"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { ExportToolbar } from "@/components/ExportToolbar"
@@ -228,6 +229,12 @@ export function DocsLayout({
         {/* 内容区域 */}
         <div className={`relative flex min-w-0 overflow-hidden ${sidebarEnabled ? 'md:col-start-2' : ''}`}>
           <main className="relative py-6 lg:py-8 flex-auto w-full">
+            <Breadcrumb
+              lang={lang}
+              version={version}
+              sidebar={sidebar}
+              frontmatterTitle={frontmatter?.title}
+            />
             {/* Frontmatter 元信息展示 */}
             {frontmatter && (frontmatter.title || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
               <header className="mb-8 pb-6 border-b border-border">

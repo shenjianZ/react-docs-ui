@@ -261,6 +261,18 @@ export interface SiteConfig {
     robots?: string
     twitterCard?: "summary" | "summary_large_image"
   }
+  sitemap?: {
+    enabled?: boolean
+    changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
+    priority?: number
+    exclude?: string[]
+  }
+  feed?: {
+    enabled?: boolean
+    title?: string
+    description?: string
+    limit?: number
+  }
   imageViewer?: ImageViewerConfig
 }
 
