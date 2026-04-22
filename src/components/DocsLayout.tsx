@@ -229,12 +229,15 @@ export function DocsLayout({
         {/* 内容区域 */}
         <div className={`relative flex min-w-0 overflow-hidden ${sidebarEnabled ? 'md:col-start-2' : ''}`}>
           <main className="relative py-6 lg:py-8 flex-auto w-full">
-            <Breadcrumb
-              lang={lang}
-              version={version}
-              sidebar={sidebar}
-              frontmatterTitle={frontmatter?.title}
-            />
+            {config.breadcrumb?.enabled !== false && (
+              <Breadcrumb
+                lang={lang}
+                version={version}
+                sidebar={sidebar}
+                frontmatterTitle={frontmatter?.title}
+                labels={{ showHome: config.breadcrumb?.showHome }}
+              />
+            )}
             {/* Frontmatter 元信息展示 */}
             {frontmatter && (frontmatter.title || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
               <header className="mb-8 pb-6 border-b border-border">
