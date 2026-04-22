@@ -54,7 +54,7 @@ async function collectDocPages(lang) {
 
   for (const file of files) {
     const relativePath = path.relative(path.join(publicDir, "docs", lang), file)
-    const slug = relativePath.replace(/\.(md|mdx)$/i, "")
+    const slug = relativePath.replace(/\\/g, "/").replace(/\.(md|mdx)$/i, "")
     const source = await fs.readFile(file, "utf8")
     const { data } = parseFrontmatter(source)
 
@@ -165,7 +165,7 @@ async function main() {
     <loc>${escapeXml(loc)}</loc>
     <lastmod>${escapeXml(lastmod)}</lastmod>
     <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
+    <priority>${Number(priority).toFixed(1)}</priority>
   </url>`
   }).join("\n")
 
