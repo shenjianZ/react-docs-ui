@@ -179,6 +179,20 @@ export function DocsLayout({
       node.setAttribute("href", href)
       node.setAttribute("data-rdu-seo", "alternate")
     }))
+
+    // RSS Feed 自动发现
+    const feedNode = document.head.querySelector('link[rel="alternate"][type="application/rss+xml"][data-rdu-seo="feed"]')
+    if (siteUrl && config.feed?.enabled !== false) {
+      upsertHeadTag('link[rel="alternate"][type="application/rss+xml"][data-rdu-seo="feed"]', () => document.createElement("link"), node => {
+        node.setAttribute("rel", "alternate")
+        node.setAttribute("type", "application/rss+xml")
+        node.setAttribute("title", config.feed?.title || site?.title || "RSS Feed")
+        node.setAttribute("href", joinSiteUrl(siteUrl, "/feed.xml"))
+        node.setAttribute("data-rdu-seo", "feed")
+      })
+    } else if (feedNode) {
+      feedNode.remove()
+    }
   }, [config.seo, frontmatter?.canonical, frontmatter?.noindex, lang, pageDescription, pagePath, pageTitle, siteUrl, slug, version])
   
   const toc = config.toc?.enabled !== false
