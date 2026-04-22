@@ -53,6 +53,80 @@
    - 在 `react-docs-ui` 执行 `pnpm build:lib`
    - 因为模板默认消费的是 `dist`，不是 `src`
 
+## 本地联调方式
+
+推荐使用 `file:` 依赖联调，不推荐 `pnpm link`，避免出现重复 React 或 Router 上下文问题。
+
+1. 先构建库产物
+   ```bash
+   cd react-docs-ui
+   pnpm build:lib
+   ```
+
+2. 让模板消费本地库
+   ```bash
+   cd ../create-react-docs-ui/template
+   pnpm add react-docs-ui@file:../../react-docs-ui
+   pnpm install
+   ```
+   这个 `file:` 依赖只能用于本地联调，不能发布到 npm 模板中。
+
+3. 启动模板项目验证
+   ```bash
+   pnpm dev
+   ```
+
+4. 每次修改 `react-docs-ui` 源码后
+   - 回到 `react-docs-ui` 执行 `pnpm build:lib`
+   - 重启 `create-react-docs-ui/template` 的 `pnpm dev`
+   - 如果 Vite 没刷新，删除 `create-react-docs-ui/template/node_modules/.vite`
+
+5. 测试脚手架生成新项目
+   ```bash
+   cd create-react-docs-ui
+   node index.js test-docs
+   ```
+   生成前要先确认 `react-docs-ui/dist/react-docs-ui.es.js` 存在；CLI 会优先把新项目依赖写成本地 `file:` 路径，方便联调。
+
+## 发布前恢复模板依赖
+
+发布 `create-react-docs-ui` 前，必须确认 `create-react-docs-ui/template/package.json` 里的依赖是 npm 版本号，而不是本地 `file:` 路径。
+
+正确值：
+
+```json
+"react-docs-ui": "^0.7.6"
+```
+
+错误值：
+
+```json
+"react-docs-ui": "file:../../react-docs-ui"
+```
+
+发布前检查：
+
+```powershell
+cd D:\VScodeProject\react-docs\create-react-docs-ui
+Select-String -Path .\template\package.json -Pattern "react-docs-ui"
+```
+
+如果看到 `file:../../react-docs-ui`，先改回当前要发布的 npm 版本号，再执行：
+
+```powershell
+pnpm --dir template install
+pnpm --dir template build
+```
+
+建议再执行一次打包预检：
+
+```powershell
+pnpm pack
+git status --short
+```
+
+确认发布包里没有本地 `file:` 依赖、`pnpm-workspace.yaml` 或临时 link 配置。
+
 ## 每次都要检查的同步点
 
 - 页面渲染逻辑是否同时覆盖：
@@ -115,4 +189,3 @@
 - 不要把“主项目演示逻辑”误当成“库能力已经完成”
 - 每次改动后都问自己一句：
   - 这个功能是只在 `react-docs-ui` 生效，还是在 template 里也应该生效？
-
