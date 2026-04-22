@@ -14,6 +14,7 @@ import { DocsPage } from "@/pages/DocsPage"
 import { HomePage } from "@/pages/HomePage"
 import { AIProvider } from "@/components/ai"
 import { Toaster } from "@/components/ui/toaster"
+import { toast } from "@/components/ui/use-toast"
 import { scanComponents, loadComponents, getBuiltinComponents } from "@/lib/component-scanner"
 import type { SiteConfig } from "@/lib/config"
 
@@ -61,11 +62,13 @@ function App() {
               }
             } catch (error) {
               console.warn('[MDX] 加载组件失败:', error)
+              toast({ title: "组件加载失败", description: "部分自定义组件未能加载，已使用内置组件替代", variant: "destructive" })
             }
           }
         }
       } catch (e) {
         console.error('[Config] 加载配置失败:', e)
+        toast({ title: "配置加载失败", description: "无法加载站点配置，请检查网络连接后刷新页面", variant: "destructive" })
       }
     }
 

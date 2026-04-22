@@ -25,7 +25,7 @@ export function Mermaid({ chart }: MermaidProps) {
       .then((module) => {
         const mermaid = module.default
         if (!initialized) {
-          mermaid.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" })
+          mermaid.initialize({ startOnLoad: false, theme: "default", securityLevel: "strict" })
           initialized = true
         }
         return mermaid.render(`mermaid-${id}`, chart)

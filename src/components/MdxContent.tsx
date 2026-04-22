@@ -18,6 +18,7 @@ import { ImageViewer } from "./ImageViewer"
 import { Mermaid } from "./mdx-components"
 import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
 import { buildVersionedPath } from "../lib/versioning"
+import { copyToClipboard, sanitizeHtml } from "../lib/utils"
 import macros_physics from "katex-physics"
 
 interface MdxContentProps {
@@ -353,31 +354,11 @@ function ShikiCodeBlock({
       { lang: resolvedLang, theme, showLineNumbers },
       codeHighlight,
       shikiBundle
-    ).then(setHtml)
+    ).then((rawHtml) => setHtml(sanitizeHtml(rawHtml)))
   }, [code, resolvedLang, isDark, showLineNumbers, codeHighlight, shikiBundle])
   
   // 复制功能
   const handleCopy = React.useCallback(async () => {
-    const copyToClipboard = async (text: string) => {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text)
-      } else {
-        const textarea = document.createElement('textarea')
-        textarea.value = text
-        textarea.style.position = 'fixed'
-        textarea.style.left = '-9999px'
-        textarea.style.top = '-9999px'
-        document.body.appendChild(textarea)
-        textarea.focus()
-        textarea.select()
-        try {
-          document.execCommand('copy')
-        } finally {
-          document.body.removeChild(textarea)
-        }
-      }
-    }
-
     try {
       await copyToClipboard(code)
       setCopied(true)

@@ -11,10 +11,18 @@ export function ChangelogPage() {
   const lang = params.lang === "en" ? "en" : "zh-cn"
   const [config, setConfig] = useState<SiteConfig | null>(null)
   const [items, setItems] = useState<ChangelogItem[]>([])
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
-    getConfig(lang).then(setConfig).catch(() => setConfig(null))
-    getChangelogIndex(lang).then((data) => setItems(data.items)).catch(() => setItems([]))
+    setLoadError(false)
+    getConfig(lang).then(setConfig).catch(() => {
+      setConfig(null)
+      setLoadError(true)
+    })
+    getChangelogIndex(lang).then((data) => setItems(data.items)).catch(() => {
+      setItems([])
+      setLoadError(true)
+    })
   }, [lang])
 
   const pageSize = config?.changelog?.pageSize && config.changelog.pageSize > 0
@@ -41,6 +49,27 @@ export function ChangelogPage() {
   }, [currentPage, pageSize, searchParams, setSearchParams])
 
   if (!config) {
+    if (loadError) {
+      return (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center space-y-3">
+            <p className="text-lg font-medium text-muted-foreground">
+              {lang === "en" ? "Failed to load page data" : "页面数据加载失败"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {lang === "en" ? "Please check your network and refresh." : "请检查网络连接后刷新页面。"}
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium transition hover:bg-muted"
+            >
+              {lang === "en" ? "Refresh" : "刷新页面"}
+            </button>
+          </div>
+        </div>
+      )
+    }
     return <div>Loading...</div>
   }
 

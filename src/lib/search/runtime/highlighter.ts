@@ -6,6 +6,58 @@ export interface HighlightResult {
   }>
 }
 
+export interface HighlightSegment {
+  text: string
+  highlighted: boolean
+}
+
+export function highlightTextToSegments(
+  text: string,
+  queryTerms: string[]
+): HighlightSegment[] {
+  if (!text || queryTerms.length === 0) {
+    return [{ text, highlighted: false }]
+  }
+
+  const lowerText = text.toLowerCase()
+  const ranges: Array<{ start: number; end: number }> = []
+
+  for (const term of queryTerms) {
+    const lowerTerm = term.toLowerCase()
+    let pos = 0
+
+    while (true) {
+      const index = lowerText.indexOf(lowerTerm, pos)
+      if (index === -1) break
+
+      ranges.push({ start: index, end: index + term.length })
+      pos = index + 1
+    }
+  }
+
+  if (ranges.length === 0) {
+    return [{ text, highlighted: false }]
+  }
+
+  const merged = mergeRanges(ranges)
+  const segments: HighlightSegment[] = []
+  let lastEnd = 0
+
+  for (const range of merged) {
+    if (range.start > lastEnd) {
+      segments.push({ text: text.slice(lastEnd, range.start), highlighted: false })
+    }
+    segments.push({ text: text.slice(range.start, range.end), highlighted: true })
+    lastEnd = range.end
+  }
+
+  if (lastEnd < text.length) {
+    segments.push({ text: text.slice(lastEnd), highlighted: false })
+  }
+
+  return segments
+}
+
 export function highlightText(
   text: string,
   queryTerms: string[],
@@ -36,7 +88,7 @@ export function highlightText(
   }
 
   const merged = mergeRanges(ranges)
-  
+
   let result = ''
   let lastEnd = 0
 
@@ -138,6 +190,19 @@ export function highlightSnippet(
 ): string {
   const snippet = generateSnippet(content, queryTerms, options)
   return highlightText(snippet, queryTerms, options.tag || 'mark')
+}
+
+export function highlightSnippetToSegments(
+  content: string,
+  queryTerms: string[],
+  options: {
+    maxLength?: number
+    contextBefore?: number
+    contextAfter?: number
+  } = {}
+): HighlightSegment[] {
+  const snippet = generateSnippet(content, queryTerms, options)
+  return highlightTextToSegments(snippet, queryTerms)
 }
 
 export function tokenizeQuery(query: string): string[] {

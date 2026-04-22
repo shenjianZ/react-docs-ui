@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import {
@@ -15,6 +15,7 @@ import {
 import { useTheme } from "@/components/theme-provider"
 import { docIndexCache } from "@/lib/doc-index"
 import type { DocItem } from "@/lib/doc-scanner"
+import { copyToClipboard } from "@/lib/utils"
 
 export function CommandMenu() {
   const [open, setOpen] = useState(false)
@@ -25,26 +26,6 @@ export function CommandMenu() {
   const params = useParams<{ lang: string }>()
   const lang = params.lang || (location.pathname.startsWith("/en") ? "en" : "zh-cn")
   const { setTheme } = useTheme()
-
-  const copyToClipboard = useCallback(async (text: string) => {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
-    } else {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.left = '-9999px'
-      textarea.style.top = '-9999px'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-      try {
-        document.execCommand('copy')
-      } finally {
-        document.body.removeChild(textarea)
-      }
-    }
-  }, [])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

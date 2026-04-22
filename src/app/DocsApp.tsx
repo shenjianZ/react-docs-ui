@@ -22,6 +22,7 @@ import { SearchLauncherProvider } from "../components/SearchLauncher"
 import { ComponentProvider } from "../components/ComponentProvider"
 import { AIProvider } from "../components/ai/AIProvider"
 import { Toaster } from "../components/ui/toaster"
+import { toast } from "../components/ui/use-toast"
 import { ChangelogPage } from "../pages/ChangelogPage"
 import { getConfig, type SiteConfig } from "../lib/config"
 import { getPrevNextPage } from "../lib/navigation"
@@ -109,7 +110,10 @@ function SearchLauncherWrapper({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = useState<SiteConfig | null>(null)
   
   useEffect(() => {
-    getConfig(lang).then(setConfig).catch(console.error)
+    getConfig(lang).then(setConfig).catch((error) => {
+      console.error("[SearchLauncher] Failed to load config:", error)
+      toast({ title: "加载配置失败", description: "无法加载站点配置，请刷新页面重试", variant: "destructive" })
+    })
   }, [lang])
   
   return (
@@ -159,11 +163,13 @@ function RootShell(): React.JSX.Element {
               setComponents(loadedComponents)
             } catch (error) {
               console.warn('[MDX] 加载组件失败:', error)
+              toast({ title: "组件加载失败", description: "部分自定义组件未能加载，已使用内置组件替代", variant: "destructive" })
             }
           }
         }
       } catch (error) {
         console.error("Error loading config:", error)
+        toast({ title: "配置加载失败", description: "无法加载站点配置，请检查网络连接后刷新页面", variant: "destructive" })
       }
     })()
 

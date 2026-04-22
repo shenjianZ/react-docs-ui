@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { cn } from '../../lib/utils'
+import { cn, copyToClipboard } from '../../lib/utils'
 import type { ChatMessage as ChatMessageType } from '../../lib/ai/types'
 import { Bot, User, Loader2, AlertCircle, RefreshCw, Copy, Check, CheckCircle, Pencil, Trash2, X, CheckCheck } from 'lucide-react'
 import './AIChatMessage.css'
@@ -27,26 +27,6 @@ export function AIChatMessage({ message, onRegenerate, onEdit, onDelete }: AICha
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
   const hasError = !!message.error
-
-  const copyToClipboard = useCallback(async (text: string) => {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
-    } else {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.left = '-9999px'
-      textarea.style.top = '-9999px'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-      try {
-        document.execCommand('copy')
-      } finally {
-        document.body.removeChild(textarea)
-      }
-    }
-  }, [])
 
   const handleCopy = useCallback(async () => {
     try {
