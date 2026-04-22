@@ -26,9 +26,11 @@
         "scripts/cli.mjs",
         "scripts/generate-changelog-index.mjs",
         "scripts/generate-doc-git-meta.mjs",
+        "scripts/generate-feed.mjs",
         "scripts/generate-llms-files.mjs",
         "scripts/generate-search-index.mjs",
         "scripts/generate-shiki-bundle.mjs",
+        "scripts/generate-sitemap.mjs",
         "README.md",
         "package.json"
     ],

@@ -6,7 +6,7 @@ import { formatChangelogDate, getChangelogBadgeVariant, getChangelogTypeLabel } 
 interface ReleaseMetaBarProps {
   lang: string
   version?: string
-  date?: string
+  date?: string | Date
   type?: string
   breaking?: boolean
 }

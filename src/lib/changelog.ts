@@ -23,9 +23,9 @@ export async function getChangelogIndex(lang: string) {
   return await response.json() as ChangelogIndex
 }
 
-export function formatChangelogDate(value: string, lang: string) {
+export function formatChangelogDate(value: string | Date, lang: string) {
   const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
+  if (Number.isNaN(date.getTime())) return String(value)
   return date.toLocaleDateString(lang === "en" ? "en-US" : "zh-CN")
 }
 

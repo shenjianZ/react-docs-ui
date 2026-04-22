@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigationType } from "react-router-dom"
 
 export function useScrollPosition() {
   const location = useLocation()
+  const navigationType = useNavigationType()
   const scrollPositionsRef = useRef<Map<string, number>>(new Map())
   const isRestoringRef = useRef(false)
   const restoredPathsRef = useRef<Set<string>>(new Set())
@@ -40,23 +41,21 @@ export function useScrollPosition() {
     const scrollY = window.scrollY
     const key = location.pathname + location.search
     
-    // 只有当滚动位置不为 0 时才保存（避免记录顶部位置）
-    if (scrollY > 0) {
-      scrollPositionsRef.current.set(key, scrollY)
-      restoredPathsRef.current.add(key) // 标记该页面已被访问过
-      sessionStorage.setItem("scroll-positions", JSON.stringify(Object.fromEntries(scrollPositionsRef.current)))
-    }
+    scrollPositionsRef.current.set(key, scrollY)
+    restoredPathsRef.current.add(key) // 标记该页面已被访问过
+    sessionStorage.setItem("scroll-positions", JSON.stringify(Object.fromEntries(scrollPositionsRef.current)))
   }, [location.pathname, location.search])
 
   // 恢复页面的滚动位置
   const restoreScrollPosition = useCallback(() => {
     const key = location.pathname + location.search
+    const shouldRestore = navigationType === "POP"
     
     // 检查该页面是否有保存的滚动位置
     const savedPosition = getSavedScrollPosition(key)
     
-    // 只有当该页面确实保存过滚动位置且位置大于 0 时才恢复
-    if (savedPosition !== undefined && savedPosition > 0) {
+    // 只有浏览器后退/前进时才恢复，普通链接跳转始终回到顶部
+    if (shouldRestore && savedPosition !== undefined && savedPosition > 0) {
       isRestoringRef.current = true
       
       // 使用 requestAnimationFrame 确保在合适的时机恢复
@@ -69,14 +68,14 @@ export function useScrollPosition() {
         }, 200)
       })
     } else {
-      // 如果没有保存的位置，确保滚动到顶部
+      // 普通链接跳转或没有保存位置时，确保滚动到顶部
       requestAnimationFrame(() => {
         if (window.scrollY > 0) {
           window.scrollTo(0, 0)
         }
       })
     }
-  }, [getSavedScrollPosition, location.pathname, location.search])
+  }, [getSavedScrollPosition, location.pathname, location.search, navigationType])
 
   useEffect(() => {
     // 初始化时加载 sessionStorage 中的数据

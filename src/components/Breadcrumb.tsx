@@ -94,7 +94,7 @@ export function Breadcrumb({ lang, version, sidebar, frontmatterTitle, labels }:
     return findBreadcrumbPath(sidebar, pathname, lang)
   }, [sidebar, pathname, lang])
 
-  const lastItemTitle = items.at(-1)?.title
+  const lastItemTitle = items[items.length - 1]?.title
   const displayFrontmatterTitle =
     frontmatterTitle &&
     normalizeBreadcrumbTitle(frontmatterTitle) !== normalizeBreadcrumbTitle(lastItemTitle)

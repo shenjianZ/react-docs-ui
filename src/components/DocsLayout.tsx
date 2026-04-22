@@ -94,6 +94,7 @@ export function DocsLayout({
   }, [sidebar])
   const topAuthors = frontmatter?.authors?.length ? frontmatter.authors : frontmatter?.author ? [frontmatter.author] : []
   const showTopAuthors = config.pageMeta?.showAuthors !== false && topAuthors.length > 0
+  const isChangelogPage = slug === "changelog" || Boolean(slug?.startsWith("changelog/"))
   const isChangelogDetail = Boolean(slug?.startsWith("changelog/"))
   const createdAtValue = frontmatter?.createdAt
   const formattedCreatedAt = createdAtValue
@@ -108,8 +109,8 @@ export function DocsLayout({
     : rawTitle
   const pageDescription = frontmatter?.description || config.seo?.defaultDescription || site?.description
   const readingTime = React.useMemo(
-    () => config.reading?.showTime !== false ? estimateReadingTime(content, lang) : null,
-    [content, lang, config.reading?.showTime]
+    () => config.reading?.showTime !== false && !isChangelogPage ? estimateReadingTime(content, lang) : null,
+    [content, lang, config.reading?.showTime, isChangelogPage]
   )
   const siteUrl = site?.url?.replace(/\/+$/, "")
   const pagePath = version ? `/${lang}/v/${version}${slug ? `/${slug}` : ""}` : `/${lang}${slug ? `/${slug}` : ""}`
@@ -213,6 +214,32 @@ export function DocsLayout({
   // 滚动位置记忆
   useScrollPosition()
 
+  const [headerOffset, setHeaderOffset] = useState(56)
+
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>('header[data-print-hidden]')
+    if (!header) return
+
+    const updateHeaderOffset = () => {
+      setHeaderOffset(Math.ceil(header.getBoundingClientRect().height))
+    }
+
+    updateHeaderOffset()
+    const observer = new ResizeObserver(updateHeaderOffset)
+    observer.observe(header)
+    window.addEventListener("resize", updateHeaderOffset)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", updateHeaderOffset)
+    }
+  }, [config.announcement?.enabled, config.announcement?.text])
+
+  const sidePanelStyle: React.CSSProperties = {
+    top: headerOffset,
+    height: `calc(100vh - ${headerOffset}px)`,
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
@@ -241,7 +268,7 @@ export function DocsLayout({
   className={`flex-1 items-start px-4 md:px-8 ${sidebarEnabled ? 'md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10' : ''} ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
 >
         {sidebarEnabled && sidebar && (
-          <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block">
+          <aside className="fixed z-30 -ml-2 hidden w-full shrink-0 md:sticky md:block" style={sidePanelStyle}>
             <ScrollArea className="h-full py-6 pr-6 lg:py-8">
               <SidebarNav lang={lang} version={version} sidebar={sidebar} />
             </ScrollArea>
@@ -331,7 +358,7 @@ export function DocsLayout({
               <ReleaseMetaBar
                 lang={lang}
                 version={typeof frontmatter?.version === "string" ? frontmatter.version : undefined}
-                date={typeof frontmatter?.date === "string" ? frontmatter.date : undefined}
+                date={frontmatter?.date}
                 type={typeof frontmatter?.type === "string" ? frontmatter.type : undefined}
                 breaking={frontmatter?.breaking === true}
               />
@@ -361,7 +388,7 @@ export function DocsLayout({
       </div>
       {/* 目录导航 - 紧贴页面右侧边缘 */}
       {toc && toc.length > 0 && (
-        <aside className="fixed top-14 right-0 z-30 hidden lg:block h-[calc(100vh-3.5rem)] w-[280px] shrink-0 border-l border-border bg-background/50 backdrop-blur-sm">
+        <aside className="fixed right-0 z-30 hidden lg:block w-[280px] shrink-0 border-l border-border bg-background/50 backdrop-blur-sm" style={sidePanelStyle}>
           <ScrollArea className="h-full py-6 pr-4 lg:py-8 pl-6">
             <TableOfContents toc={toc} />
           </ScrollArea>
