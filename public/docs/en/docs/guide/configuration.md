@@ -22,6 +22,10 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | `codeHighlight` | Syntax highlighting languages and themes |
 | `search` | Full-text search |
 | `seo` | Page SEO tag configuration |
+| `sitemap` | Sitemap auto-generation |
+| `feed` | RSS Feed configuration |
+| `breadcrumb` | Breadcrumb navigation |
+| `reading` | Reading experience (reading time, progress bar) |
 | `export` | Markdown / PDF / Word / bulk export |
 | `pageMeta` | Page-level metadata display configuration |
 | `editLink` | Edit-this-page link configuration |
@@ -463,6 +467,64 @@ Supported variables: `{lang}`, `{slug}`, `{docPath}`, `{ext}`, `{filePath}`.
 | `description` | string | App description |
 | `themeColor` | string | Theme color |
 | `backgroundColor` | string | Background color |
+
+## Sitemap `sitemap`
+
+| Field | Type | Description | Default |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Whether to generate `sitemap.xml` at build time | `true` |
+| `changefreq` | string | Page update frequency | `"weekly"` |
+| `priority` | number | Page priority, range `0.0 - 1.0` | `0.7` |
+| `exclude` | string[] | Paths to exclude. Supports exact paths, suffix wildcards (`*.pdf`), and directory wildcards (`/en/private/*`) | `[]` |
+
+Notes:
+
+- Requires `site.url` to be configured; otherwise full URLs cannot be generated.
+- Automatically scans all doc pages at build time, filtering out `draft: true` and `noindex: true` pages.
+- Valid `changefreq` values: `always`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `never`.
+- Output goes to `public/sitemap.xml`.
+
+## RSS Feed `feed`
+
+| Field | Type | Description | Default |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Whether to generate `feed.xml` at build time | `true` |
+| `title` | string | Feed title | Site title |
+| `description` | string | Feed description | Site description |
+| `limit` | number | Maximum number of RSS items | `20` |
+
+Notes:
+
+- RSS items are sourced from changelog release notes in the docs directory.
+- Requires `site.url` to be configured.
+- Browsers auto-discover the RSS feed via `<link rel="alternate" type="application/rss+xml">`.
+- Output goes to `public/feed.xml`.
+
+## Breadcrumb `breadcrumb`
+
+| Field | Type | Description | Default |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Whether to show breadcrumb navigation | `true` |
+| `showHome` | boolean | Whether to show the home entry (icon and label) | `true` |
+
+Notes:
+
+- Breadcrumb paths are generated automatically based on `sidebar.collections` or `sidebar.sections`.
+- Changelog detail pages display as `Home > Changelog > Version`.
+- Set to `false` to hide breadcrumb navigation entirely.
+
+## Reading Experience `reading`
+
+| Field | Type | Description | Default |
+| :-- | :-- | :-- | :-- |
+| `showTime` | boolean | Whether to show estimated reading time | `true` |
+| `showProgress` | boolean | Whether to show the reading progress bar | `false` |
+
+Notes:
+
+- Reading time is estimated automatically based on content: Chinese at 300 chars/min, English at 200 words/min.
+- The progress bar appears at the top of the page and updates in real time as you scroll.
+- Both features can be toggled independently.
 
 ## Recommendations
 

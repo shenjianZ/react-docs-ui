@@ -22,6 +22,10 @@
 | `codeHighlight` | 代码高亮语言与主题 |
 | `search` | 全文搜索 |
 | `seo` | 页面 SEO 标签配置 |
+| `sitemap` | Sitemap 自动生成 |
+| `feed` | RSS Feed 配置 |
+| `breadcrumb` | 面包屑导航 |
+| `reading` | 阅读体验（阅读时间、进度条） |
 | `export` | Markdown / PDF / Word / 批量导出 |
 | `pageMeta` | 页面元信息展示配置 |
 | `editLink` | “编辑此页”链接配置 |
@@ -463,6 +467,64 @@ HTML `img` 常用属性：
 | `description` | string | 应用描述 |
 | `themeColor` | string | 主题色 |
 | `backgroundColor` | string | 背景色 |
+
+## Sitemap 配置 `sitemap`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否在构建时生成 `sitemap.xml` | `true` |
+| `changefreq` | string | 页面更新频率 | `"weekly"` |
+| `priority` | number | 页面优先级，范围 `0.0 - 1.0` | `0.7` |
+| `exclude` | string[] | 排除路径，支持精确路径、后缀通配（`*.pdf`）和目录通配（`/zh-cn/private/*`） | `[]` |
+
+说明：
+
+- 需要在 `site.url` 中配置站点域名，否则无法生成完整 URL。
+- 构建时自动扫描所有文档页面，过滤 `draft: true` 和 `noindex: true` 的页面。
+- `changefreq` 可选值：`always`、`hourly`、`daily`、`weekly`、`monthly`、`yearly`、`never`。
+- 构建产物输出到 `public/sitemap.xml`。
+
+## RSS Feed 配置 `feed`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否在构建时生成 `feed.xml` | `true` |
+| `title` | string | Feed 标题 | 站点标题 |
+| `description` | string | Feed 描述 | 站点描述 |
+| `limit` | number | RSS 条目数量上限 | `20` |
+
+说明：
+
+- RSS 条目来源于 changelog 目录下的发布日志文件。
+- 需要在 `site.url` 中配置站点域名。
+- 浏览器会通过 `<link rel="alternate" type="application/rss+xml">` 自动发现 RSS 源。
+- 构建产物输出到 `public/feed.xml`。
+
+## 面包屑导航 `breadcrumb`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | 是否显示面包屑导航 | `true` |
+| `showHome` | boolean | 是否显示首页入口（图标和文字） | `true` |
+
+说明：
+
+- 面包屑路径基于 `sidebar.collections` 或 `sidebar.sections` 配置自动生成。
+- Changelog 详情页会显示为 `首页 > 更新日志 > 版本号`。
+- 设为 `false` 可完全隐藏面包屑导航。
+
+## 阅读体验 `reading`
+
+| 字段 | 类型 | 说明 | 默认值 |
+| :-- | :-- | :-- | :-- |
+| `showTime` | boolean | 是否显示阅读时间估算 | `true` |
+| `showProgress` | boolean | 是否显示阅读进度条 | `false` |
+
+说明：
+
+- 阅读时间根据页面内容自动估算，中文按 300 字/分钟、英文按 200 词/分钟计算。
+- 进度条显示在页面顶部，随滚动实时更新。
+- 两个功能独立控制，可以单独开关。
 
 ## 建议
 
