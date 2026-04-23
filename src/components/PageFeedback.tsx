@@ -52,6 +52,7 @@ export function PageFeedback({ config, lang, slug, title, filePath }: PageFeedba
     submit: config?.labels?.submit || "提交反馈",
     thanks: config?.labels?.thanks || "感谢反馈",
   }), [config?.labels])
+  const includePageMeta = config?.includePageMeta !== false
   const question = lang === "en" ? "Was this page helpful?" : "这篇文档对你有帮助吗？"
   const errorMessage = lang === "en" ? "Failed to submit feedback. Please try again later." : "反馈提交失败，请稍后重试。"
 
@@ -127,10 +128,10 @@ export function PageFeedback({ config, lang, slug, title, filePath }: PageFeedba
         body: JSON.stringify({
           value: nextValue,
           comment: comment || undefined,
-          lang: config.includePageMeta === false ? undefined : lang,
-          slug: config.includePageMeta === false ? undefined : slug || "index",
-          title: config.includePageMeta === false ? undefined : title,
-          filePath: config.includePageMeta === false ? undefined : filePath,
+          lang: includePageMeta ? lang : undefined,
+          slug: includePageMeta ? slug || "index" : undefined,
+          title: includePageMeta ? title : undefined,
+          filePath: includePageMeta ? filePath : undefined,
           url: window.location.href,
           timestamp: new Date().toISOString(),
         }),
