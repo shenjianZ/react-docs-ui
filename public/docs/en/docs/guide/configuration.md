@@ -1,3 +1,11 @@
+---
+title: Configuration File (`site.yaml`) Explained
+description: Explains the main site.yaml and site.en.yaml fields used by the template project
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Configuration File (`site.yaml`) Explained
 
 The project is configuration-driven. Most site behavior is controlled by `public/config/site.yaml` for Chinese and `public/config/site.en.yaml` for English. This page documents the fields supported by the current runtime and also calls out a few legacy or sample-only fields where relevant.

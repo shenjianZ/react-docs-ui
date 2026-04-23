@@ -1,3 +1,11 @@
+---
+title: React Docs UI
+description: English homepage for React Docs UI, introducing the configuration-driven docs site experience
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # React Docs UI
 
 A **configuration-driven** modern documentation website builder based on React.

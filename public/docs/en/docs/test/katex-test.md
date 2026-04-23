@@ -1,3 +1,11 @@
+---
+title: KaTeX Full Feature Test
+description: Used to verify math formulas and KaTeX extension rendering in the React Docs UI template project
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 🧪 KaTeX Full Feature Test
 
 > Used to verify that KaTeX correctly loads all extensions (mhchem / physics / mathtools, etc.)

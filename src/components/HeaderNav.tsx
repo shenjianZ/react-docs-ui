@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { type ReactNode, useEffect, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
 import { useSearchLauncher } from "@/components/SearchLauncher"
+import { UserMenu } from "@/components/auth/UserMenu"
 
 import { AnnouncementBar } from "@/components/AnnouncementBar"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
@@ -429,6 +430,7 @@ export function HeaderNav({ lang, version, site, navbar, announcement, versions,
                 </Tooltip>
               </TooltipProvider>
             )}
+            <UserMenu />
           </nav>
           {/* 移动端：显示下拉菜单 */}
           <div className="relative md:hidden">
@@ -551,6 +553,10 @@ export function HeaderNav({ lang, version, site, navbar, announcement, versions,
                     </DropdownMenuSub>
                   </>
                 )}
+                <DropdownMenuSeparator />
+                <div className="flex items-center justify-center py-1">
+                  <UserMenu />
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

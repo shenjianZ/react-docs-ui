@@ -1,3 +1,11 @@
+---
+title: React Docs UI
+description: React Docs UI 的中文首页，介绍配置驱动的文档站能力和核心特性
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # React Docs UI
 
 一个基于 React 的、**配置驱动**的现代化文档网站构建工具。

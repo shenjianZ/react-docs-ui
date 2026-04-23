@@ -376,7 +376,7 @@ editLink:
 
 feedback:
     enabled: true
-    endpoint: ""
+    endpoint: "/api/feedback"
     method: "POST"
     includePageMeta: true
     labels:
@@ -388,3 +388,15 @@ feedback:
 
 ai:
     enabled: true
+
+backend:
+    enabled: true
+    baseUrl: "/api"
+    features:
+        auth: true
+        comments: true
+        bookmarks: true
+        analytics: true
+        feedback: true
+        notifications: true
+        admin: false

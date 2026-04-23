@@ -1,3 +1,11 @@
+---
+title: 文档
+description: React Docs UI 模板项目的文档入口页，汇总快速开始和测试页面
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 文档
 
 欢迎使用 React Docs UI 文档系统。

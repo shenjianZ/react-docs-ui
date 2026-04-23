@@ -1,3 +1,11 @@
+---
+title: Quick Start
+description: Start the React Docs UI template project quickly with the minimum setup steps
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Quick Start
 
 This guide will walk you through creating, configuring, and running your own React documentation website from scratch in 5 minutes.

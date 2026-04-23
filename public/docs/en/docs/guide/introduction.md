@@ -1,3 +1,11 @@
+---
+title: Introduction
+description: Introduces the core ideas, advantages, and main capabilities of React Docs UI
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Introduction
 
 React Docs UI is a React component library and toolset designed specifically for building modern documentation websites. Its core philosophy is **configuration over code**, allowing you to focus entirely on content creation.

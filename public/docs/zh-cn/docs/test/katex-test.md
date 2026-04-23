@@ -1,3 +1,11 @@
+---
+title: KaTeX 全功能测试
+description: 用于验证 React Docs UI 模板项目中的数学公式与 KaTeX 扩展渲染能力
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 
 # 🧪 KaTeX 全功能测试
 

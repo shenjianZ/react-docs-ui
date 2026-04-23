@@ -1,3 +1,11 @@
+---
+title: 文档渲染测试页
+description: 用于验证 React Docs UI 模板项目对常见 Markdown 与 MDX 语法的渲染效果
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 
 # 📄 文档渲染测试页
 

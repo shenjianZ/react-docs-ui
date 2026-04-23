@@ -1,3 +1,11 @@
+---
+title: Installation
+description: Explains how to initialize and install a React Docs UI site with create-react-docs-ui
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Installation
 
 ## Prerequisites

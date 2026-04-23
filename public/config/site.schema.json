@@ -7,7 +7,8 @@
     "breadcrumb": { "$ref": "#/$defs/breadcrumb" },
     "reading": { "$ref": "#/$defs/reading" },
     "sitemap": { "$ref": "#/$defs/sitemap" },
-    "feed": { "$ref": "#/$defs/feed" }
+    "feed": { "$ref": "#/$defs/feed" },
+    "backend": { "$ref": "#/$defs/backend" }
   },
   "$defs": {
     "breadcrumb": {
@@ -50,6 +51,18 @@
         "title": { "type": "string" },
         "description": { "type": "string" },
         "limit": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "baseUrl": { "type": "string" },
+        "features": {
+          "type": "object",
+          "additionalProperties": { "type": "boolean" }
+        }
       }
     }
   }

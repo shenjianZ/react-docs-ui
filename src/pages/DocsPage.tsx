@@ -301,7 +301,7 @@ export function DocsPage({ aiEnabled = false }: DocsPageProps) {
       ) : (
         <MdxContent
           source={content}
-          skipFirstH1={!!frontmatter?.title}
+          skipFirstH1={!!(frontmatter?.title || frontmatter?.firstH1)}
           imageViewer={config?.imageViewer}
           codeHighlight={config?.codeHighlight}
           shikiBundle={siteShikiBundle}

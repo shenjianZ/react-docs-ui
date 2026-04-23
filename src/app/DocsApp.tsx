@@ -21,6 +21,7 @@ import { FontProvider } from "../components/FontProvider"
 import { SearchLauncherProvider } from "../components/SearchLauncher"
 import { ComponentProvider } from "../components/ComponentProvider"
 import { AIProvider } from "../components/ai/AIProvider"
+import { AuthProvider } from "../hooks/useAuth"
 import { Toaster } from "../components/ui/toaster"
 import { toast } from "../components/ui/use-toast"
 import { ChangelogPage } from "../pages/ChangelogPage"
@@ -183,7 +184,8 @@ function RootShell(): React.JSX.Element {
       <SiteConfigContext.Provider value={{ config, lang }}>
         <FontProvider config={config} lang={lang}>
           <AIProvider>
-            <ComponentProvider components={components}>
+            <AuthProvider>
+              <ComponentProvider components={components}>
               <SearchLauncherWrapper>
                 <Suspense fallback={<Outlet />}>
                   <LazyGlobalContextMenu config={config?.contextMenu}>
@@ -198,7 +200,8 @@ function RootShell(): React.JSX.Element {
                   </LazyGlobalContextMenu>
                 </Suspense>
               </SearchLauncherWrapper>
-            </ComponentProvider>
+              </ComponentProvider>
+            </AuthProvider>
             <Toaster />
           </AIProvider>
         </FontProvider>

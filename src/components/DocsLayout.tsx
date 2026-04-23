@@ -15,6 +15,9 @@ import { Breadcrumb } from "@/components/Breadcrumb"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Footer } from "./Footer"
 import { ExportToolbar } from "@/components/ExportToolbar"
+import { useAnalytics } from "@/hooks/useAnalytics"
+import { CommentSection } from "@/components/comments/CommentSection"
+import { BookmarkButton } from "@/components/BookmarkButton"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { useSearchLauncher } from "@/components/SearchLauncher"
 import type { TocItem } from "@/lib/rehype-toc"
@@ -103,7 +106,8 @@ export function DocsLayout({
       : String(createdAtValue)
     : undefined
   
-  const rawTitle = frontmatter?.title || frontmatter?.firstH1 || config.seo?.defaultTitle || site?.title || "Docs"
+  const documentTitle = frontmatter?.title || frontmatter?.firstH1
+  const rawTitle = documentTitle || config.seo?.defaultTitle || site?.title || "Docs"
   const pageTitle = config.seo?.titleTemplate && rawTitle
     ? config.seo.titleTemplate.replace(/\{title\}/g, rawTitle).replace(/\{siteTitle\}/g, site?.title || "Docs")
     : rawTitle
@@ -208,6 +212,13 @@ export function DocsLayout({
   
   const { openSearch } = useSearchLauncher()
 
+  useAnalytics({
+    enabled: config.backend?.enabled !== false && config.backend?.features?.analytics !== false,
+    pageSlug: slug || "index",
+    pageTitle: frontmatter?.title || frontmatter?.firstH1,
+    lang,
+  })
+
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -287,14 +298,14 @@ export function DocsLayout({
               />
             )}
             {/* Frontmatter 元信息展示 */}
-            {frontmatter && (frontmatter.title || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
+            {frontmatter && (documentTitle || frontmatter.description || showTopAuthors || formattedCreatedAt || lastUpdated || editUrl) && (
               <header className="mb-8 pb-6 border-b border-border">
-                {frontmatter.title ? (
+                {documentTitle ? (
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <h1 className="text-3xl font-bold tracking-tight">{frontmatter.title}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{documentTitle}</h1>
                     <ExportToolbar
                       content={content}
-                      title={frontmatter.title}
+                      title={documentTitle}
                       lang={lang}
                       availableLangs={availableLangs}
                       exportConfig={config.export}
@@ -340,7 +351,7 @@ export function DocsLayout({
                 )}
               </header>
             )}
-            {(!frontmatter || (!frontmatter.title && !frontmatter.description && !showTopAuthors && !formattedCreatedAt && !lastUpdated && !editUrl)) && (
+            {(!frontmatter || (!documentTitle && !frontmatter.description && !showTopAuthors && !formattedCreatedAt && !lastUpdated && !editUrl)) && (
               <div className="mb-4">
                 <div className="flex justify-end">
                   <ExportToolbar
@@ -365,6 +376,15 @@ export function DocsLayout({
             )}
             {children}
             <div className="mt-8 border-t border-border pt-6">
+              {config.backend?.enabled !== false && config.backend?.features?.bookmarks !== false && slug && (
+                <div className="mb-3">
+                  <BookmarkButton
+                    pageSlug={slug}
+                    pageTitle={frontmatter?.title || frontmatter?.firstH1}
+                    lang={lang}
+                  />
+                </div>
+              )}
               <PageMetaActions
                 lang={lang}
                 slug={slug}
@@ -378,6 +398,9 @@ export function DocsLayout({
               />
             </div>
             <PageNavigation prev={prev} next={next} lang={lang} version={version} />
+            {config.backend?.enabled !== false && config.backend?.features?.comments !== false && slug && (
+              <CommentSection pageSlug={slug} lang={lang} />
+            )}
           </main>
         </div>
         <div className={sidebarEnabled ? "md:col-start-2" : undefined}>

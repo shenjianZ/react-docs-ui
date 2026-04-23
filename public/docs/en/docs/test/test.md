@@ -1,3 +1,11 @@
+---
+title: Document Rendering Test Page
+description: Used to verify common Markdown and MDX rendering behavior in the React Docs UI template project
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 📄 Document Rendering Test Page
 
 > Used to test whether the documentation website correctly renders various Markdown / MDX features.

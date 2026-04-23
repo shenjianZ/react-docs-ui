@@ -1,3 +1,11 @@
+---
+title: 安装
+description: 说明如何使用 create-react-docs-ui 脚手架初始化并安装 React Docs UI 文档站点
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 安装
 
 ## 环境要求

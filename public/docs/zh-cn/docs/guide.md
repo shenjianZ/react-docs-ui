@@ -1,3 +1,11 @@
+---
+title: 指南
+description: React Docs UI 模板项目的指南目录页，收录介绍、安装、快速上手和配置说明
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 指南
 
 本指南将帮助你全面了解并掌握 React Docs UI 的各项功能。无论你是初学者还是希望进行深度定制，都能在这里找到所需的信息。

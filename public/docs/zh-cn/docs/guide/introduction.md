@@ -1,3 +1,11 @@
+---
+title: 介绍
+description: 介绍 React Docs UI 的核心理念、主要优势和整体能力边界
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 介绍
 
 React Docs UI 是一个专为构建现代化文档网站而设计的 React 组件库与工具集。它的核心哲学是**配置优于编码**，让你能将精力完全集中在内容创作上。

@@ -1,3 +1,11 @@
+---
+title: PDF Server Deployment
+description: Explains how to deploy server-side PDF export support for the React Docs UI template project
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # PDF Server Deployment
 
 React Docs UI provides a PDF generation service that can be deployed as a standalone Docker container.

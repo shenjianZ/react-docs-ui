@@ -1,3 +1,11 @@
+---
+title: PDF Server 部署
+description: 说明如何为 React Docs UI 模板项目部署 PDF 导出服务端能力
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # PDF Server 部署
 
 React Docs UI 提供了 PDF 生成服务，可以独立部署为 Docker 容器。

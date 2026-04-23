@@ -1,3 +1,11 @@
+---
+title: Guide
+description: Guide index page for the React Docs UI template project, covering introduction, installation, quick start, and configuration
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Guide
 
 This guide will help you fully understand and master all the features of React Docs UI. Whether you are a beginner or looking for in-depth customization, you will find the information you need here.

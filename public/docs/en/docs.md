@@ -1,3 +1,11 @@
+---
+title: Documentation
+description: Entry page for the React Docs UI template documentation, linking to guides and test pages
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # Documentation
 
 Welcome to the React Docs UI documentation system.

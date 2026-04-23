@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 import type { FeedbackConfig } from "@/lib/config"
+import { toast } from "@/components/ui/use-toast"
 
 interface PageFeedbackProps {
   config?: FeedbackConfig
@@ -58,12 +59,18 @@ export function PageFeedback({ config, lang, slug, title, filePath }: PageFeedba
           timestamp: new Date().toISOString(),
         }),
       })
-      if (!response.ok) throw new Error(`Failed to submit feedback: ${response.status}`)
+      const payload = await response.json().catch(() => null)
+      if (!response.ok) {
+        throw new Error(payload?.message || `Failed to submit feedback: ${response.status}`)
+      }
       localStorage.setItem(storageKey, "1")
       setSubmitted(true)
+      toast({ description: payload?.message || labels.thanks })
     } catch (err) {
       console.error("[PageFeedback] submit failed:", err)
-      setError(errorMessage)
+      const message = err instanceof Error ? err.message : errorMessage
+      setError(message)
+      toast({ description: message, variant: "destructive" })
     }
   }
 

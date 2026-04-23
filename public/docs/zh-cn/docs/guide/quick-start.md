@@ -1,3 +1,11 @@
+---
+title: 快速上手
+description: 通过最少步骤快速启动 React Docs UI 模板项目并开始编写文档
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 快速上手
 
 本指南将引导你在 5 分钟内，从零开始创建、配置并运行一个属于你自己的 React 文档网站。

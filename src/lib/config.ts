@@ -46,6 +46,22 @@ export interface FeedbackConfig {
   }
 }
 
+export interface BackendFeatureConfig {
+  auth?: boolean
+  comments?: boolean
+  bookmarks?: boolean
+  analytics?: boolean
+  feedback?: boolean
+  notifications?: boolean
+  admin?: boolean
+}
+
+export interface BackendConfig {
+  enabled?: boolean
+  baseUrl?: string
+  features?: BackendFeatureConfig
+}
+
 export interface EditLinkConfig {
   enabled?: boolean
   urlTemplate?: string
@@ -227,6 +243,7 @@ export interface SiteConfig {
     enabled?: boolean        // 是否启用AI功能，默认 true
     // AI功能可通过UI配置，此处仅作为站点级开关
   }
+  backend?: BackendConfig
   // 字体配置
   fonts?: {
     fontFamilyZhCn?: string  // 中文字体族，多个字体用逗号分隔

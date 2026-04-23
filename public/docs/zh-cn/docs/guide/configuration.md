@@ -1,3 +1,11 @@
+---
+title: 配置文件（`site.yaml`）字段说明
+description: 说明模板项目中 site.yaml 与 site.en.yaml 的主要配置字段和示例
+author: React Docs UI Team
+createdAt: 2026-03-25
+lastUpdated: 2026-03-27
+---
+
 # 配置文件（`site.yaml`）字段说明
 
 项目遵循“配置驱动”。站点的大部分行为都由 `public/config/site.yaml`（中文）和 `public/config/site.en.yaml`（英文）控制。本文档按当前运行时实际支持的字段说明，并补充少量保留/兼容字段的用途。
