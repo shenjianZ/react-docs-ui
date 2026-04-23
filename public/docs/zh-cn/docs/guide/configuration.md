@@ -454,7 +454,7 @@ HTML `img` 常用属性：
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `enabled` | boolean | 是否显示反馈区 |
-| `endpoint` | string | 反馈上报地址，留空则仅本地记录提交状态 |
+| `endpoint` | string | 反馈接口地址；组件会先检查接口状态，接口不可用时不显示 |
 | `method` | string | 请求方法，当前固定为 `POST` |
 | `includePageMeta` | boolean | 是否在请求中附带页面信息 |
 | `labels` | object | 按钮与文案配置 |

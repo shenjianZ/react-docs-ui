@@ -454,7 +454,7 @@ Supported variables: `{lang}`, `{slug}`, `{docPath}`, `{ext}`, `{filePath}`.
 | Field | Type | Description |
 | :-- | :-- | :-- |
 | `enabled` | boolean | Show the page feedback section |
-| `endpoint` | string | Feedback endpoint; when empty, submission is stored locally only |
+| `endpoint` | string | Feedback API endpoint; the block is hidden when the status API is unavailable |
 | `method` | string | Request method, currently `POST` |
 | `includePageMeta` | boolean | Include page metadata in the payload |
 | `labels` | object | UI labels for the feedback block |

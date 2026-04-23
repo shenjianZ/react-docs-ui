@@ -10,6 +10,7 @@ interface PageMetaActionsProps {
   lastUpdated?: string
   editUrl?: string
   feedback?: FeedbackConfig
+  backend?: SiteConfig["backend"]
   pageMeta?: SiteConfig["pageMeta"]
   editLinkLabel?: string
 }
@@ -25,7 +26,13 @@ export function PageMetaActions(props: PageMetaActionsProps) {
   const showLastUpdated = props.pageMeta?.showLastUpdated !== false && Boolean(formattedLastUpdated)
   const showEditLink = props.pageMeta?.showEditLink !== false && Boolean(props.editUrl)
   const hasSummary = showLastUpdated || showEditLink
-  const showFeedback = Boolean(props.feedback && props.feedback.enabled !== false)
+  const showFeedback = Boolean(
+    props.feedback &&
+      props.feedback.enabled !== false &&
+      props.feedback.endpoint &&
+      props.backend?.enabled !== false &&
+      props.backend?.features?.feedback !== false
+  )
 
   if (!hasSummary && !showFeedback) return null
 
@@ -50,7 +57,9 @@ export function PageMetaActions(props: PageMetaActionsProps) {
           )}
         </div>
       )}
-      <PageFeedback config={props.feedback} lang={props.lang} slug={props.slug} title={props.title} filePath={props.filePath} />
+      {showFeedback && (
+        <PageFeedback config={props.feedback} lang={props.lang} slug={props.slug} title={props.title} filePath={props.filePath} />
+      )}
     </div>
   )
 }

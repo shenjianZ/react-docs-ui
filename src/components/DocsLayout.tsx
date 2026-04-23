@@ -393,6 +393,7 @@ export function DocsLayout({
                 lastUpdated={lastUpdated}
                 editUrl={editUrl}
                 feedback={frontmatter?.title === "Not Found" ? { ...config.feedback, enabled: false } : config.feedback}
+                backend={config.backend}
                 pageMeta={config.pageMeta}
                 editLinkLabel={config.editLink?.label}
               />
