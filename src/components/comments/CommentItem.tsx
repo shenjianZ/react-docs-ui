@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Heart, Reply, Pencil, Trash2 } from "lucide-react"
 import type { CommentItem as CommentItemType } from "@/lib/api/types"
-import { useAuth } from "@/hooks/useAuth"
 import {
   Dialog,
   DialogContent,
@@ -12,14 +11,13 @@ import {
 
 interface CommentItemProps {
   comment: CommentItemType
-  onReply: (parentId: string) => void
+  onReply: () => void
   onUpdate: (id: string, content: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onLike: (id: string) => Promise<void>
 }
 
 export function CommentItem({ comment, onReply, onUpdate, onDelete, onLike }: CommentItemProps) {
-  const { isAuthenticated } = useAuth()
   const [editing, setEditing] = useState(false)
   const [editContent, setEditContent] = useState(comment.content)
   const [liking, setLiking] = useState(false)
@@ -105,14 +103,19 @@ export function CommentItem({ comment, onReply, onUpdate, onDelete, onLike }: Co
               </button>
             </div>
           ) : (
-            <p className="mt-1 text-sm leading-relaxed break-words">{comment.content}</p>
+            <div className="mt-1 space-y-1">
+              {comment.replyToAuthorLabel && (
+                <p className="text-xs text-muted-foreground">回复 @{comment.replyToAuthorLabel}</p>
+              )}
+              <p className="text-sm leading-relaxed break-words">{comment.content}</p>
+            </div>
           )}
 
           <div className="mt-1.5 flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100">
-            {isAuthenticated && (
+            {comment.canReply && (
               <button
                 type="button"
-                onClick={() => onReply(comment.id)}
+                onClick={onReply}
                 className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 <Reply className="h-3.5 w-3.5" />

@@ -9,7 +9,11 @@ interface BackendComment {
   author_avatar_url?: string | null
   author_bio?: string | null
   can_edit: boolean
+  can_reply?: boolean
   parent_id?: string | null
+  thread_root_id?: string
+  reply_to_comment_id?: string | null
+  reply_to_author_label?: string | null
   content: string
   status: string
   lang: string
@@ -26,7 +30,11 @@ function normalizeComment(comment: BackendComment): CommentItem {
     authorAvatarUrl: comment.author_avatar_url,
     authorBio: comment.author_bio,
     canEdit: comment.can_edit,
+    canReply: comment.can_reply ?? false,
     parentId: comment.parent_id,
+    threadRootId: comment.thread_root_id || comment.id,
+    replyToCommentId: comment.reply_to_comment_id,
+    replyToAuthorLabel: comment.reply_to_author_label,
     content: comment.content,
     status: comment.status,
     lang: comment.lang,

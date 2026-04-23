@@ -5,10 +5,11 @@ import { LoginDialog } from "@/components/auth/LoginDialog"
 
 interface CommentInputProps {
   placeholder?: string
+  autoFocus?: boolean
   onSubmit: (content: string) => Promise<void>
 }
 
-export function CommentInput({ placeholder = "写下你的评论...", onSubmit }: CommentInputProps) {
+export function CommentInput({ placeholder = "写下你的评论...", autoFocus = false, onSubmit }: CommentInputProps) {
   const { isAuthenticated } = useAuth()
   const [content, setContent] = useState("")
   const [loading, setLoading] = useState(false)
@@ -50,6 +51,7 @@ export function CommentInput({ placeholder = "写下你的评论...", onSubmit }
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
+        autoFocus={autoFocus}
         className="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       />
       <button

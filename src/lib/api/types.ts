@@ -51,7 +51,11 @@ export interface CommentItem {
   authorAvatarUrl?: string | null
   authorBio?: string | null
   canEdit: boolean
+  canReply: boolean
   parentId?: string | null
+  threadRootId: string
+  replyToCommentId?: string | null
+  replyToAuthorLabel?: string | null
   content: string
   status: string
   lang: string
