@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from "react"
 import * as authApi from "@/lib/api/auth"
 import { TOKEN_REFRESH_FAILED_EVENT } from "@/lib/api/client"
-import type { AuthUser, UpdateProfileRequest } from "@/lib/api/types"
+import type {
+  AuthUser,
+  EmailCodePurpose,
+  OAuthProvider,
+  UpdateProfileRequest,
+} from "@/lib/api/types"
 
 const ACCESS_TOKEN_KEY = "auth.access_token"
 const REFRESH_TOKEN_KEY = "auth.refresh_token"
@@ -14,7 +19,10 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<string>
-  register: (email: string, password: string) => Promise<string>
+  loginWithEmailCode: (email: string, verificationCode: string) => Promise<string>
+  register: (email: string, password: string, verificationCode: string) => Promise<string>
+  sendEmailCode: (email: string, purpose: EmailCodePurpose) => Promise<string>
+  loginWithProvider: (provider: OAuthProvider) => Promise<string>
   logout: () => Promise<string>
   updateProfile: (payload: UpdateProfileRequest) => Promise<string>
   uploadAvatar: (file: File) => Promise<string>
@@ -68,29 +76,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(TOKEN_REFRESH_FAILED_EVENT, handleRefreshFailed)
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await authApi.login({ email, password })
-    const user = result.data
+  const applyAuthResult = useCallback((user: AuthUser & { accessToken: string, refreshToken: string }) => {
     storeTokens(user.accessToken, user.refreshToken)
     setState({
       user,
       loading: false,
       isAuthenticated: true,
     })
-    return result.message
   }, [])
 
-  const register = useCallback(async (email: string, password: string) => {
-    const result = await authApi.register({ email, password })
-    const user = result.data
-    storeTokens(user.accessToken, user.refreshToken)
-    setState({
-      user,
-      loading: false,
-      isAuthenticated: true,
-    })
+  const login = useCallback(async (email: string, password: string) => {
+    const result = await authApi.login({ email, password })
+    applyAuthResult(result.data)
     return result.message
+  }, [applyAuthResult])
+
+  const loginWithEmailCode = useCallback(async (email: string, verificationCode: string) => {
+    const result = await authApi.loginWithEmailCode({ email, verificationCode })
+    applyAuthResult(result.data)
+    return result.message
+  }, [applyAuthResult])
+
+  const register = useCallback(async (email: string, password: string, verificationCode: string) => {
+    const result = await authApi.register({ email, password, verificationCode })
+    applyAuthResult(result.data)
+    return result.message
+  }, [applyAuthResult])
+
+  const sendEmailCode = useCallback(async (email: string, purpose: EmailCodePurpose) => {
+    return authApi.sendEmailCode({ email, purpose })
   }, [])
+
+  const loginWithProvider = useCallback(async (provider: OAuthProvider) => {
+    const result = await authApi.loginWithProvider(provider)
+    applyAuthResult(result.data)
+    return result.message
+  }, [applyAuthResult])
 
   const updateProfile = useCallback(async (payload: UpdateProfileRequest) => {
     const result = await authApi.updateProfile(payload)
@@ -125,7 +146,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, updateProfile, uploadAvatar }}>
+    <AuthContext.Provider value={{
+      ...state,
+      login,
+      loginWithEmailCode,
+      register,
+      sendEmailCode,
+      loginWithProvider,
+      logout,
+      updateProfile,
+      uploadAvatar,
+    }}>
       {children}
     </AuthContext.Provider>
   )
@@ -139,7 +170,10 @@ export function useAuth(): AuthContextValue {
       loading: false,
       isAuthenticated: false,
       login: async () => "",
+      loginWithEmailCode: async () => "",
       register: async () => "",
+      sendEmailCode: async () => "",
+      loginWithProvider: async () => "",
       logout: async () => "",
       updateProfile: async () => "",
       uploadAvatar: async () => "",

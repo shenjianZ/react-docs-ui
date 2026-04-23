@@ -14,9 +14,13 @@ export interface ApiTokens {
   refreshToken: string
 }
 
+export type EmailCodePurpose = "register" | "login"
+export type OAuthProvider = "google" | "github" | "wechat" | "qq"
+
 export interface AuthUser {
   id?: string
   email: string
+  emailVerified?: boolean
   username?: string | null
   nickname?: string | null
   avatarUrl?: string | null
@@ -32,9 +36,20 @@ export interface LoginRequest {
   password: string
 }
 
+export interface EmailCodeLoginRequest {
+  email: string
+  verificationCode: string
+}
+
 export interface RegisterRequest {
   email: string
   password: string
+  verificationCode: string
+}
+
+export interface SendEmailCodeRequest {
+  email: string
+  purpose: EmailCodePurpose
 }
 
 export interface UpdateProfileRequest {
