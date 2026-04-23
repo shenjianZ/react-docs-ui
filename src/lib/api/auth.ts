@@ -163,8 +163,7 @@ export async function loginWithProvider(provider: OAuthProvider): Promise<ApiRes
     let settled = false
     const cleanup = () => {
       window.removeEventListener("message", handleMessage)
-      window.clearInterval(closeWatcher)
-      if (!popup.closed) popup.close()
+      window.clearTimeout(timeoutWatcher)
     }
 
     const finish = (callback: () => void) => {
@@ -175,27 +174,25 @@ export async function loginWithProvider(provider: OAuthProvider): Promise<ApiRes
     }
 
     const handleMessage = (event: MessageEvent<OAuthPopupMessage>) => {
-      if (event.origin !== window.location.origin) return
-      if (event.source !== popup) return
       const payload = event.data
       if (!payload || payload.type !== OAUTH_POPUP_MESSAGE_TYPE) return
+      if (event.source !== popup) return
 
-      if (!payload.success || !payload.data) {
+      const authData = payload.data
+      if (!payload.success || !authData) {
         finish(() => reject(new Error(payload.message || "第三方登录失败")))
         return
       }
 
       finish(() => resolve({
-        data: normalizeAuthResult(payload.data),
+        data: normalizeAuthResult(authData),
         message: payload.message || "登录成功",
       }))
     }
 
-    const closeWatcher = window.setInterval(() => {
-      if (popup.closed && !settled) {
-        finish(() => reject(new Error("登录已取消")))
-      }
-    }, 500)
+    const timeoutWatcher = window.setTimeout(() => {
+      finish(() => reject(new Error("第三方登录超时，请重试")))
+    }, 120000)
 
     window.addEventListener("message", handleMessage)
   })

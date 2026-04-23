@@ -23,12 +23,14 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const [bio, setBio] = useState("")
   const [saving, setSaving] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open || !user) return
     setUsername(user.username || "")
     setNickname(user.nickname || "")
     setBio(user.bio || "")
+    setFailedAvatarUrl(null)
   }, [open, user])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,11 +83,12 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
           {/* 头像上传 */}
           <div className="flex items-center gap-4">
             <div className="relative h-16 w-16 shrink-0">
-              {user?.avatarUrl ? (
+              {user?.avatarUrl && user.avatarUrl !== failedAvatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt="头像"
                   className="h-16 w-16 rounded-full object-cover"
+                  onError={() => setFailedAvatarUrl(user.avatarUrl ?? null)}
                 />
               ) : (
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-xl font-medium">

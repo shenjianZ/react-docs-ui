@@ -20,6 +20,7 @@ export function UserMenu() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [registerOpen, setRegisterOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null)
 
   const handleLogout = async () => {
     const message = await logout()
@@ -60,8 +61,13 @@ export function UserMenu() {
             className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-xs font-medium hover:opacity-80 transition-opacity"
             aria-label="用户菜单"
           >
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
+            {user?.avatarUrl && user.avatarUrl !== failedAvatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setFailedAvatarUrl(user.avatarUrl ?? null)}
+              />
             ) : (
               <span>
                 {(user?.nickname || user?.email || "U").charAt(0).toUpperCase()}

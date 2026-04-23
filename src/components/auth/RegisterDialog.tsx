@@ -130,6 +130,7 @@ export function RegisterDialog({ open, onOpenChange, onSwitchToLogin }: Register
             <input
               id="register-password"
               type="password"
+              autoComplete="new-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -144,6 +145,7 @@ export function RegisterDialog({ open, onOpenChange, onSwitchToLogin }: Register
             <input
               id="register-confirm"
               type="password"
+              autoComplete="new-password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

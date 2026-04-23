@@ -22,6 +22,7 @@ export function CommentItem({ comment, onReply, onUpdate, onDelete, onLike }: Co
   const [editContent, setEditContent] = useState(comment.content)
   const [liking, setLiking] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null)
 
   const authorInitials = comment.authorLabel.slice(0, 2).toUpperCase()
 
@@ -60,8 +61,13 @@ export function CommentItem({ comment, onReply, onUpdate, onDelete, onLike }: Co
           className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-xs font-medium"
           aria-label="查看用户公开资料"
         >
-          {comment.authorAvatarUrl ? (
-            <img src={comment.authorAvatarUrl} alt="" className="h-full w-full object-cover" />
+          {comment.authorAvatarUrl && comment.authorAvatarUrl !== failedAvatarUrl ? (
+            <img
+              src={comment.authorAvatarUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              onError={() => setFailedAvatarUrl(comment.authorAvatarUrl ?? null)}
+            />
           ) : (
             authorInitials
           )}
@@ -162,8 +168,13 @@ export function CommentItem({ comment, onReply, onUpdate, onDelete, onLike }: Co
           </DialogHeader>
           <div className="flex items-start gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-sm font-medium">
-              {comment.authorAvatarUrl ? (
-                <img src={comment.authorAvatarUrl} alt="" className="h-full w-full object-cover" />
+              {comment.authorAvatarUrl && comment.authorAvatarUrl !== failedAvatarUrl ? (
+                <img
+                  src={comment.authorAvatarUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  onError={() => setFailedAvatarUrl(comment.authorAvatarUrl ?? null)}
+                />
               ) : (
                 authorInitials
               )}
