@@ -20,6 +20,10 @@ interface BackendRefreshResult {
 
 let refreshPromise: Promise<string | null> | null = null
 
+function shouldSetJsonContentType(body: BodyInit | null | undefined) {
+  return body != null && !(body instanceof FormData)
+}
+
 function getStoredAccessToken(): string | null {
   if (typeof window === "undefined") return null
   return window.localStorage.getItem(ACCESS_TOKEN_KEY)
@@ -86,7 +90,7 @@ export class ApiClient {
       headers.set("Authorization", `Bearer ${accessToken}`)
     }
 
-    if (init.body && !headers.has("Content-Type")) {
+    if (shouldSetJsonContentType(init.body) && !headers.has("Content-Type")) {
       headers.set("Content-Type", "application/json")
     }
 
