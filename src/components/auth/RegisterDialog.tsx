@@ -157,21 +157,21 @@ export function RegisterDialog({ open, onOpenChange, onSwitchToLogin }: Register
             <label htmlFor="register-code" className="text-sm font-medium">
               邮箱验证码
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 id="register-code"
                 type="text"
                 required
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
-                className="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 placeholder="输入邮箱验证码"
               />
               <button
                 type="button"
                 disabled={sendingCode || countdown > 0}
                 onClick={handleSendCode}
-                className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border px-3 text-sm hover:bg-muted disabled:opacity-50"
+                className="inline-flex h-9 w-full shrink-0 items-center justify-center rounded-md border px-3 text-sm hover:bg-muted disabled:opacity-50 sm:w-auto"
               >
                 {sendingCode ? <Loader2 className="h-4 w-4 animate-spin" /> : countdown > 0 ? `${countdown}s` : "发送验证码"}
               </button>

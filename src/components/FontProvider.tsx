@@ -22,9 +22,51 @@ const fallbackFonts: FontContextValue = {
   fontFamilyEn: "system-ui, sans-serif",
 }
 
+type FontFaceSource = {
+  family: string
+  fileStems: string[]
+}
+
+type FontFaceVariant = {
+  weight: number
+  style: "normal" | "italic"
+  suffixes: string[]
+}
+
 const FONT_STYLE_ID = "react-docs-ui-font-face-styles"
 const CONTENT_READY_EVENT = "react-docs-ui:content-ready"
-const FONT_FACE_CSS = `
+const BUILTIN_FONT_FAMILIES = new Set(["Fragment Mono", "MiSans"])
+const GENERIC_FONT_FAMILIES = new Set([
+  "-apple-system",
+  "arial",
+  "blinkmacsystemfont",
+  "cursive",
+  "emoji",
+  "fangsong",
+  "fantasy",
+  "math",
+  "microsoft yahei",
+  "monospace",
+  "noto color emoji",
+  "pingfang sc",
+  "sans-serif",
+  "segoe ui",
+  "serif",
+  "system-ui",
+  "ui-monospace",
+  "ui-rounded",
+  "ui-sans-serif",
+  "ui-serif",
+])
+const FONT_FACE_VARIANTS: FontFaceVariant[] = [
+  { weight: 400, style: "normal", suffixes: ["400", "Regular"] },
+  { weight: 400, style: "italic", suffixes: ["Italic", "400Italic", "RegularItalic"] },
+  { weight: 500, style: "normal", suffixes: ["500", "Medium"] },
+  { weight: 600, style: "normal", suffixes: ["600", "SemiBold", "Semibold"] },
+  { weight: 700, style: "normal", suffixes: ["700", "Bold"] },
+]
+const FONT_FILE_EXTENSIONS = ["woff2", "woff"]
+const BUILTIN_FONT_FACE_CSS = `
 @font-face {
   font-family: 'Fragment Mono';
   src: url('/fonts/FragmentMono-Regular.woff2') format('woff2');
@@ -66,23 +108,130 @@ const FONT_FACE_CSS = `
 }
 `
 
-function ensureFontFaceStyle() {
+function splitFontFamilyList(fontFamily: string) {
+  const families: string[] = []
+  let current = ""
+  let quote: "'" | "\"" | null = null
+
+  for (const char of fontFamily) {
+    if ((char === "'" || char === "\"") && !quote) {
+      quote = char
+      current += char
+      continue
+    }
+
+    if (quote === char) {
+      quote = null
+      current += char
+      continue
+    }
+
+    if (char === "," && !quote) {
+      families.push(current)
+      current = ""
+      continue
+    }
+
+    current += char
+  }
+
+  if (current) {
+    families.push(current)
+  }
+
+  return families
+    .map(font => font.trim().replace(/^['"]|['"]$/g, ""))
+    .filter(Boolean)
+}
+
+function getFontFileStems(fontFamily: string) {
+  const exactStem = fontFamily.trim()
+  const compactStem = exactStem.replace(/[\s_-]+/g, "")
+  return [...new Set([exactStem, compactStem])].filter(Boolean)
+}
+
+function escapeCssString(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, " ")
+}
+
+function getConfiguredFontFaceSources(configuredFonts: FontContextValue) {
+  const sources = new Map<string, FontFaceSource>()
+
+  for (const fontFamily of [
+    extractPrimaryFontFamily(configuredFonts.fontFamilyZhCn),
+    extractPrimaryFontFamily(configuredFonts.fontFamilyEn),
+  ]) {
+    if (!fontFamily || BUILTIN_FONT_FAMILIES.has(fontFamily)) {
+      continue
+    }
+
+    const normalizedName = fontFamily.toLowerCase()
+    if (GENERIC_FONT_FAMILIES.has(normalizedName)) {
+      continue
+    }
+
+    const fileStems = getFontFileStems(fontFamily)
+    if (fileStems.length === 0) {
+      continue
+    }
+
+    sources.set(fontFamily, { family: fontFamily, fileStems })
+  }
+
+  return [...sources.values()]
+}
+
+function buildFontFaceSrc(source: FontFaceSource, suffixes: string[]) {
+  const family = escapeCssString(source.family)
+  const urls = source.fileStems.flatMap(fileStem =>
+    suffixes.flatMap(suffix =>
+      FONT_FILE_EXTENSIONS.map(extension => {
+        const fileName = encodeURIComponent(`${fileStem}-${suffix}.${extension}`)
+        const format = extension === "woff2" ? "woff2" : "woff"
+        return `url("/fonts/${fileName}") format("${format}")`
+      })
+    )
+  )
+
+  return [`local("${family}")`, ...urls].join(",\n    ")
+}
+
+function buildConfiguredFontFaceCss(configuredFonts: FontContextValue) {
+  return getConfiguredFontFaceSources(configuredFonts)
+    .flatMap(source =>
+      FONT_FACE_VARIANTS.map(variant => `@font-face {
+  font-family: "${escapeCssString(source.family)}";
+  src: ${buildFontFaceSrc(source, variant.suffixes)};
+  font-weight: ${variant.weight};
+  font-style: ${variant.style};
+  font-display: swap;
+}`)
+    )
+    .join("\n\n")
+}
+
+function ensureFontFaceStyle(configuredFonts: FontContextValue) {
   let styleElement = document.getElementById(FONT_STYLE_ID) as HTMLStyleElement | null
+  const configuredFontFaceCss = buildConfiguredFontFaceCss(configuredFonts)
+  const fontFaceCss = configuredFontFaceCss
+    ? `${BUILTIN_FONT_FACE_CSS}\n${configuredFontFaceCss}`
+    : BUILTIN_FONT_FACE_CSS
+
   if (!styleElement) {
     styleElement = document.createElement("style")
     styleElement.id = FONT_STYLE_ID
-    styleElement.textContent = FONT_FACE_CSS
     document.head.appendChild(styleElement)
+  }
+
+  if (styleElement.textContent !== fontFaceCss) {
+    styleElement.textContent = fontFaceCss
   }
 }
 
 const FontContext = createContext<FontContextValue>(defaultFonts)
 
 function extractPrimaryFontFamily(fontFamily: string): string | null {
-  const primary = fontFamily
-    .split(",")[0]
-    ?.trim()
-    .replace(/^['"]|['"]$/g, "")
+  const primary = splitFontFamilyList(fontFamily)[0]
 
   return primary || null
 }
@@ -145,7 +294,7 @@ export function FontProvider({ children, config, lang = "zh-cn" }: FontProviderP
     const enPrimaryFont = extractPrimaryFontFamily(configuredFonts.fontFamilyEn)
 
     const loadConfiguredFonts = async () => {
-      ensureFontFaceStyle()
+      ensureFontFaceStyle(configuredFonts)
 
       const tasks: Promise<unknown>[] = []
 

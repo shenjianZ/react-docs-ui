@@ -16,14 +16,14 @@ Using the official scaffold is the most efficient way. Open your terminal and ru
 
 ```bash
 # This will create a project named "my-awesome-docs"
-npx create-react-docs-ui@latest my-awesome-docs
+pnpm create react-docs-ui my-awesome-docs
 ```
 
 Then, navigate to the project directory and install dependencies:
 
 ```bash
 cd my-awesome-docs
-npm install
+pnpm install
 ```
 
 ## 2. Organize Your Documentation
@@ -93,12 +93,32 @@ sidebar:
 
 Here, the about item in the sidebar also needs to create a file `about.md` under `public/docs/en/about`
 
-## 4. Launch the Website
+## 4. Connect Backend Features
+
+If you want auth, comments, bookmarks, analytics, or feedback, start the backend service too:
+
+```bash
+cd ../web-rust-template-project
+cargo run
+```
+
+In development, `/api` is proxied to `http://localhost:3000` by default.
+
+If you do not have a backend yet, you can temporarily disable backend UI:
+
+```yaml
+backend:
+  enabled: false
+```
+
+See [Backend Integration](/docs/backend/overview) for the full setup.
+
+## 5. Launch the Website
 
 Save all your changes, then run in the terminal:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Your website should now be running at `http://localhost:5173`. Visit it, and you will see the updated title, Logo, and the newly added "About" link in the navigation bar and sidebar. Congratulations, you have successfully mastered the basic workflow of React Docs UI!

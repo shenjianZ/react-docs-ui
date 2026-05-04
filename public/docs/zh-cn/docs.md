@@ -18,6 +18,13 @@ lastUpdated: 2026-03-27
 - [配置说明](/docs/guide/configuration) - 深入了解配置选项
 - [PDF Server 部署](/docs/guide/pdf-server) - 部署 PDF 生成服务
 
+## 后端集成
+
+- [接入概览](/docs/backend/overview) - 查看 `backend` 配置和运行时能力映射
+- [部署 Rust 后端](/docs/backend/deploy-rust-backend) - 使用官方参考后端提供认证、评论、书签和统计能力
+- [邮箱 SMTP 配置](/docs/backend/email-smtp) - 配置邮箱验证码发送
+- [Google / GitHub OAuth](/docs/backend/oauth-google-github) - 配置第三方登录材料和回调地址
+
 ## 文档测试
 
 - [MD 测试](/docs/test/test) - 测试 Markdown 渲染功能

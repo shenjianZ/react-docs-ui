@@ -58,9 +58,33 @@ export function Footer({ footer, lang }: FooterProps) {
       <div className="container max-w-screen-2xl px-4 md:px-8 py-8 rounded-md border">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2 text-sm text-muted-foreground">
-          {footer.copyright && (
-            <div className="text-foreground/80">{footer.copyright}</div>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {footer.copyright && (
+              <span className="inline-flex items-center rounded-md border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground/80">
+                {footer.copyright}
+              </span>
+            )}
+            {footer.beian?.text && (
+              <a
+                className="inline-flex items-center rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                href={footer.beian.url || "https://beian.miit.gov.cn/"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {footer.beian.text}
+              </a>
+            )}
+            {footer.policeBeian?.text && (
+              <a
+                className="inline-flex items-center rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                href={footer.policeBeian.url || "https://beian.mps.gov.cn/"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {footer.policeBeian.text}
+              </a>
+            )}
+          </div>
           <div className="flex flex-wrap gap-3 items-center">
             {footer.repository?.url && (
               <a
@@ -187,18 +211,22 @@ export function Footer({ footer, lang }: FooterProps) {
           </div>
         )}
         </div>
-        <Separator className="my-6" />
-        <div className="text-xs text-muted-foreground">
-          Built with{" "}
-          <a
-            className="inline-flex items-center rounded-md border border-transparent bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-200"
-            href="https://react-docs-ui.shenjianl.cn/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Docs UI
-          </a>
-        </div>
+        {footer.poweredBy !== false && (
+          <>
+            <Separator className="my-6" />
+            <div className="text-xs text-muted-foreground">
+              Built with{" "}
+              <a
+                className="inline-flex items-center rounded-md border border-transparent bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-200"
+                href="https://react-docs-ui.shenjianl.cn/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                React Docs UI
+              </a>
+            </div>
+          </>
+        )}
       </div>
     </footer>
   )

@@ -30,6 +30,7 @@ pnpm dev
 - Internationalization
 - Table of contents
 - PWA support
+- Backend integration: auth, comments, bookmarks, analytics, feedback
 - AI integration (requires API key)
 
 ### AI Agent Skills

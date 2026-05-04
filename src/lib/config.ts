@@ -88,6 +88,11 @@ export interface ChangelogConfig {
   pageSize?: number
 }
 
+export interface CollapseControlConfig {
+  enabled?: boolean
+  defaultCollapsed?: boolean
+}
+
 export interface SiteConfig {
   site: {
     logo: string | { light: string; dark: string }
@@ -123,6 +128,7 @@ export interface SiteConfig {
   sidebar: {
     // 全局开关，未设置时按数据存在与否自动判断
     enabled?: boolean
+    collapseControl?: CollapseControlConfig
     // 旧版：单一侧边栏结构（向后兼容）
     sections?: {
       title: string
@@ -154,6 +160,15 @@ export interface SiteConfig {
   footer?: {
     enabled?: boolean
     copyright?: string
+    beian?: {
+      text?: string
+      url?: string
+    }
+    policeBeian?: {
+      text?: string
+      url?: string
+    }
+    poweredBy?: boolean
     repository?: {
       url?: string
       branch?: string
@@ -225,6 +240,7 @@ export interface SiteConfig {
   // 目录导航配置
   toc?: {
     enabled?: boolean        // 是否启用目录导航，默认 true
+    collapseControl?: CollapseControlConfig
     maxLevel?: number        // 最大标题层级，默认 3（h1-h3）
     title?: string           // 目录标题，默认 "本页目录"
   }
@@ -237,6 +253,9 @@ export interface SiteConfig {
   reading?: {
     showTime?: boolean       // 是否显示阅读时间，默认 true
     showProgress?: boolean   // 是否显示阅读进度条，默认 false
+    fullscreen?: {
+      enabled?: boolean      // 是否显示文章全屏按钮，默认 false
+    }
   }
   // AI功能配置
   ai?: {
@@ -248,7 +267,6 @@ export interface SiteConfig {
   fonts?: {
     fontFamilyZhCn?: string  // 中文字体族，多个字体用逗号分隔
     fontFamilyEn?: string    // 英文字体族，多个字体用逗号分隔
-    downloadFonts?: string[] // 启动 dev/build 时自动检查并下载到 public/fonts
   }
   // 代码高亮配置
   codeHighlight?: SyntaxHighlightConfig

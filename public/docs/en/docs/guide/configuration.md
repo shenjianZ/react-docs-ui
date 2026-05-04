@@ -38,6 +38,7 @@ The project is configuration-driven. Most site behavior is controlled by `public
 | `pageMeta` | Page-level metadata display configuration |
 | `editLink` | Edit-this-page link configuration |
 | `feedback` | Page feedback configuration |
+| `backend` | Business API base path and feature flags |
 | `ai` | Global AI feature switch |
 | `pwa` | PWA-related settings |
 
@@ -358,12 +359,11 @@ Notes:
 | :-- | :-- | :-- | :-- |
 | `fontFamilyZhCn` | string | Chinese font stack | `"MiSans, PingFang SC, sans-serif"` |
 | `fontFamilyEn` | string | English or monospace font stack | `"Fragment Mono, system-ui, sans-serif"` |
-| `downloadFonts` | string[] | Font file names that should be prepared into `public/fonts` during dev/build | `["FragmentMono-Regular.woff2"]` |
 
 Notes:
 
 - The page renders with system fonts first, then switches to configured site fonts asynchronously.
-- `downloadFonts` is a build helper, not a runtime network allow-list.
+- At runtime, the preferred family from `fontFamilyZhCn` and `fontFamilyEn` is used to declare local `@font-face` rules. For example, `Noto Sans SC` matches common file names such as `/fonts/NotoSansSC-400.woff2` and `/fonts/NotoSansSC-Regular.woff2`.
 
 ## Code Highlight `codeHighlight`
 
@@ -427,6 +427,33 @@ Notes:
 Notes:
 
 - If `pdfServer.enabled` is `false`, PDF export falls back to browser print/export.
+- `export.pdfServer.url` is a dedicated PDF service URL and does not reuse `backend.baseUrl`.
+
+## Backend `backend`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `enabled` | boolean | Enable backend-driven features |
+| `baseUrl` | string | Business API base path, `"/api"` by default |
+| `features` | object | Per-feature flags |
+
+`backend.features`
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `auth` | boolean | Controls login entry, user menu, and profile editing |
+| `comments` | boolean | Controls the comments section |
+| `bookmarks` | boolean | Controls the bookmark button |
+| `analytics` | boolean | Controls page-view and duration reporting |
+| `feedback` | boolean | Controls the feedback block |
+| `notifications` | boolean | Reserved config, not directly consumed yet |
+| `admin` | boolean | Reserved config, no built-in admin UI yet |
+
+Notes:
+
+- `backend.enabled = false` turns off the whole backend-driven UI.
+- `DocsLayout` maps these flags to comments, bookmarks, analytics, and feedback visibility.
+- `web-rust-template-project` is the recommended reference backend.
 
 ## Page Meta `pageMeta`
 
@@ -458,6 +485,11 @@ Supported variables: `{lang}`, `{slug}`, `{docPath}`, `{ext}`, `{filePath}`.
 | `method` | string | Request method, currently `POST` |
 | `includePageMeta` | boolean | Include page metadata in the payload |
 | `labels` | object | UI labels for the feedback block |
+
+Notes:
+
+- The feedback section requires `feedback.enabled !== false`, `backend.enabled !== false`, and `backend.features.feedback !== false`.
+- If `/feedback/status` is unavailable, the frontend hides the feedback block.
 
 ## AI `ai`
 

@@ -3,7 +3,6 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin, type UserConfig, type ViteDevServer } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { fontDownloadPlugin } from "./plugins/font-download-plugin";
 
 function publicHmrPlugin(): Plugin {
     return {
@@ -49,7 +48,7 @@ const searchPlugin = await searchIndexPlugin()
 
 const config: UserConfig = {
     appType: "spa",
-    plugins: [react(), tailwindcss(), nodePolyfills(), fontDownloadPlugin(), publicHmrPlugin(), searchPlugin],
+    plugins: [react(), tailwindcss(), nodePolyfills(), publicHmrPlugin(), searchPlugin],
     publicDir: "public",
     server: {
         host: "0.0.0.0",

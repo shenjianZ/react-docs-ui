@@ -1,6 +1,14 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Calendar, User, Clock } from "lucide-react"
+import {
+  Calendar,
+  User,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
+} from "lucide-react"
 
 import { HeaderNav } from "@/components/HeaderNav"
 import { MobileSidebar } from "@/components/MobileSidebar"
@@ -12,7 +20,9 @@ import { SidebarNav } from "@/components/SidebarNav"
 import { TableOfContents } from "@/components/TableOfContents"
 import { PageNavigation } from "@/components/PageNavigation"
 import { Breadcrumb } from "@/components/Breadcrumb"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Footer } from "./Footer"
 import { ExportToolbar } from "@/components/ExportToolbar"
 import { useAnalytics } from "@/hooks/useAnalytics"
@@ -209,6 +219,10 @@ export function DocsLayout({
   const toc = config.toc?.enabled !== false
     ? (frontmatter?.toc || [])
     : []
+  const hasToc = toc.length > 0
+  const sidebarControlEnabled = config.sidebar?.collapseControl?.enabled === true
+  const tocControlEnabled = config.toc?.collapseControl?.enabled === true
+  const fullscreenControlEnabled = config.reading?.fullscreen?.enabled === true
   
   const { openSearch } = useSearchLauncher()
 
@@ -221,6 +235,36 @@ export function DocsLayout({
 
   // 移动端侧边栏状态
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    sidebarControlEnabled && config.sidebar?.collapseControl?.defaultCollapsed === true
+  )
+  const [tocCollapsed, setTocCollapsed] = useState(
+    tocControlEnabled && config.toc?.collapseControl?.defaultCollapsed === true
+  )
+  const [articleFullscreen, setArticleFullscreen] = useState(false)
+
+  useEffect(() => {
+    setSidebarCollapsed(
+      sidebarControlEnabled && config.sidebar?.collapseControl?.defaultCollapsed === true
+    )
+  }, [config.sidebar?.collapseControl?.defaultCollapsed, sidebarControlEnabled])
+
+  useEffect(() => {
+    setTocCollapsed(
+      tocControlEnabled && config.toc?.collapseControl?.defaultCollapsed === true
+    )
+  }, [config.toc?.collapseControl?.defaultCollapsed, tocControlEnabled])
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setArticleFullscreen(false)
+      }
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
+  }, [])
 
   // 滚动位置记忆
   useScrollPosition()
@@ -250,11 +294,32 @@ export function DocsLayout({
     top: headerOffset,
     height: `calc(100vh - ${headerOffset}px)`,
   }
+  const showSidebarPanel = sidebarEnabled && !sidebarCollapsed && !articleFullscreen
+  const showTocPanel = hasToc && !tocCollapsed && !articleFullscreen
+  const showSidebarControl = sidebarEnabled && sidebarControlEnabled && !articleFullscreen
+  const showTocControl = hasToc && tocControlEnabled && !articleFullscreen
+  const showFullscreenControl = fullscreenControlEnabled
+  const toggleArticleFullscreen = async () => {
+    if (articleFullscreen) {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen().catch(() => undefined)
+      }
+      setArticleFullscreen(false)
+      return
+    }
+
+    if (document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen().catch(() => undefined)
+    }
+    setArticleFullscreen(true)
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
-      {config.reading?.showProgress === true && <ReadingProgressBar />}
+      {!articleFullscreen && (
+        <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
+      )}
+      {!articleFullscreen && config.reading?.showProgress === true && <ReadingProgressBar />}
       {/* 移动端侧边栏 */}
       {sidebarEnabled && sidebar && (
         <MobileSidebar
@@ -266,28 +331,71 @@ export function DocsLayout({
         />
       )}
       {/* 统一悬浮球 */}
-      <FloatingActionBall
-        lang={lang}
-        navItems={navbar.items || []}
-        toc={toc}
-        showSidebar={sidebarEnabled}
-        showSearch={config.search?.enabled !== false}
-        onOpenSidebar={() => setMobileSidebarOpen(true)}
-        onOpenSearch={openSearch}
-      />
+      {!articleFullscreen && (
+        <FloatingActionBall
+          lang={lang}
+          navItems={navbar.items || []}
+          toc={toc}
+          showSidebar={sidebarEnabled}
+          showSearch={config.search?.enabled !== false}
+          onOpenSidebar={() => setMobileSidebarOpen(true)}
+          onOpenSearch={openSearch}
+        />
+      )}
       <div 
-  className={`flex-1 items-start px-4 md:px-8 ${sidebarEnabled ? 'md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10' : ''} ${toc && toc.length > 0 ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'}`}
+  className={`flex-1 items-start px-4 md:px-8 ${showSidebarPanel ? 'md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10' : ''} ${showTocPanel ? 'container lg:max-w-[calc(100vw-280px)]' : 'container'} ${articleFullscreen ? 'w-full max-w-none' : ''}`}
 >
-        {sidebarEnabled && sidebar && (
-          <aside className="fixed z-30 -ml-2 hidden w-full shrink-0 md:sticky md:block" style={sidePanelStyle}>
+        {showSidebarPanel && sidebar && (
+          <aside className="z-30 -ml-2 hidden w-full shrink-0 md:sticky md:block" style={sidePanelStyle}>
             <ScrollArea className="h-full py-6 pr-6 lg:py-8">
               <SidebarNav lang={lang} version={version} sidebar={sidebar} />
             </ScrollArea>
+            {showSidebarControl && (
+              <button
+                type="button"
+                aria-label="收起左侧导航"
+                className="absolute right-0 top-0 z-40 hidden h-full w-6 translate-x-full items-center justify-center bg-background/0 text-muted-foreground opacity-0 transition hover:bg-muted/80 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:flex"
+                onClick={() => setSidebarCollapsed(true)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            )}
           </aside>
         )}
+        {showSidebarControl && sidebarCollapsed && (
+          <button
+            type="button"
+            aria-label="展开左侧导航"
+            className="fixed left-0 z-40 hidden w-6 items-center justify-center bg-background/0 text-muted-foreground opacity-0 transition hover:bg-muted/80 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:flex"
+            style={sidePanelStyle}
+            onClick={() => setSidebarCollapsed(false)}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
         {/* 内容区域 */}
-        <div className={`relative flex min-w-0 overflow-hidden ${sidebarEnabled ? 'md:col-start-2' : ''}`}>
+        <div className={`relative flex min-w-0 overflow-hidden ${showSidebarPanel ? 'md:col-start-2' : ''}`}>
           <main className="relative py-6 lg:py-8 flex-auto w-full">
+            {showFullscreenControl && (
+              <TooltipProvider>
+                <div className="mb-4 flex justify-end gap-2" data-print-hidden>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label={articleFullscreen ? "退出文章全屏" : "文章全屏展示"}
+                        onClick={toggleArticleFullscreen}
+                      >
+                        {articleFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{articleFullscreen ? "退出文章全屏" : "文章全屏展示"}</TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipProvider>
+            )}
             {config.breadcrumb?.enabled !== false && (
               <Breadcrumb
                 lang={lang}
@@ -404,19 +512,40 @@ export function DocsLayout({
             )}
           </main>
         </div>
-        <div className={sidebarEnabled ? "md:col-start-2" : undefined}>
+        <div className={showSidebarPanel ? "md:col-start-2" : undefined}>
           {config.footer?.enabled !== false && (
             <Footer footer={config.footer} lang={lang} />
           )}
         </div>
       </div>
       {/* 目录导航 - 紧贴页面右侧边缘 */}
-      {toc && toc.length > 0 && (
+      {showTocPanel && (
         <aside className="fixed right-0 z-30 hidden lg:block w-[280px] shrink-0 border-l border-border bg-background/50 backdrop-blur-sm" style={sidePanelStyle}>
           <ScrollArea className="h-full py-6 pr-4 lg:py-8 pl-6">
             <TableOfContents toc={toc} />
           </ScrollArea>
+          {showTocControl && (
+            <button
+              type="button"
+              aria-label="收起本页目录"
+              className="absolute left-0 top-0 z-40 hidden h-full w-6 -translate-x-full items-center justify-center bg-background/0 text-muted-foreground opacity-0 transition hover:bg-muted/80 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:flex"
+              onClick={() => setTocCollapsed(true)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
         </aside>
+      )}
+      {showTocControl && tocCollapsed && (
+        <button
+          type="button"
+          aria-label="展开本页目录"
+          className="fixed right-0 z-40 hidden w-6 items-center justify-center bg-background/0 text-muted-foreground opacity-0 transition hover:bg-muted/80 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:flex"
+          style={sidePanelStyle}
+          onClick={() => setTocCollapsed(false)}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
       )}
     </div>
   )

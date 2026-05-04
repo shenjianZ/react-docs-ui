@@ -67,6 +67,9 @@ changelog:
 # 侧边栏导航配置
 sidebar:
     enabled: true
+    collapseControl:
+        enabled: true
+        defaultCollapsed: false
     collections:
         docs:
             sections:
@@ -85,6 +88,23 @@ sidebar:
                         path: "/docs/guide/changelog"
                       - title: "PDF Server 部署"
                         path: "/docs/guide/pdf-server"
+                - title: "后端集成"
+                  path: "/docs/backend"
+                  children:
+                      - title: "接入概览"
+                        path: "/docs/backend/overview"
+                      - title: "部署 Rust 后端"
+                        path: "/docs/backend/deploy-rust-backend"
+                      - title: "能力准备清单"
+                        path: "/docs/backend/capability-preparation"
+                      - title: "邮箱 SMTP 配置"
+                        path: "/docs/backend/email-smtp"
+                      - title: "Google / GitHub OAuth"
+                        path: "/docs/backend/oauth-google-github"
+                      - title: "接口约定"
+                        path: "/docs/backend/endpoint-contract"
+                      - title: "常见问题"
+                        path: "/docs/backend/troubleshooting"
                 - title: "文档测试"
                   path: "/docs/test"
                   children:
@@ -115,6 +135,9 @@ toc:
 
     # Enable table of contents
     enabled: true
+    collapseControl:
+        enabled: true
+        defaultCollapsed: false
 
     # TOC title
     title: "本页目录"
@@ -140,11 +163,18 @@ imageViewer:
 footer:
     enabled: true
     copyright: "© 2026 React Docs UI. All rights reserved."
+    beian:
+        text: "京ICP备00000000号-1"
+        url: "https://beian.miit.gov.cn/"
+    policeBeian:
+        text: "京公网安备00000000000000号"
+        url: "https://beian.mps.gov.cn/"
+    poweredBy: true
     repository:
         url: "https://github.com/shenjianZ/React-docs-ui"
         branch: "master"
     lastUpdated: "2026-03-05"
-    version: "v0.4.0"
+    version: "v0.9.0"
     groups:
         - title: "社区"
           items:
@@ -268,12 +298,6 @@ mdx:
 fonts:
     fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
-    downloadFonts:
-        - "FragmentMono-Italic.woff2"
-        - "FragmentMono-Regular.woff2"
-        - "MiSans-Bold.woff2"
-        - "MiSans-Medium.woff2"
-        - "MiSans-Regular.woff2"
 
 # 代码高亮配置
 codeHighlight:
@@ -331,6 +355,9 @@ reading:
     showTime: true
     # 是否显示阅读进度条（默认 false）
     showProgress: true
+    # 是否显示文章全屏按钮（默认 false）
+    fullscreen:
+        enabled: true
 
 # Sitemap 配置
 sitemap:

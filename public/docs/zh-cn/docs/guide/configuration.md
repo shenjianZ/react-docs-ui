@@ -38,6 +38,7 @@ lastUpdated: 2026-03-27
 | `pageMeta` | 页面元信息展示配置 |
 | `editLink` | “编辑此页”链接配置 |
 | `feedback` | 页面反馈配置 |
+| `backend` | 业务后端地址与功能开关 |
 | `ai` | AI 功能总开关 |
 | `pwa` | PWA 相关配置 |
 
@@ -358,12 +359,11 @@ HTML `img` 常用属性：
 | :-- | :-- | :-- | :-- |
 | `fontFamilyZhCn` | string | 中文字体栈 | `"MiSans, PingFang SC, sans-serif"` |
 | `fontFamilyEn` | string | 英文或等宽字体栈 | `"Fragment Mono, system-ui, sans-serif"` |
-| `downloadFonts` | string[] | 构建或开发时自动准备到 `public/fonts` 的字体文件名 | `["FragmentMono-Regular.woff2"]` |
 
 说明：
 
 - 页面会先用系统字体渲染，再异步切换到你配置的站点字体。
-- `downloadFonts` 属于构建辅助配置，不是运行时网络请求白名单。
+- 运行时会根据 `fontFamilyZhCn` 和 `fontFamilyEn` 的首选字体名声明本地 `@font-face`，例如 `Noto Sans SC` 会匹配 `/fonts/NotoSansSC-400.woff2`、`/fonts/NotoSansSC-Regular.woff2` 等常见文件名。
 
 ## 代码高亮 `codeHighlight`
 
@@ -427,6 +427,33 @@ HTML `img` 常用属性：
 说明：
 
 - 若 `pdfServer.enabled` 为 `false`，PDF 导出会退回到浏览器打印方案。
+- `export.pdfServer.url` 是 PDF 服务地址，不会自动复用 `backend.baseUrl`。
+
+## 后端 `backend`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `enabled` | boolean | 是否启用后端驱动能力 |
+| `baseUrl` | string | 业务 API 基础路径，默认 `"/api"` |
+| `features` | object | 分能力开关 |
+
+`backend.features`
+
+| 字段 | 类型 | 说明 |
+| :-- | :-- | :-- |
+| `auth` | boolean | 控制登录入口、用户菜单和资料编辑 |
+| `comments` | boolean | 控制评论区 |
+| `bookmarks` | boolean | 控制书签按钮 |
+| `analytics` | boolean | 控制访问量和阅读时长上报 |
+| `feedback` | boolean | 控制页面反馈组件 |
+| `notifications` | boolean | 预留配置，当前运行时未直接消费 |
+| `admin` | boolean | 预留配置，当前运行时未内置后台界面 |
+
+说明：
+
+- `backend.enabled = false` 会整体关闭这组能力。
+- `DocsLayout` 会根据 `comments`、`bookmarks`、`analytics`、`feedback` 这些开关决定是否展示对应 UI。
+- 推荐使用 `web-rust-template-project` 作为参考后端实现。
 
 ## 页面元信息 `pageMeta`
 
@@ -458,6 +485,11 @@ HTML `img` 常用属性：
 | `method` | string | 请求方法，当前固定为 `POST` |
 | `includePageMeta` | boolean | 是否在请求中附带页面信息 |
 | `labels` | object | 按钮与文案配置 |
+
+说明：
+
+- 反馈区需要同时满足 `feedback.enabled !== false`、`backend.enabled !== false`、`backend.features.feedback !== false`。
+- 如果 `/feedback/status` 不可用，前端会直接隐藏反馈区。
 
 ## AI 功能 `ai`
 

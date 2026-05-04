@@ -6,11 +6,59 @@
   "properties": {
     "breadcrumb": { "$ref": "#/$defs/breadcrumb" },
     "reading": { "$ref": "#/$defs/reading" },
+    "sidebar": { "$ref": "#/$defs/sidebar" },
+    "toc": { "$ref": "#/$defs/toc" },
+    "footer": { "$ref": "#/$defs/footer" },
     "sitemap": { "$ref": "#/$defs/sitemap" },
     "feed": { "$ref": "#/$defs/feed" },
     "backend": { "$ref": "#/$defs/backend" }
   },
   "$defs": {
+    "collapseControl": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "defaultCollapsed": { "type": "boolean" }
+      }
+    },
+    "sidebar": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "collapseControl": { "$ref": "#/$defs/collapseControl" }
+      }
+    },
+    "toc": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "collapseControl": { "$ref": "#/$defs/collapseControl" },
+        "maxLevel": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "title": { "type": "string" }
+      }
+    },
+    "footer": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "copyright": { "type": "string" },
+        "beian": { "$ref": "#/$defs/footerLink" },
+        "policeBeian": { "$ref": "#/$defs/footerLink" },
+        "poweredBy": { "type": "boolean" }
+      }
+    },
+    "footerLink": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "text": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
     "breadcrumb": {
       "type": "object",
       "additionalProperties": true,
@@ -24,7 +72,14 @@
       "additionalProperties": true,
       "properties": {
         "showTime": { "type": "boolean" },
-        "showProgress": { "type": "boolean" }
+        "showProgress": { "type": "boolean" },
+        "fullscreen": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
       }
     },
     "sitemap": {

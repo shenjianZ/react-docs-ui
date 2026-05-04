@@ -67,6 +67,9 @@ changelog:
 # Sidebar Navigation Configuration
 sidebar:
     enabled: true
+    collapseControl:
+        enabled: true
+        defaultCollapsed: false
     collections:
         docs:
             sections:
@@ -85,6 +88,23 @@ sidebar:
                         path: "/docs/guide/changelog"
                       - title: "PDF Server Deployment"
                         path: "/docs/guide/pdf-server"
+                - title: "Backend Integration"
+                  path: "/docs/backend"
+                  children:
+                      - title: "Overview"
+                        path: "/docs/backend/overview"
+                      - title: "Deploy Rust Backend"
+                        path: "/docs/backend/deploy-rust-backend"
+                      - title: "Capability Preparation"
+                        path: "/docs/backend/capability-preparation"
+                      - title: "Email SMTP"
+                        path: "/docs/backend/email-smtp"
+                      - title: "Google / GitHub OAuth"
+                        path: "/docs/backend/oauth-google-github"
+                      - title: "Endpoint Contract"
+                        path: "/docs/backend/endpoint-contract"
+                      - title: "Troubleshooting"
+                        path: "/docs/backend/troubleshooting"
                 - title: "Documentation Tests"
                   path: "/docs/test"
                   children:
@@ -115,6 +135,9 @@ toc:
 
     # Enable table of contents
     enabled: true
+    collapseControl:
+        enabled: true
+        defaultCollapsed: false
 
     # TOC title
     title: "On This Page"
@@ -140,11 +163,18 @@ imageViewer:
 footer:
     enabled: true
     copyright: "© 2025 React Docs UI. All rights reserved."
+    beian:
+        text: "ICP No. 00000000-1"
+        url: "https://beian.miit.gov.cn/"
+    policeBeian:
+        text: "Public Security Record No. 00000000000000"
+        url: "https://beian.mps.gov.cn/"
+    poweredBy: true
     repository:
         url: "https://github.com/shenjianZ/React-docs-ui"
         branch: "master"
     lastUpdated: "2026-03-05"
-    version: "v0.4.0"
+    version: "v0.9.0"
     groups:
         - title: "Community"
           items:
@@ -269,12 +299,6 @@ mdx:
 fonts:
     fontFamilyZhCn: "MiSans, PingFang SC, Noto Sans SC, Microsoft YaHei, sans-serif"
     fontFamilyEn: "Fragment Mono, system-ui, sans-serif"
-    downloadFonts:
-        - "FragmentMono-Italic.woff2"
-        - "FragmentMono-Regular.woff2"
-        - "MiSans-Bold.woff2"
-        - "MiSans-Medium.woff2"
-        - "MiSans-Regular.woff2"
 
 # Code highlight configuration
 codeHighlight:
@@ -332,6 +356,9 @@ reading:
     showTime: true
     # Show reading progress bar (default: false)
     showProgress: true
+    # Show article fullscreen button (default: false)
+    fullscreen:
+        enabled: true
 
 # Sitemap Configuration
 sitemap:
