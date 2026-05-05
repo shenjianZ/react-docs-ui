@@ -80,6 +80,7 @@ interface HeaderNavProps {
     enabled?: boolean
     placeholder?: string
   }
+  backendEnabled?: boolean
 }
 
 function GiteeIcon({ className }: { className?: string }) {
@@ -191,7 +192,7 @@ async function canResolveVersionedDoc(lang: string, version: string, pathname: s
   return false
 }
 
-export function HeaderNav({ lang, version, site, navbar, announcement, versions, themeConfig, searchConfig }: HeaderNavProps) {
+export function HeaderNav({ lang, version, site, navbar, announcement, versions, themeConfig, searchConfig, backendEnabled = true }: HeaderNavProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const pathname = location.pathname
@@ -430,7 +431,7 @@ export function HeaderNav({ lang, version, site, navbar, announcement, versions,
                 </Tooltip>
               </TooltipProvider>
             )}
-            <UserMenu />
+            {backendEnabled && <UserMenu />}
           </nav>
           {/* 移动端：显示下拉菜单 */}
           <div className="relative md:hidden">
@@ -553,10 +554,14 @@ export function HeaderNav({ lang, version, site, navbar, announcement, versions,
                     </DropdownMenuSub>
                   </>
                 )}
-                <DropdownMenuSeparator />
-                <div className="flex items-center justify-center py-1">
-                  <UserMenu />
-                </div>
+                {backendEnabled && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <div className="flex items-center justify-center py-1">
+                      <UserMenu />
+                    </div>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

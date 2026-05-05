@@ -317,7 +317,7 @@ export function DocsLayout({
   return (
     <div className="relative flex min-h-screen flex-col">
       {!articleFullscreen && (
-        <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} />
+        <HeaderNav lang={lang} version={version} site={site} navbar={navbar} announcement={config.announcement} themeConfig={theme} searchConfig={config.search} versions={config.versions} backendEnabled={config.backend?.enabled !== false} />
       )}
       {!articleFullscreen && config.reading?.showProgress === true && <ReadingProgressBar />}
       {/* 移动端侧边栏 */}

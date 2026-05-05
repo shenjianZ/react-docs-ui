@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { buildVersionedPath } from "@/lib/versioning"
 
@@ -25,42 +25,35 @@ const i18n = {
   },
 }
 
-function handleNavigationClick(e: React.MouseEvent<HTMLAnchorElement>, targetPath: string) {
-  e.preventDefault()
-
-  try {
-    const stored = sessionStorage.getItem("scroll-positions")
-    if (stored) {
-      const positions = JSON.parse(stored)
-
-      // 清除当前页面的滚动位置
-      const currentKey = window.location.pathname + window.location.search
-      delete positions[currentKey]
-
-      // 清除目标页面的滚动位置
-      const targetKey = targetPath + window.location.search
-      delete positions[targetKey]
-
-      sessionStorage.setItem("scroll-positions", JSON.stringify(positions))
-    }
-  } catch {
-    // ignore
-  }
-
-  // 导航到目标页面
-  const href = e.currentTarget.getAttribute('href')
-  if (href) {
-    window.location.href = href
-  }
-}
-
 export function PageNavigation({ prev, next, lang, version }: PageNavigationProps) {
+  const navigate = useNavigate()
+
   if (!prev && !next) {
     return null
   }
 
   const texts = i18n[lang as keyof typeof i18n] || i18n["zh-cn"]
   const resolveTo = (path: string) => path.startsWith(`/${lang}`) ? path : buildVersionedPath(lang, path, version)
+
+  function handleNavigationClick(e: React.MouseEvent<HTMLAnchorElement>, targetPath: string) {
+    e.preventDefault()
+
+    try {
+      const stored = sessionStorage.getItem("scroll-positions")
+      if (stored) {
+        const positions = JSON.parse(stored)
+        const currentKey = window.location.pathname + window.location.search
+        delete positions[currentKey]
+        const targetKey = targetPath + window.location.search
+        delete positions[targetKey]
+        sessionStorage.setItem("scroll-positions", JSON.stringify(positions))
+      }
+    } catch {
+      // ignore
+    }
+
+    navigate(targetPath)
+  }
 
   return (
     <div className="flex flex-row gap-4 mt-8 pt-8 border-t" data-print-hidden>
