@@ -1,6 +1,6 @@
 {
     "name": "react-docs-ui",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "type": "module",
     "description": "React documentation site UI components — navigation, sidebar, search, code highlight, MDX rendering and theming to help you build docs fast.",
     "homepage": "https://shenjianZ.github.io/react-docs-ui",
@@ -19,7 +19,7 @@
     "module": "dist/react-docs-ui.es.js",
     "types": "dist/types/index.d.ts",
     "bin": {
-        "react-docs-ui": "./scripts/cli.mjs"
+        "react-docs-ui": "scripts/cli.mjs"
     },
     "files": [
         "dist",

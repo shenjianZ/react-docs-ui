@@ -3,7 +3,7 @@ title: MDX 组件使用示例
 description: 演示模板项目中的内置组件、自定义组件、Tabs 与 Mermaid 的写法
 author: React Docs UI Team
 createdAt: 2026-03-25
-lastUpdated: 2026-03-27
+lastUpdated: 2026-06-14
 ---
 
 # MDX 组件使用示例
@@ -58,6 +58,55 @@ graph TD
   A[Markdown/MDX] --> B[react-docs-ui]
   B --> C[Tabs]
   B --> D[Mermaid]
+```
+
+当图表元素较多时，默认会以自然尺寸渲染并在有限高度内双向滚动，避免文字被压缩到看不清。点击图表右上角的「全屏」按钮，可以打开全屏查看器：支持滚轮缩放、按住拖拽平移、工具栏（放大 / 缩小 / 适配窗口 / 原始比例 / 重置 / 下载 SVG / 浏览器全屏），以及键盘快捷键 `+` `-` `0` `F`。
+
+下方是一个节点较多的大图，可用于验证上述交互：
+
+```mermaid
+flowchart TD
+  A[需求评审] --> B[技术方案设计]
+  B --> C{是否有现成组件}
+  C -->|是| D[复用组件]
+  C -->|否| E[新建组件]
+  D --> F[编写单元测试]
+  E --> F
+  F --> G[提交代码评审]
+  G --> H{评审通过?}
+  H -->|是| I[合并到主干]
+  H -->|否| J[根据评审意见修改]
+  J --> G
+  I --> K[灰度发布]
+  K --> L[全量发布]
+  L --> M[线上监控告警]
+  M --> N{指标是否正常?}
+  N -->|是| O[流程完成]
+  N -->|否| P[触发回滚]
+  P --> B
+```
+
+多参与者的时序图同样适用：
+
+```mermaid
+sequenceDiagram
+  participant U as 用户
+  participant F as 前端
+  participant B as 后端服务
+  participant C as 缓存
+  participant DB as 数据库
+  participant Q as 消息队列
+  U->>F: 点击登录
+  F->>B: POST /api/login
+  B->>C: 查询 token
+  C-->>B: 未命中
+  B->>DB: 查询用户信息
+  DB-->>B: 返回用户记录
+  B->>DB: 写入登录日志
+  B->>C: 写入 token
+  B->>Q: 推送登录事件
+  B-->>F: 200 + token
+  F-->>U: 跳转到首页
 ```
 
 ## 代码块示例

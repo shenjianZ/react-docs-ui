@@ -16,7 +16,7 @@ import { Copy, Check } from "lucide-react"
 import { getImageViewerLabels } from "../lib/image-viewer"
 import { ImageViewer } from "./ImageViewer"
 import { Mermaid } from "./mdx-components"
-import type { ImageViewerConfig, SyntaxHighlightConfig } from "../lib/config"
+import type { ImageViewerConfig, MermaidViewerConfig, SyntaxHighlightConfig } from "../lib/config"
 import { buildVersionedPath } from "../lib/versioning"
 import { copyToClipboard, sanitizeHtml } from "../lib/utils"
 import macros_physics from "katex-physics"
@@ -25,6 +25,7 @@ interface MdxContentProps {
   source: string
   skipFirstH1?: boolean
   imageViewer?: ImageViewerConfig
+  mermaidViewer?: MermaidViewerConfig
   codeHighlight?: SyntaxHighlightConfig
   shikiBundle?: ShikiBundle
 }
@@ -568,6 +569,7 @@ export function MdxContent({
   source,
   skipFirstH1 = false,
   imageViewer,
+  mermaidViewer,
   codeHighlight,
   shikiBundle,
 }: MdxContentProps) {
@@ -687,7 +689,7 @@ export function MdxContent({
 
               if (codeLang === 'mermaid') {
                 const chart = typeof codeChildren === 'string' ? codeChildren : String(codeChildren || '')
-                return <Mermaid chart={chart} />
+                return <Mermaid chart={chart} lang={lang} viewerConfig={mermaidViewer} />
               }
               
               return (

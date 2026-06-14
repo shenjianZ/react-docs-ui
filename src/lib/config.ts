@@ -26,6 +26,26 @@ export interface ImageViewerConfig {
   labels?: ImageViewerLabels
 }
 
+export interface MermaidViewerLabels {
+  zoomIn?: string
+  zoomOut?: string
+  fit?: string
+  actualSize?: string
+  reset?: string
+  fullscreen?: string
+  download?: string
+  close?: string
+  openViewer?: string
+  downloadSuccess?: string
+  downloadError?: string
+  fullscreenError?: string
+}
+
+export interface MermaidViewerConfig {
+  enabled?: boolean
+  labels?: MermaidViewerLabels
+}
+
 export interface SyntaxHighlightConfig {
   langs?: string[]
   lightTheme?: string
@@ -319,6 +339,7 @@ export interface SiteConfig {
     limit?: number
   }
   imageViewer?: ImageViewerConfig
+  mermaidViewer?: MermaidViewerConfig
 }
 
 export async function getConfig(

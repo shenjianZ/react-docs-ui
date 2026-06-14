@@ -3,7 +3,7 @@ title: MDX Component Usage Examples
 description: Demonstrates built-in components, custom components, Tabs, and Mermaid in the template project
 author: React Docs UI Team
 createdAt: 2026-03-25
-lastUpdated: 2026-03-27
+lastUpdated: 2026-06-14
 ---
 
 # MDX Component Usage Examples
@@ -58,6 +58,55 @@ graph TD
   A[Markdown/MDX] --> B[react-docs-ui]
   B --> C[Tabs]
   B --> D[Mermaid]
+```
+
+When a diagram has many elements, it renders at its natural size with bidirectional scrolling inside a bounded height, so the text is never shrunk to an unreadable size. Click the fullscreen button in the top-right corner of a diagram to open the viewer: mouse-wheel zoom, drag to pan, a toolbar (zoom in / zoom out / fit / actual size / reset / download SVG / browser fullscreen), and keyboard shortcuts `+` `-` `0` `F`.
+
+Below is a larger diagram you can use to try these interactions:
+
+```mermaid
+flowchart TD
+  A[Requirement Review] --> B[Technical Design]
+  B --> C{Reuse existing component?}
+  C -->|Yes| D[Reuse Component]
+  C -->|No| E[Create Component]
+  D --> F[Write Unit Tests]
+  E --> F
+  F --> G[Submit Code Review]
+  G --> H{Review Passed?}
+  H -->|Yes| I[Merge to Main]
+  H -->|No| J[Revise per Feedback]
+  J --> G
+  I --> K[Canary Release]
+  K --> L[Full Rollout]
+  L --> M[Monitoring and Alerts]
+  M --> N{Metrics Healthy?}
+  N -->|Yes| O[Process Complete]
+  N -->|No| P[Trigger Rollback]
+  P --> B
+```
+
+The same applies to sequence diagrams with many participants:
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant F as Frontend
+  participant B as Backend
+  participant C as Cache
+  participant DB as Database
+  participant Q as Queue
+  U->>F: Click sign in
+  F->>B: POST /api/login
+  B->>C: Lookup token
+  C-->>B: Miss
+  B->>DB: Query user
+  DB-->>B: User record
+  B->>DB: Write login log
+  B->>C: Store token
+  B->>Q: Emit login event
+  B-->>F: 200 + token
+  F-->>U: Redirect to home
 ```
 
 ## Code Block Examples
